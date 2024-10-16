@@ -4,6 +4,9 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState } from 'react';
 import { SafeAreaView, Button, StyleSheet, Text, Pressable, View } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import { saveImage, loadStoredImages, deleteImage, clearAllImages } from './Image_Storage';
+
+
 
 
 //messages
@@ -67,21 +70,31 @@ export default Camera_Test = () => {
     setFacing(facing==="front" ? "back" : "front");
   }
   
-  async function takePictureAndStore (){
-    if (camera){
-      const photoTools = usePhotoGallery();
+  // Updated function to save the image to the local file system, uses saveImage from Image_Storage.js
+  async function takePictureAndStore() {
+    if (camera) {
+      const photoTools = usePhotoGallery(); // Assuming usePhotoGallery is defined elsewhere
       const newPic = await camera.takePictureAsync({
-        base64:true,
-        skipProcessing:true,
+        base64: true, // Capture the image as base64
+        skipProcessing: true,
       });
-      photoTools.addPhoto(newPic.uri)
-      console.log("photo taken")
-      //console.log(photoTools.getRecentPhoto())
-    }
-    else{
-      console.log("attempted photo failed")
+  
+      try {
+        // Use the saveImage function from Image_storage.js to store the image
+        const savedPath = await saveImage(newPic.base64); // Pass the base64 image data to saveImage
+        
+        if (savedPath) {
+          photoTools.addPhoto(savedPath); // Add the file path to the gallery
+          console.log('Photo URI stored in AsyncStorage:', savedPath);
+        }
+      } catch (error) {
+        console.log('Error saving the photo:', error);
+      }
+    } else {
+      console.log('Camera not ready');
     }
   }
+  
 
   return (
     <SafeAreaView style={styles.container}>
