@@ -10,7 +10,11 @@ Database list:
     * `_id: ObjectID`
     * `name: String`
     * `image_link: String`
-    * `tags: ObjectID[]`
+    * `color_tags: ObjectID[]`
+    * `type_tags: ObjectID[]`
+    * `brand_tags: ObjectID[]`
+    * `other_tags: ObjectID[]`
+    * `donation_reminders: Boolean`
     * `user_id: Object_ID`
 * days
     * `_id: ObjectID`
@@ -21,11 +25,6 @@ Database list:
     * `_id: ObjectID`
     * `name: String`
     * `items: ObjectID[]`
-* tags
-    * `_id: ObjectID[]`
-    * `user_id: ObjectID`
-    * `name: String`
-    * `donation_reminders_on: Boolean`
 * users
     * `_id: ObjectID`
     * `username: String`
