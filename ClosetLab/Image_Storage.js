@@ -1,9 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import RNFetchBlob from 'rn-fetch-blob'; // Replaces react-native-fs
-import { v4 as uuidv4 } from 'uuid'; // For generating unique keys (Currently not needed, but could be)
+import * as FileSystem from 'expo-file-system'; // Replaces rn-fetch-blob
 
 // Fetch all stored keys and their corresponding image paths from AsyncStorage.
-// Returns an array of URIs that can be used to display the images.
 export async function loadStoredImages() {
   try {
     const keys = await AsyncStorage.getAllKeys(); // Get all stored image keys
@@ -19,39 +17,38 @@ export async function loadStoredImages() {
   }
 }
 
-// Takes a base64 image string, saves it as a file, and stores its file path in AsyncStorage.
-// Returns the saved file path.
+// Save image to file system and store path in AsyncStorage
 export async function saveImage(imageUri) {
   const fileName = `photo_${Date.now()}.jpg`; // Create a unique file name
-  const path = `${RNFetchBlob.fs.dirs.DocumentDir}/${fileName}`; // Define local path
+  const path = `${FileSystem.documentDirectory}${fileName}`; // Define local path
 
   try {
-    // Write the file to the file system using rn-fetch-blob
-    await RNFetchBlob.fs.writeFile(path, imageUri, 'base64');
+    // Save base64 image to file system
+    await FileSystem.writeAsStringAsync(path, imageUri, { encoding: FileSystem.EncodingType.Base64 });
     console.log('Image saved to file system:', path);
-    
-    // Save the image path in AsyncStorage
+
+    // Save file path in AsyncStorage
     await AsyncStorage.setItem(fileName, path);
     console.log('Image saved in AsyncStorage:', path);
-    
+
     return path; // Return the path for further use
   } catch (error) {
     console.error('Error saving image:', error);
   }
 }
 
-// Removes the image file from the file system and deletes the corresponding path from AsyncStorage.
+// Delete image from file system and AsyncStorage
 export async function deleteImage(key) {
   try {
-    // Retrieve the file path from AsyncStorage
+    // Retrieve file path from AsyncStorage
     const filePath = await AsyncStorage.getItem(key);
-    
+
     if (filePath) {
-      // Remove the image from the file system using rn-fetch-blob
-      await RNFetchBlob.fs.unlink(filePath);
+      // Remove image from file system
+      await FileSystem.deleteAsync(filePath);
       console.log('Image deleted from file system:', filePath);
-      
-      // Remove the path from AsyncStorage
+
+      // Remove file path from AsyncStorage
       await AsyncStorage.removeItem(key);
       console.log('Image deleted from AsyncStorage:', key);
     } else {
@@ -62,7 +59,7 @@ export async function deleteImage(key) {
   }
 }
 
-// Clears all keys and values stored in AsyncStorage
+// Clear all keys and values from AsyncStorage
 export async function clearAllImages() {
   try {
     await AsyncStorage.clear();
@@ -71,3 +68,4 @@ export async function clearAllImages() {
     console.error('Error clearing image storage:', error);
   }
 }
+
