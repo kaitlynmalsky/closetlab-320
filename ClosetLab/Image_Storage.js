@@ -2,16 +2,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system'; // Replaces rn-fetch-blob
 
 // Fetch all stored keys and their corresponding image paths from AsyncStorage.
-export async function loadStoredImages() {
+export async function getStoredImages() {
   try {
     const keys = await AsyncStorage.getAllKeys(); // Get all stored image keys
-    const imageURIs = await AsyncStorage.multiGet(keys); // Retrieve all image paths
+    const imageURIs = await AsyncStorage.multiGet(keys); // Retrieve all image paths as key-value pairs
 
     imageURIs.forEach((image) => {
-      console.log('Image URI:', image[1]); // Log the image path for debugging
+      console.log('Image Key:', image[0]); // Log the key (filename)
+      console.log('Image URI:', image[1]); // Log the image path (URI)
     });
 
-    return imageURIs.map((image) => image[1]); // Return just the image URIs
+    return imageURIs; // Return key-value pairs [key, uri]
   } catch (error) {
     console.log('Error loading images:', error);
   }
