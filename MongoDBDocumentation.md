@@ -23,6 +23,7 @@ Database list:
     * `date: Date`
 * outfits
     * `_id: ObjectID`
+    * `user_id: ObjectID`
     * `name: String`
     * `items: ObjectID[]`
 * users
