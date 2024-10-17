@@ -4,7 +4,8 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState } from 'react';
 import { SafeAreaView, Button, StyleSheet, Text, Pressable, View } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import { saveImage, loadStoredImages, deleteImage, clearAllImages } from './Image_Storage';
+import Image from './Image_Storage'; // Import the Image class
+
 
 
 
@@ -69,8 +70,8 @@ export default Camera_Test = () => {
   function toggleCameraFacing() {
     setFacing(facing==="front" ? "back" : "front");
   }
-  
-  // Updated function to save the image to the local file system, uses saveImage from Image_Storage.js
+
+  // Updated function to save the image to the local file system
   async function takePictureAndStore() {
     if (camera) {
       const photoTools = usePhotoGallery(); // Assuming usePhotoGallery is defined elsewhere
@@ -80,8 +81,11 @@ export default Camera_Test = () => {
       });
   
       try {
-        // Use the saveImage function from Image_storage.js to store the image
-        const savedPath = await saveImage(newPic.base64); // Pass the base64 image data to saveImage
+        const key = `photo_${Date.now()}`; // Generate a unique key for the image
+        const image = new Image(newPic.base64, key); // Create a new Image instance
+  
+        // Use the saveImage method of the Image class to store the image
+        const savedPath = await image.saveImage(); // Save the image and get the saved path
         
         if (savedPath) {
           photoTools.addPhoto(savedPath); // Add the file path to the gallery
@@ -94,6 +98,7 @@ export default Camera_Test = () => {
       console.log('Camera not ready');
     }
   }
+  
   
 
   return (
