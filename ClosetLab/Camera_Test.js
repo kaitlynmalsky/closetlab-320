@@ -8,7 +8,42 @@ import { saveImage, loadStoredImages, deleteImage, clearAllImages } from './Imag
 import styles from './Stylesheet';
 
 
-
+//https://medium.com/@programer7823/how-to-remove-image-background-in-nodejs-without-any-api-02abad4a7b3a
+//https://github.com/atlj/react-native-background-remover
+//import { removeBackground } from "@imgly/background-removal";
+//global.Buffer = require('buffer').Buffer;
+////const toBuffer = (uri) => Buffer.from(uri.replace(/^.\*,/g, ''), 'base64');
+//
+//const toDataURI = (blob) =>
+//  new Promise((resolve) => {
+//    const reader = new FileReader();
+//    reader.readAsDataURL(blob);
+//    reader.onloadend = () => {
+//      const uri = reader.result?.toString();
+//      resolve(uri);
+//    };
+//  });
+//const toBuffer = (blob) =>
+//  new Promise((resolve) => {
+//    const reader = new FileReader();
+//    reader.readAsDataURL(blob);
+//    reader.onloadend = () => {
+//      const uri = reader.result?.toString() ?? '';
+//      const base64 = uri.replace(/^.\*,/g, '');
+//
+//      resolve(Buffer.from(base64, 'base64'));
+//    };
+//  });
+//async function removeImageBackground(imgSource) {
+//  const blob = await removeBackground(imgSource);
+//  //const buffer = Buffer.from(await blob.arrayBuffer());
+//  //const dataURL = `data:image/png;base64,${buffer.toString("base64")}`;
+//  //return dataURL;
+//
+//  const dataURI = await toDataURI(blob);
+//  return dataURI;
+//}
+//
 //messages
 
 const giveCamPermissionMessage = "We need your permission to use your camera."
@@ -79,6 +114,11 @@ export default Camera_Test = () => {
         skipProcessing: true,
       });
 
+      //remove bg
+      //const newPic_noBG = await removeImageBackground(newPic);
+
+      //console.log(newPic_noBG);
+
       try {
         // Use the saveImage function from Image_storage.js to store the image
         const savedPath = await saveImage(newPic.base64); // Pass the base64 image data to saveImage
@@ -96,7 +136,7 @@ export default Camera_Test = () => {
   }
 
 
-  return (
+  activeCameraView = (
     <SafeAreaView style={styles.container}>
       <View style={styles.container}>
         <CameraView style={styles.camera} facing={facing} ref={(ref) => setCamera(ref)}>
@@ -122,4 +162,6 @@ export default Camera_Test = () => {
       </View>
     </SafeAreaView>
   );
+
+  return activeCameraView;
 }
