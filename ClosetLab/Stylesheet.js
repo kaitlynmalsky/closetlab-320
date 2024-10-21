@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     camera: {
-        width: '200%',
+        width: '100%',
         height: '100%'
     },
     message: {
