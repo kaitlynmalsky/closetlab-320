@@ -96,26 +96,24 @@ export default Camera_Test = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View>
-        <CameraView style={styles.camera} facing={facing} ref={(ref) => setCamera(ref)}>
-          <View style={[styles.container_camera]}>
+      <CameraView style={styles.camera} facing={facing} ref={(ref) => setCamera(ref)}>
+        <View style={[styles.container_test]}>
 
-            <Pressable style={styles.button_camera} onPress={toggleCameraFacing}>
-              <Text style={styles.button_text}>Flip Camera</Text>
-            </Pressable>
+          <Pressable style={styles.button_camera} onPress={toggleCameraFacing}>
+            <Text style={styles.button_text}>Flip Camera</Text>
+          </Pressable>
 
-            <Pressable style={styles.button_camera} onPress={takePictureAndStore}>
-              <Text style={styles.button_text}>Take Picture</Text>
-            </Pressable>
+          <Pressable style={styles.button_camera} onPress={takePictureAndStore}>
+            <Text style={styles.button_text}>Take Picture</Text>
+          </Pressable>
 
-            <Pressable style={styles.button_camera} onPress={onGoToHome}>
-              <Text style={styles.button_text}>Back to Home</Text>
-            </Pressable>
+          <Pressable style={styles.button_camera} onPress={onGoToHome}>
+            <Text style={styles.button_text}>Back to Home</Text>
+          </Pressable>
 
-          </View>
+        </View>
 
-        </CameraView>
-      </View>
+      </CameraView>
     </SafeAreaView>
   );
 }
