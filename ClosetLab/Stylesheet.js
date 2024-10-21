@@ -7,11 +7,20 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
+        position: 'relative',
+    },
+    container_test: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative'
     },
     container_camera: {
-        flexDirection: 'row',
-        flexWrap: 'nowrap',
-        justifyContent: 'flex-end',
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'absolute',
         bottom: 0,
     },
     button: {
@@ -23,9 +32,9 @@ const styles = StyleSheet.create({
     },
     button_camera: {
         backgroundColor: 'rgba(44, 44, 44, 0.2)',
-        margin: 2,
-        width: 'calc(100vw/3)',
-        height: 'calc(100vw/3)',
+        margin: 20,
+        width: 'calc(100vw/6)',
+        height: 'calc(100vw/6)',
     },
     button_text: {
         color: 'white',
