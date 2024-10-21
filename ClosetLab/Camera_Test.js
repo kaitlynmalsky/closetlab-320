@@ -3,9 +3,9 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState } from 'react';
 import { SafeAreaView, Button, StyleSheet, Text, Pressable, View } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { saveImage, loadStoredImages, deleteImage, clearAllImages } from './Image_Storage';
-
+import * as styles from './Stylesheet';
 
 
 
@@ -18,13 +18,13 @@ const recentPhotoURI = [];
 
 export const usePhotoGallery = () => {
   //const [recentPhotoURI, setRecentPhotoURI] = useState(["test"]); 
-  
+
   //returns last taken photo URI.
-  function getRecentPhoto(){
-    return recentPhotoURI.length>0?recentPhotoURI[recentPhotoURI.length-1]:"";
+  function getRecentPhoto() {
+    return recentPhotoURI.length > 0 ? recentPhotoURI[recentPhotoURI.length - 1] : "";
   }
   //appends something to the end of the internal photo URI storage.
-  function addPhoto(thisURI){
+  function addPhoto(thisURI) {
     return recentPhotoURI.push(thisURI);
     //return setRecentPhotoURI(recentPhotoURI.push(thisURI))
   }
@@ -39,7 +39,7 @@ export const usePhotoGallery = () => {
 //This took unnecessarily long lol
 export default Camera_Test = () => {
   const navigation = useNavigation();
-  const onGoToHome = () => { 
+  const onGoToHome = () => {
     navigation.navigate('Home');
   };
 
@@ -67,9 +67,9 @@ export default Camera_Test = () => {
   }
 
   function toggleCameraFacing() {
-    setFacing(facing==="front" ? "back" : "front");
+    setFacing(facing === "front" ? "back" : "front");
   }
-  
+
   // Updated function to save the image to the local file system, uses saveImage from Image_Storage.js
   async function takePictureAndStore() {
     if (camera) {
@@ -78,11 +78,11 @@ export default Camera_Test = () => {
         base64: true, // Capture the image as base64
         skipProcessing: true,
       });
-  
+
       try {
         // Use the saveImage function from Image_storage.js to store the image
         const savedPath = await saveImage(newPic.base64); // Pass the base64 image data to saveImage
-        
+
         if (savedPath) {
           photoTools.addPhoto(savedPath); // Add the file path to the gallery
           console.log('Photo URI stored in AsyncStorage:', savedPath);
@@ -94,7 +94,7 @@ export default Camera_Test = () => {
       console.log('Camera not ready');
     }
   }
-  
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -105,11 +105,11 @@ export default Camera_Test = () => {
             <Pressable style={styles.button} onPress={toggleCameraFacing}>
               <Text style={styles.text}>Flip Camera</Text>
             </Pressable>
-            
+
             <Pressable style={styles.button} onPress={takePictureAndStore}>
               <Text style={styles.text}>Take Picture</Text>
             </Pressable>
-            
+
           </View>
 
           <View style={styles.buttonContainer}>
@@ -125,34 +125,34 @@ export default Camera_Test = () => {
 }
 
 //TODO: 1 file devoted to common styles across entire app
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  message: {
-    textAlign: 'center',
-    paddingBottom: 10,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: 'transparent',
-    margin: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-});
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     justifyContent: 'center',
+//   },
+//   message: {
+//     textAlign: 'center',
+//     paddingBottom: 10,
+//   },
+//   camera: {
+//     flex: 1,
+//   },
+//   buttonContainer: {
+//     flex: 1,
+//     flexDirection: 'row',
+//     backgroundColor: 'transparent',
+//     margin: 64,
+//   },
+//   button: {
+//     flex: 1,
+//     alignSelf: 'flex-end',
+//     alignItems: 'center',
+//   },
+//   text: {
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     color: 'white',
+//   },
+// });
 
 
