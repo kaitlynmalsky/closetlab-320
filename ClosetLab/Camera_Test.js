@@ -7,8 +7,6 @@ import { useNavigation } from '@react-navigation/native';
 import { saveImage, loadStoredImages, deleteImage, clearAllImages } from './Image_Storage';
 import styles from './Stylesheet';
 
-
-
 //messages
 
 const giveCamPermissionMessage = "We need your permission to use your camera."
@@ -98,24 +96,22 @@ export default Camera_Test = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
+      <View>
         <CameraView style={styles.camera} facing={facing} ref={(ref) => setCamera(ref)}>
-          <View style={styles.buttonContainer}>
+          <View style={[styles.container_camera]}>
 
-            <Pressable style={styles.button} onPress={toggleCameraFacing}>
-              <Text style={styles.text}>Flip Camera</Text>
+            <Pressable style={styles.button_camera} onPress={toggleCameraFacing}>
+              <Text style={styles.button_text}>Flip Camera</Text>
             </Pressable>
 
-            <Pressable style={styles.button} onPress={takePictureAndStore}>
-              <Text style={styles.text}>Take Picture</Text>
+            <Pressable style={styles.button_camera} onPress={takePictureAndStore}>
+              <Text style={styles.button_text}>Take Picture</Text>
             </Pressable>
 
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <Pressable style={styles.button} onPress={onGoToHome}>
-              <Text style={styles.text}>Back to Home</Text>
+            <Pressable style={styles.button_camera} onPress={onGoToHome}>
+              <Text style={styles.button_text}>Back to Home</Text>
             </Pressable>
+
           </View>
 
         </CameraView>

@@ -8,6 +8,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    container_camera: {
+        flexDirection: 'row',
+        flexWrap: 'nowrap',
+        justifyContent: 'flex-end',
+        bottom: 0,
+    },
     button: {
         padding: 20,
         margin: 10,
@@ -15,11 +21,19 @@ const styles = StyleSheet.create({
         borderColor: '#f0f0f0',
         backgroundColor: '#2c2c2c',
     },
+    button_camera: {
+        backgroundColor: 'rgba(44, 44, 44, 0.2)',
+        margin: 2,
+        width: 'calc(100vw/3)',
+        height: 'calc(100vw/3)',
+    },
     button_text: {
-        color: 'white'
+        color: 'white',
+        textAlign: 'center',
     },
     camera: {
-        flex: 1,
+        width: '200%',
+        height: '100%'
     },
     message: {
         textAlign: 'center',
