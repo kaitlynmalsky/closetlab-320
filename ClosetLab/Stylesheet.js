@@ -1,7 +1,7 @@
 // import React, { useState } from 'react';
 import { StyleSheet } from "react-native";
 
-export default styles = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
@@ -36,4 +36,6 @@ export default styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
     },
-})
+});
+
+export default styles;
