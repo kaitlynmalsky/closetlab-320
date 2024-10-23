@@ -55,7 +55,7 @@ def post_clothes():
 def get_clothes():
     try:
         # Access the "clothing_items" collection
-        db = client['closetlab']  # Replace 'closetlab' with your actual database name
+        db = client['closetlab']
         clothing_items_collection = db['clothing_items']
         
         # Retrieve all items from the collection
