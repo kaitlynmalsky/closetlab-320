@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
+        flexDirection: 'row',
         bottom: 0,
     },
     button: {
