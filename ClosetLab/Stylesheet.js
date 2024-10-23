@@ -1,5 +1,42 @@
 // import React, { useState } from 'react';
-import { StyleSheet } from "react-native";
+import { StyleSheet, Image, Platform } from "react-native";
+
+const iconResources = {
+    flip:require("./assets/buttonIcons/icon_flip.png"),
+}
+
+
+export function generateIcon(name){
+    console.log(name)
+    console.log(iconResources["flip"])
+    if (!iconResources[name]){
+        console.log("using favicon")
+        return (<Image 
+            style={{
+                width: 300,
+                height: 300,
+                borderWidth: 0,
+                resizeMode: "contain",
+                alignItems: 'center',
+                borderColor: 'black'
+            }}
+            resizeMode={'cover'} // cover or contain its upto you view look
+            source={{ uri: require("./assets/favicon.png") }} />)
+    }
+    console.log("using normal")
+    return (<Image 
+        style={{
+            width: 300,
+            height: 300,
+            borderWidth: 0,
+            resizeMode: "contain",
+            alignItems: 'center',
+            borderColor: 'black'
+        }}
+        resizeMode={'cover'} // cover or contain its upto you view look
+        source={{ uri: require('./assets/adaptive-icon.png') }} />)
+}
+
 
 const styles = StyleSheet.create({
     container: {
@@ -21,7 +58,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
-        bottom: 0,
+        flexDirection: 'row',
+        bottom: 2,
     },
     button: {
         padding: 20,
@@ -32,9 +70,13 @@ const styles = StyleSheet.create({
     },
     button_camera: {
         backgroundColor: 'rgba(44, 44, 44, 0.2)',
+        padding: 10,
         margin: 20,
         width: 'calc(100vw/6)',
         height: 'calc(100vw/6)',
+        alignItems: 'center',
+        justifyContent:'center',
+        borderWidth: StyleSheet.hairlineWidth,
     },
     button_text: {
         color: 'white',

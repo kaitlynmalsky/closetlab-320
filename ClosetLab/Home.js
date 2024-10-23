@@ -16,7 +16,7 @@ export default Home = () => {
     function getRecentTakenPhoto() {
         const maybeURI = photoTools.getRecentPhoto();
         if (maybeURI) {
-            //console.log("uri available")
+            
             setImageElement(<Image style={
                 {
                     width: 300,
@@ -30,7 +30,21 @@ export default Home = () => {
         }
         else {
             //console.log("uri unavailable")
-            setImageElement(<Text >No Recent Image!</Text>)
+            setImageElement(<View>
+                <Text >No Recent Image!</Text>
+                <Image 
+            style={{
+              width: 300,
+              height: 300,
+              borderWidth: 0,
+              resizeMode: "contain",
+              alignItems: 'center',
+              borderColor: 'black'
+          }}
+            resizeMode={'cover'} // cover or contain its upto you view look
+            source={{ uri: require("./assets/favicon.png") }} />
+            </View>)
+            
         }
     }
 

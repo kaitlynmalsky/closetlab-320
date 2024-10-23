@@ -2,10 +2,10 @@
 //https://docs.expo.dev/versions/latest/sdk/camera/#example-appjson-with-config-plugin
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState } from 'react';
-import { SafeAreaView, Button, StyleSheet, Text, Pressable, View } from 'react-native';
+import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { saveImage, loadStoredImages, deleteImage, clearAllImages } from './Image_Storage';
-import styles from './Stylesheet';
+import styles, {generateIcon, icons} from './Stylesheet';
 
 
 //https://medium.com/@programer7823/how-to-remove-image-background-in-nodejs-without-any-api-02abad4a7b3a
@@ -117,8 +117,6 @@ export default Camera_Test = () => {
       //remove bg
       //const newPic_noBG = await removeImageBackground(newPic);
 
-      //console.log(newPic_noBG);
-
       try {
         // Use the saveImage function from Image_storage.js to store the image
         const savedPath = await saveImage(newPic.base64); // Pass the base64 image data to saveImage
@@ -139,10 +137,21 @@ export default Camera_Test = () => {
   activeCameraView = (
     <SafeAreaView style={styles.container}>
       <CameraView style={styles.camera} facing={facing} ref={(ref) => setCamera(ref)}>
-        <View style={[styles.container_test]}>
+        <View style={[styles.container_camera]}>
 
           <Pressable style={styles.button_camera} onPress={toggleCameraFacing}>
-            <Text style={styles.button_text}>Flip Camera</Text>
+            {generateIcon("flip")}
+            <Image 
+            style={{
+              width: 300,
+              height: 300,
+              borderWidth: 0,
+              resizeMode: "contain",
+              alignItems: 'center',
+              borderColor: 'black'
+          }}
+            resizeMode={'cover'} // cover or contain its upto you view look
+            source={{ uri: require("./assets/favicon.png") }} />
           </Pressable>
 
           <Pressable style={styles.button_camera} onPress={takePictureAndStore}>
