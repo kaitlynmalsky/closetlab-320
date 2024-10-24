@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, Pressable, Image } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, Pressable, Image, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { usePhotoGallery } from './Camera_Test.js';
 import styles from './Stylesheet';
@@ -34,15 +34,15 @@ export default Home = () => {
                 <Text >No Recent Image!</Text>
                 <Image 
             style={{
-              width: 300,
-              height: 300,
-              borderWidth: 0,
-              resizeMode: "contain",
-              alignItems: 'center',
-              borderColor: 'black'
-          }}
+                width: 100,
+                height: 100,
+                borderWidth: 0,
+                resizeMode: "contain",
+                alignItems: 'center',
+                borderColor: 'black'
+            }}
             resizeMode={'cover'} // cover or contain its upto you view look
-            source={{ uri: require("./assets/favicon.png") }} />
+            source={require('./assets/favicon.png')} />
             </View>)
             
         }

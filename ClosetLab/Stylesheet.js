@@ -3,38 +3,40 @@ import { StyleSheet, Image, Platform } from "react-native";
 
 const iconResources = {
     flip:require("./assets/buttonIcons/icon_flip.png"),
+    home:require("./assets/buttonIcons/icon_home.png"),
+    cam:require("./assets/buttonIcons/icon_cam.png"),
 }
-
 
 export function generateIcon(name){
     console.log(name)
-    console.log(iconResources["flip"])
+    
     if (!iconResources[name]){
         console.log("using favicon")
         return (<Image 
             style={{
-                width: 300,
-                height: 300,
+                width: 100,
+                height: 100,
                 borderWidth: 0,
                 resizeMode: "contain",
                 alignItems: 'center',
                 borderColor: 'black'
             }}
             resizeMode={'cover'} // cover or contain its upto you view look
-            source={{ uri: require("./assets/favicon.png") }} />)
+            source={require("./assets/favicon.png")} />)
     }
     console.log("using normal")
     return (<Image 
         style={{
-            width: 300,
-            height: 300,
+            width: 50,
+            height: 50,
             borderWidth: 0,
             resizeMode: "contain",
             alignItems: 'center',
             borderColor: 'black'
         }}
         resizeMode={'cover'} // cover or contain its upto you view look
-        source={{ uri: require('./assets/adaptive-icon.png') }} />)
+        source={iconResources[name] } />)
+        //source={{ uri: iconResources[name] }} />)
 }
 
 
@@ -71,7 +73,7 @@ const styles = StyleSheet.create({
     button_camera: {
         backgroundColor: 'rgba(44, 44, 44, 0.2)',
         padding: 10,
-        margin: 20,
+        margin: 7,
         width: 'calc(100vw/6)',
         height: 'calc(100vw/6)',
         alignItems: 'center',

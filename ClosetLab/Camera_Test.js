@@ -141,25 +141,14 @@ export default Camera_Test = () => {
 
           <Pressable style={styles.button_camera} onPress={toggleCameraFacing}>
             {generateIcon("flip")}
-            <Image 
-            style={{
-              width: 300,
-              height: 300,
-              borderWidth: 0,
-              resizeMode: "contain",
-              alignItems: 'center',
-              borderColor: 'black'
-          }}
-            resizeMode={'cover'} // cover or contain its upto you view look
-            source={{ uri: require("./assets/favicon.png") }} />
           </Pressable>
 
           <Pressable style={styles.button_camera} onPress={takePictureAndStore}>
-            <Text style={styles.button_text}>Take Picture</Text>
+          {generateIcon("cam")}
           </Pressable>
 
           <Pressable style={styles.button_camera} onPress={onGoToHome}>
-            <Text style={styles.button_text}>Back to Home</Text>
+          {generateIcon("home")}
           </Pressable>
 
         </View>
