@@ -2,17 +2,17 @@
 import { StyleSheet, Image, Platform } from "react-native";
 
 const iconResources = {
-    flip:require("./assets/buttonIcons/icon_flip.png"),
+    flip: require("./assets/buttonIcons/icon_flip.png"),
     home:require("./assets/buttonIcons/icon_home.png"),
     cam:require("./assets/buttonIcons/icon_cam.png"),
 }
 
-export function generateIcon(name){
+export function generateIcon(name) {
     console.log(name)
     
     if (!iconResources[name]){
         console.log("using favicon")
-        return (<Image 
+        return (<Image
             style={{
                 width: 100,
                 height: 100,
@@ -25,7 +25,7 @@ export function generateIcon(name){
             source={require("./assets/favicon.png")} />)
     }
     console.log("using normal")
-    return (<Image 
+    return (<Image
         style={{
             width: 50,
             height: 50,
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         position: 'absolute',
         flexDirection: 'row',
-        bottom: 2,
+        bottom: 0,
     },
     button: {
         padding: 20,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         width: 'calc(100vw/6)',
         height: 'calc(100vw/6)',
         alignItems: 'center',
-        justifyContent:'center',
+        justifyContent: 'center',
         borderWidth: StyleSheet.hairlineWidth,
     },
     button_text: {
