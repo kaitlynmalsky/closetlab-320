@@ -7,6 +7,31 @@ closet_lab_database = client["closet_lab_db"]
 
 dummy_user_id = "67057228f80354e361ae2bf5"
 
+def db_add_clothing_item(name: str = "", image_link: str = "", image: str = "", user_id: str = dummy_user_id,
+                         brand_tags: list = None, color_tags: list = None,
+                         other_tags: list = None, type_tags: list = None,
+                         donation_reminders: bool = False):
+    try:
+        print("Adding clothing item to database")
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        clothing_item = {
+            "name": name,
+            "image_link": image_link,
+            "image": image,  
+            "user_id": ObjectId(user_id),
+            "brand_tags": brand_tags or [],
+            "color_tags": color_tags or [],
+            "other_tags": other_tags or [],
+            "type_tags": type_tags or [],
+            "donation_reminders": donation_reminders
+        }
+        result = clothing_item_collection.insert_one(clothing_item)
+        print("Clothing item added successfully with ID:", result.inserted_id)
+        return str(result.inserted_id)
+    except Exception as e:
+        print("Error adding item to database:", str(e))
+        raise
+
 def db_get_clothing_item(object_id: str):
     try: 
         print("Getting clothing item from database")
@@ -16,7 +41,6 @@ def db_get_clothing_item(object_id: str):
             # Convert ObjectId to string for JSON serialization
             document['_id'] = str(document['_id'])
             document['user_id'] = str(document.get('user_id', ''))
-            # Ensure tags are lists
             document['brand_tags'] = document.get('brand_tags', [])
             document['color_tags'] = document.get('color_tags', [])
             document['other_tags'] = document.get('other_tags', [])
@@ -24,26 +48,6 @@ def db_get_clothing_item(object_id: str):
         return document
     except Exception as e:
         print("Error getting clothing item from database:", str(e))
-        raise
-
-def db_add_clothing_item(image_link: str, name: str = "", user_id: str = dummy_user_id, brand_tags: list = None, color_tags: list = None, other_tags: list = None, type_tags: list = None):
-    try:
-        print("Adding clothing item to database")
-        clothing_item_collection = closet_lab_database["clothing_items"]
-        clothing_item = {
-            "image_link": image_link,
-            "name": name,
-            "user_id": ObjectId(user_id),
-            "brand_tags": brand_tags or [],
-            "color_tags": color_tags or [],
-            "other_tags": other_tags or [],
-            "type_tags": type_tags or []
-        }
-        result = clothing_item_collection.insert_one(clothing_item)
-        print("Clothing item added successfully with ID:", result.inserted_id)
-        return str(result.inserted_id)
-    except Exception as e:
-        print("Error adding item to database:", str(e))
         raise
 
 def db_delete_clothing_item(object_id: str):
