@@ -10,6 +10,7 @@ Database list:
     * `_id: ObjectID`
     * `name: String`
     * `image_link: String`
+    * `image: Binary` (images are stored in base64)
     * `color_tags: ObjectID[]`
     * `type_tags: ObjectID[]`
     * `brand_tags: ObjectID[]`
