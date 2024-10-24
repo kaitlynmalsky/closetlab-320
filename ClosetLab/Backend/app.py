@@ -4,6 +4,7 @@ from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from bson.objectid import ObjectId
+import base64
 
 app = Flask(__name__)
 CORS(app)  # Allow all origins for testing
@@ -39,7 +40,9 @@ def db_add_clothing_item(image_link: str, name:str = "", user_id: str = dummy_us
     try:
         print("Adding clothing item to database")
         clothing_item_collection = closet_lab_database["clothing_items"]
-        clothing_item_collection.insert_one({"image_link": image_link, "name": name, user_id: ObjectId(user_id), "brand_tags": brand_tags, "color_tags": color_tags, "other_tags": other_tags, "type_tags": other_tags})
+        with open(image_link, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+            clothing_item_collection.insert_one({"image_link": image_link, "image": encoded_string, "name": name, user_id: ObjectId(user_id), "brand_tags": brand_tags, "color_tags": color_tags, "other_tags": other_tags, "type_tags": other_tags})
     except Exception as e:
         print("Error adding item to database, " + e)
 
@@ -60,7 +63,7 @@ def db_get_outfit(object_id: str):
     except Exception as e:
         print("Error getting outfit from database, " + e)
 
-def db_add_outfit(user_id: str = dummy_user_id, name:str = "Unnamed Outfit", items: list[str] = []):
+def db_add_outfit(user_id: str = dummy_user_id, name:str = "", items: list[str] = []):
     try:
         print("Adding outfit to database")
         outfit_collection = closet_lab_database["outfits"]
@@ -79,7 +82,7 @@ def db_delete_outfit(object_id: str):
     except Exception as e:
         print("Error deleting object from database, " + e)
 
-db_add_clothing_item("example.com/testdb", "Test from backend")
+db_add_clothing_item(image_link="../assets/favicon.png")
 # end database functions
 
 @app.route('/api/v1/post-clothes', methods=['POST'])
