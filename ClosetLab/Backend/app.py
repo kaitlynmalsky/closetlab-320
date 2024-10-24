@@ -12,6 +12,9 @@ from db_helpers import (
     db_delete_outfit
 )
 
+app = Flask(__name__)
+CORS(app)  # Allow all origins for testing
+
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -34,25 +37,29 @@ def add_clothing_item():
         if not data:
             return jsonify({'error': 'No data provided'}), 400
 
-        image_link = data.get('image_link')
-        if not image_link:
-            return jsonify({'error': 'Image link is required'}), 400
+        image = data.get('image')
+        if not image:
+            return jsonify({'error': 'Image data is required'}), 400
 
         name = data.get('name', '')
+        image_link = data.get('image_link', '') 
         user_id = data.get('user_id', dummy_user_id)
         brand_tags = data.get('brand_tags', [])
         color_tags = data.get('color_tags', [])
         other_tags = data.get('other_tags', [])
         type_tags = data.get('type_tags', [])
+        donation_reminders = data.get('donation_reminders', False)
 
         item_id = db_add_clothing_item(
-            image_link=image_link,
             name=name,
+            image_link=image_link,
+            image=image,
             user_id=user_id,
             brand_tags=brand_tags,
             color_tags=color_tags,
             other_tags=other_tags,
-            type_tags=type_tags
+            type_tags=type_tags,
+            donation_reminders=donation_reminders
         )
 
         return jsonify({'message': 'Clothing item added successfully', 'id': item_id}), 201
@@ -137,4 +144,3 @@ def delete_outfit(outfit_id):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
-
