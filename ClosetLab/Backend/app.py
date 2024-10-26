@@ -50,7 +50,16 @@ def db_delete_clothing_item(object_id: str):
     try:
         print("Deleting clothing item from database")
         clothing_item_collection = closet_lab_database["clothing_items"]
-        clothing_item_collection.delete_one({"_id": ObjectId(object_id)})
+        print(clothing_item_collection.delete_one({"_id": ObjectId(object_id)}))
+    except Exception as e:
+        print("Error removing item from database, " + e)
+
+def db_ClearAll_clothing_item(): #for debugging; do not ever use this normally
+    try:
+        print("Deleting all clothing items from database")
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        for item in clothing_item_collection.find():
+            print(clothing_item_collection.delete_one({"_id": item["_id"]}))
     except Exception as e:
         print("Error removing item from database, " + e)
 
@@ -82,7 +91,9 @@ def db_delete_outfit(object_id: str):
     except Exception as e:
         print("Error deleting object from database, " + e)
 
-db_add_clothing_item(image_link="../assets/favicon.png")
+db_add_clothing_item(image_link="./assets/favicon.png")
+db_delete_clothing_item("671d247379293f2823fdbca6")
+db_ClearAll_clothing_item()
 # end database functions
 
 @app.route('/api/v1/post-clothes', methods=['POST'])
@@ -104,7 +115,7 @@ def post_clothes():
             "type_tags": data.get("type_tags", []),
             "brand_tags": data.get("brand_tags", []),
             "other_tags": data.get("other_tags", []),
-            "donation_reminders": data.get("donation_reminders", False),
+            "donation_reminders": data.get("useDonationReminder", False),
             "user_id": ObjectId(data.get("user_id"))  # Convert user_id to ObjectId
         }
 
@@ -126,7 +137,7 @@ def get_clothes():
         
         # Retrieve all items from the collection
         clothes = list(clothing_items_collection.find())
-
+        print(clothes)
         # Convert MongoDB ObjectId to string for JSON serialization
         for item in clothes:
             item['_id'] = str(item['_id'])
@@ -172,7 +183,23 @@ def get_clothing_by_id(clothing_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/v1/scrap', methods=['GET'])
+def scrap(): #so that this database doesn't get impossibly messy while I'm testing
+    try:
+        db = client['closetlab']
+        clothing_item_collection = db['clothing_items']
+        try:
+            print("Deleting all clothing items from database")
+            for item in clothing_item_collection.find():
+                print(clothing_item_collection.delete_one({"_id": item["_id"]}))
+        except Exception as e:
+            print("Error removing item from database, " + e)
 
+        # Return success message
+        return jsonify({'message': 'Destroyed database data'}), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port='8000') 

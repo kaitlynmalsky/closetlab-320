@@ -13,6 +13,9 @@ export default Home = () => {
     const onGoToCamera = () => {
         navigation.navigate('Camera');
     };
+    const onGoToClothingItemTest = () => {
+        navigation.navigate('Clothing Item View');
+    };
     function getRecentTakenPhoto() {
         const maybeURI = photoTools.getRecentPhoto();
         if (maybeURI) {
@@ -32,17 +35,6 @@ export default Home = () => {
             //console.log("uri unavailable")
             setImageElement(<View>
                 <Text >No Recent Image!</Text>
-                <Image 
-            style={{
-                width: 100,
-                height: 100,
-                borderWidth: 0,
-                resizeMode: "contain",
-                alignItems: 'center',
-                borderColor: 'black'
-            }}
-            resizeMode={'cover'} // cover or contain its upto you view look
-            source={require('./assets/favicon.png')} />
             </View>)
             
         }
@@ -57,6 +49,10 @@ export default Home = () => {
             <Pressable style={styles.button} onPress={onGoToCamera}>
                 <Text style={styles.button_text}>Go to video camera</Text>
             </Pressable>
+            <Pressable style={styles.button} onPress={onGoToClothingItemTest}>
+                <Text style={styles.button_text}>Go to clothing item test</Text>
+            </Pressable>
+        
         </SafeAreaView>
     );
 };
