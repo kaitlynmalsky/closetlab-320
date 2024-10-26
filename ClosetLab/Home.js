@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, StyleSheet, Text, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { usePhotoGallery } from './Camera_Test.js';
 import styles from './Stylesheet';
+import { logFetch, getItem, postItem, deleteItem } from './APIContainer.js';
 
 
 //Base Home Tab. This also serves as a template for a basic tab. 
@@ -13,10 +14,12 @@ export default Home = () => {
     const onGoToCamera = () => {
         navigation.navigate('Camera');
     };
+
+
     function getRecentTakenPhoto() {
         const maybeURI = photoTools.getRecentPhoto();
         if (maybeURI) {
-            
+
             setImageElement(<Image style={
                 {
                     width: 300,
@@ -32,19 +35,19 @@ export default Home = () => {
             //console.log("uri unavailable")
             setImageElement(<View>
                 <Text >No Recent Image!</Text>
-                <Image 
-            style={{
-              width: 300,
-              height: 300,
-              borderWidth: 0,
-              resizeMode: "contain",
-              alignItems: 'center',
-              borderColor: 'black'
-          }}
-            resizeMode={'cover'} // cover or contain its upto you view look
-            source={{ uri: require("./assets/favicon.png") }} />
+                <Image
+                    style={{
+                        width: 300,
+                        height: 300,
+                        borderWidth: 0,
+                        resizeMode: "contain",
+                        alignItems: 'center',
+                        borderColor: 'black'
+                    }}
+                    resizeMode={'cover'} // cover or contain its upto you view look
+                    source={{ uri: require("./assets/favicon.png") }} />
             </View>)
-            
+
         }
     }
 

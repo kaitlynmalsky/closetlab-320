@@ -29,6 +29,14 @@ print("For reference, the names of the collections in the database are: " + str(
 app = Flask(__name__)
 CORS(app)  # Allow all origins for testing
 
+@app.route('/api/test/', methods=['GET'])
+def api_test():
+    try:
+        print("got request from frontend")
+        return jsonify({"message": "hello from the other siiiide"})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 # POST route to add a new clothing item
 @app.route('/api/v1/clothing-items', methods=['POST'])
 def add_clothing_item():
