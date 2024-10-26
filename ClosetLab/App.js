@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Pressable, Image } from 'react-native';
 import Camera_Test from './Camera_Test.js';
 import Home from './Home.js';
+import {ClothingItemView} from './ClothingAndOutfits.js';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
