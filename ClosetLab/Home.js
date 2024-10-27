@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, Pressable, Image, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, StyleSheet, Text, Pressable, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { usePhotoGallery } from './Camera_Test.js';
 import styles from './Stylesheet';
+import { logFetch, getItem, postItem, deleteItem } from './APIContainer.js';
 
 
 //Base Home Tab. This also serves as a template for a basic tab. 
@@ -19,7 +20,7 @@ export default Home = () => {
     function getRecentTakenPhoto() {
         const maybeURI = photoTools.getRecentPhoto();
         if (maybeURI) {
-            
+
             setImageElement(<Image style={
                 {
                     width: 300,
@@ -36,7 +37,7 @@ export default Home = () => {
             setImageElement(<View>
                 <Text >No Recent Image!</Text>
             </View>)
-            
+
         }
     }
 
