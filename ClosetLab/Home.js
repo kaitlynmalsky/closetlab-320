@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, Text, Pressable, Image } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, Pressable, Image, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { usePhotoGallery } from './Camera_Test.js';
 import styles from './Stylesheet';

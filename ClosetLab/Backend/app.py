@@ -40,12 +40,13 @@ def api_test():
 # POST route to add a new clothing item
 @app.route('/api/v1/clothing-items', methods=['POST'])
 def add_clothing_item():
+    print("added one potentially")
     try:
         data = request.json
         if not data:
             return jsonify({'error': 'No data provided'}), 400
 
-        image = data.get('image')
+        image = data.get('image_link')
         if not image:
             return jsonify({'error': 'Image data is required'}), 400
 
@@ -85,6 +86,28 @@ def get_clothing_item(item_id):
         else:
             return jsonify({'error': 'Clothing item not found'}), 404
 
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+# GET route to retrieve all clothing items belonging to user, by user ID
+@app.route('/api/v1/clothing-items-get-all/<string:user_id>', methods=['GET'])
+def get_all_clothing_items(user_id):
+    #print("hello")
+    try:
+        #print("hello2")
+        item_collection = closet_lab_database["clothing_items"].find()
+        returnItems = []
+        for item in item_collection.to_list():
+            #print("hello3")
+            if (str(user_id) == str(item["user_id"])):
+            #    try:
+            #       print(item["name"])
+                returnItems.append(db_get_clothing_item(item["_id"]))  
+            #    except Exception as e:
+            #        return jsonify({'error': 'Clothing item not found'}), 404
+        #print("hello4")
+        #print(returnItems)
+        return jsonify(returnItems), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

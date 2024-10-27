@@ -1,13 +1,13 @@
 import React, { useState, useEffect, Component } from 'react';
-const base_url = 'http://127.0.0.1:8000/api/'
+const base_url = "http://localhost:8000/api/" //'https://localhost:8000/api/'
 
 function fetchAPI(path, options = undefined) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
     const fetchData = async () => {
-        console.log("Trying to fetch API");
+        //console.log("Trying to fetch API");
         const response = await fetch(base_url + path, options);
-        console.log(response);
+        //console.log(response);
         const data = await response.json();
         setData(data);
         setLoading(false);
@@ -25,6 +25,10 @@ export const logFetch = () => {
 
 export const getItem = (item_id) => {
     path = 'v1/clothing-items/' + item_id;
+    return fetchAPI(path);
+}
+export function getAllItemsForUser (user_id) {
+    path = 'v1/clothing-items-get-all/'+user_id;
     return fetchAPI(path);
 }
 

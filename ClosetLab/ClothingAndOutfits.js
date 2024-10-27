@@ -1,10 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image } from 'react-native';
-import styles from './Stylesheet';
+import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList } from 'react-native';
+import styles, {testImg_b64} from './Stylesheet';
 import React, { useState } from 'react';
-
+import { logFetch, getItem,getAllItemsForUser,  postItem, deleteItem } from './APIContainer.js';
 //Tag Types. Items have 4 types of tags, each with any number of user-defined string properties.
-const TagType = Object.freeze({
+export const TagType = Object.freeze({
     COLOR: "color",
     BRAND: "brand",
     ITEM_TYPE: "type",
@@ -111,85 +111,24 @@ export class Outfit{
     }
 }
 
+
 const testItem = new ClothingItem(
     "./assets/buttonIcons/icon_cam.png", 
     "Test Clothing Item", 
     "12345", 
     "67057228f80354e361ae2bf5"
-);
-testItem.addPropertyToCategory("shirt", TagType.ITEM_TYPE)
-testItem.addPropertyToCategory("purple", TagType.COLOR)
-testItem.addPropertyToCategory("yellow", TagType.COLOR)
-testItem.addPropertyToCategory("Nike", TagType.BRAND)
-testItem.setIndividualDonationReminder(true)
-
-const sendClothingItem = async (clothingItemObject) => {
-  try {
-      //const response = {ok:true}
-      console.log(JSON.stringify(clothingItemObject))
-    const response = await fetch("http://localhost:8000/api/v1/post-clothes", {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(clothingItemObject),
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const responseData = await response.json();
-    //const responseData = "failed";
-    clothingItemObject.db_id = responseData.id;
-    console.log('Data retrieved successfully:', responseData);
-    //setTestElement(<Text >{responseData}</Text>)
-  } catch (error) {
-    console.error('Error sending data:', error);
-  }
-};
-
-
-//sendClothingItem(testItem);
-
-const getMostRecentClothingItemFromBackend = async () => {
-  try {
-      //const response = {ok:true}
-    const response = await fetch("http://localhost:8000/api/v1/get-clothes", {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const responseData = await response.json();
-    //const responseData = "failed";
-    console.log('Data retrieved successfully:', responseData);
-    const returnObj = responseData[responseData.length-1]
-    const returnItem = new ClothingItem(
-        returnObj.image_link, 
-        returnObj.name, 
-        returnObj.user_id, 
-        returnObj.id
-    );
-    returnItem.brand_tags = returnObj.brand_tags
-    returnItem.color_tags = returnObj.color_tags
-    returnItem.type_tags = returnObj.type_tags
-    returnItem.other_tags = returnObj.other_tags
-
-    return returnItem;
-  } catch (error) {
-    console.error('Error sending data:', error);
-  }
-};
+  );
+  testItem.addPropertyToCategory("shirt", TagType.ITEM_TYPE)
+  testItem.addPropertyToCategory("purple", TagType.COLOR)
+  testItem.addPropertyToCategory("yellow", TagType.COLOR)
+  testItem.addPropertyToCategory("Nike", TagType.BRAND)
+  testItem.setIndividualDonationReminder(true)
+  
 
 
 
-export function ClothingItemView(userId, itemId){
+export function ClothingItemView(userId, itemId){ //unused for now
+    
     const navigation = useNavigation();
     const onGoToHome = () => {
         navigation.navigate('Home');
@@ -223,3 +162,129 @@ export function ClothingItemView(userId, itemId){
         </View>
     </SafeAreaView>);
 }
+
+export function reduceListToHumanReadable(thisList){ //takes a list of strings [b, a, c]. returns "a, b, c".
+    thisList = thisList.sort();
+    return thisList.reduce(
+        (accumulator, currentValue, index) => {
+            if (index==0){return accumulator}
+            return accumulator + ", " + currentValue
+        },
+        thisList[0])
+}
+
+export function ClothingItemListView(){
+    const navigation = useNavigation();
+    const onGoToHome = () => {
+        navigation.navigate('Home');
+    };
+    //postItem(testItem)
+    //console.log()
+    const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
+    console.log(returnedData[0])
+    //React complains if every item in a list doesn't have a unique 'key' prop
+    const renderListItem = ({ item }) => (
+        <View style={styles.listItem} key={item._id}> 
+          <Text>Name: {item.name}</Text>
+          <Image style={
+                {
+                    width: 300,
+                    height: 300,
+                    resizeMode: "contain",
+                    borderWidth: 1,
+                    borderColor: 'black'
+                }
+            }
+                source={{ uri: item.image }} />
+          <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
+          <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
+        </View>
+    );
+
+    const getMaybeList = (returnedData) =>{
+        var defaultList = (<Text>No Clothing Items Yet!</Text>)
+        if (returnedData.length>0){
+            return (<FlatList
+                data={returnedData}
+                renderItem={renderListItem}
+                keyExtractor={(item) => {
+                    return item._id;
+                  }}
+                />)
+        }
+        return defaultList
+    }
+    
+    
+    return (<SafeAreaView style={styles.container}>
+        <Pressable style={styles.button} onPress={onGoToHome}>
+            <Text style={styles.button_text}>Go to Home</Text>
+        </Pressable>
+        {getMaybeList(returnedData)}
+    </SafeAreaView>);
+}
+
+
+const sendClothingItem = async (clothingItemObject) => { //deprecated: use APIContainer functions instead
+    try {
+        //const response = {ok:true}
+        console.log(JSON.stringify(clothingItemObject))
+      const response = await fetch("http://localhost:8000/api/v1/post-clothes", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(clothingItemObject),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const responseData = await response.json();
+      //const responseData = "failed";
+      clothingItemObject.db_id = responseData.id;
+      console.log('Data retrieved successfully:', responseData);
+      //setTestElement(<Text >{responseData}</Text>)
+    } catch (error) {
+      console.error('Error sending data:', error);
+    }
+  };
+  
+  
+  //sendClothingItem(testItem);
+  
+  const getMostRecentClothingItemFromBackend = async () => { //deprecated: use APIContainer functions instead
+    try {
+        //const response = {ok:true}
+      const response = await fetch("http://localhost:8000/api/v1/get-clothes", {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+  
+      const responseData = await response.json();
+      //const responseData = "failed";
+      console.log('Data retrieved successfully:', responseData);
+      const returnObj = responseData[responseData.length-1]
+      const returnItem = new ClothingItem(
+          returnObj.image_link, 
+          returnObj.name, 
+          returnObj.user_id, 
+          returnObj.id
+      );
+      returnItem.brand_tags = returnObj.brand_tags
+      returnItem.color_tags = returnObj.color_tags
+      returnItem.type_tags = returnObj.type_tags
+      returnItem.other_tags = returnObj.other_tags
+  
+      return returnItem;
+    } catch (error) {
+      console.error('Error sending data:', error);
+    }
+  };
