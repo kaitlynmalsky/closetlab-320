@@ -1,5 +1,6 @@
 import React, { useState, useEffect, Component } from 'react';
-const base_url = "http://localhost:8000/api/" //'https://localhost:8000/api/'
+// const base_url = "http://localhost:8000/api/" //'https://localhost:8000/api/'
+const base_url = "http://3.16.25.91/api/"
 
 function fetchAPI(path, options = undefined) {
     const [data, setData] = useState([]);
@@ -27,8 +28,8 @@ export const getItem = (item_id) => {
     path = 'v1/clothing-items/' + item_id;
     return fetchAPI(path);
 }
-export function getAllItemsForUser (user_id) {
-    path = 'v1/clothing-items-get-all/'+user_id;
+export function getAllItemsForUser(user_id) {
+    path = 'v1/clothing-items-get-all/' + user_id;
     return fetchAPI(path);
 }
 
