@@ -64,17 +64,17 @@ export class ClothingItem{
         else if (cat_process===TagType.ITEM_TYPE){
             oldSize = this.type_tags.length;
             this.type_tags = this.type_tags.filter(function(el) { return el !== newStringProperty; })
-            return oldSize!==this.color_tags.length;
+            return oldSize!==this.type_tags.length;
         }
         else if (cat_process===TagType.BRAND){
             oldSize = this.brand_tags.length;
             this.brand_tags = this.brand_tags.filter(function(el) { return el !== newStringProperty; })
-            return oldSize!==this.color_tags.length;
+            return oldSize!==this.brand_tags.length;
         }
         else if (cat_process===TagType.OTHER){
             oldSize = this.other_tags.length;
             this.other_tags = this.other_tags.filter(function(el) { return el !== newStringProperty; })
-            return oldSize!==this.color_tags.length;
+            return oldSize!==this.other_tags.length;
         }
         return false;
     }
