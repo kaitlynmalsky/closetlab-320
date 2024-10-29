@@ -25,11 +25,11 @@ export const logFetch = () => {
 }
 
 export const getItem = (item_id) => {
-    path = 'v1/clothing-items/' + item_id;
+    const path = 'v1/clothing-items/' + item_id;
     return fetchAPI(path);
 }
 export function getAllItemsForUser(user_id) {
-    path = 'v1/clothing-items-get-all/' + user_id;
+    const path = 'v1/clothing-items-get-all/' + user_id;
     return fetchAPI(path);
 }
 
@@ -74,7 +74,7 @@ export const deleteOutfit = (outfit_id) => {
     options = {
         method: 'DELETE'
     }
-    path = 'v1/outfits/' + outfit_id;
+    const path = 'v1/outfits/' + outfit_id;
     return fetchAPI(path);
 }
 
