@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Component } from 'react';
-// const base_url = "http://localhost:8000/api/" //'https://localhost:8000/api/'
+// const base_url = "http://localhost:8000/api/" // local host, for dev
 const base_url = "http://3.16.25.91/api/"
 
 function fetchAPI(path, options = undefined) {
