@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from bson.objectid import ObjectId
 
 from db_helpers import (
     dummy_user_id,
@@ -92,22 +93,17 @@ def get_clothing_item(item_id):
 # GET route to retrieve all clothing items belonging to user, by user ID
 @app.route('/api/v1/clothing-items-get-all/<string:user_id>', methods=['GET'])
 def get_all_clothing_items(user_id):
-    #print("hello")
     try:
-        #print("hello2")
-        item_collection = closet_lab_database["clothing_items"].find()
+        # Convert user_id to ObjectId if necessary
+        user_id_obj = ObjectId(user_id)
+        item_collection = closet_lab_database["clothing_items"].find({"user_id": user_id_obj})
         returnItems = []
-        for item in item_collection.to_list():
-            #print("hello3")
-            if (str(user_id) == str(item["user_id"])):
-            #    try:
-            #       print(item["name"])
-                returnItems.append(db_get_clothing_item(item["_id"]))  
-            #    except Exception as e:
-            #        return jsonify({'error': 'Clothing item not found'}), 404
-        #print("hello4")
-        #print(returnItems)
+
+        for item in item_collection:
+            returnItems.append(db_get_clothing_item(item["_id"]))
+
         return jsonify(returnItems), 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
