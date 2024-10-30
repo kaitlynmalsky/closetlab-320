@@ -17,6 +17,8 @@ Database list:
     * `other_tags: ObjectID[]`
     * `donation_reminders: Boolean`
     * `user_id: Object_ID`
+    * `date_added: Date`
+    * `last_worn: Date`
 * days
     * `_id: ObjectID`
     * `calendar_id: ObjectID`

@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+import datetime
 
 # Initialize the database connection
 client = MongoClient("mongodb+srv://kmalsky:Cw1ccE8Bq5VV8Lwe@closetlab.q7yvq.mongodb.net/?retryWrites=true&w=majority&appName=ClosetLab")  
@@ -23,7 +24,9 @@ def db_add_clothing_item(name: str = "", image_link: str = "", image: str = "", 
             "color_tags": color_tags or [],
             "other_tags": other_tags or [],
             "type_tags": type_tags or [],
-            "donation_reminders": donation_reminders
+            "donation_reminders": donation_reminders,
+            "date_added": datetime.datetime.now(tz=datetime.timezone.utc),
+            "last_worn": datetime.datetime.now(tz=datetime.timezone.utc)
         }
         result = clothing_item_collection.insert_one(clothing_item)
         print("Clothing item added successfully with ID:", result.inserted_id)
