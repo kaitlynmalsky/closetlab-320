@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system'; // Replaces rn-fetch-blob
+import {Platform } from "react-native";
 
 // Fetch all stored keys and their corresponding image paths from AsyncStorage.
 export async function getStoredImages() {
@@ -25,8 +26,13 @@ export async function saveImage(imageUri) {
 
   try {
     // Save base64 image to file system
-    await FileSystem.writeAsStringAsync(path, imageUri, { encoding: FileSystem.EncodingType.Base64 });
-    console.log('Image saved to file system:', path);
+    if (Platform.OS === "web") {
+      console.log("TODO: implement read file for web");
+    }
+    else{
+      await FileSystem.writeAsStringAsync(path, imageUri, { encoding: FileSystem.EncodingType.Base64 });
+      console.log('Image saved to file system:', path);
+    }
 
     // Save file path in AsyncStorage
     await AsyncStorage.setItem(fileName, path);
