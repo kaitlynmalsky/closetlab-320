@@ -151,24 +151,33 @@ export function ClothingItemView(){ //unused for now
 
 
     //const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
-    const [itemInfo, setItemInfo] = useState(<View>
-        <Text>Loading item info...</Text>
-    </View>);
+    const defaultView = (<View>
+    <Text>Loading item info...</Text>
+</View>)
+    const [itemInfo, setItemInfo] = useState();
     console.log(window.global_selectedClothingItem._id)
     const newClothing = getItem(window.global_selectedClothingItem._id);
     console.log(newClothing)
-    if ((newClothing.length) && (newClothing.length>0)){
-        setItemInfo(
-            <View>
-                <Text>Name: {newClothing.name}</Text>
-                <Text>Image: {newClothing.image_link}</Text>
-                <Text>Brands: {reduceListToHumanReadable(newClothing.brand_tags)}</Text>
-                <Text>Types: {reduceListToHumanReadable(newClothing.type_tags)}</Text>
-                <Text>Colors: {reduceListToHumanReadable(newClothing.color_tags)}</Text>
-                <Text>Other: {reduceListToHumanReadable(newClothing.other_tags)}</Text>
-            </View>
-            ); 
+    const getItemInfo = ()=>{
+        if ((newClothing.length) && (newClothing.length>0)){
+            setItemInfo(
+                <View>
+                    <Text>Name: {newClothing.name}</Text>
+                    <Text>Image: {newClothing.image_link}</Text>
+                    <Text>Brands: {reduceListToHumanReadable(newClothing.brand_tags)}</Text>
+                    <Text>Types: {reduceListToHumanReadable(newClothing.type_tags)}</Text>
+                    <Text>Colors: {reduceListToHumanReadable(newClothing.color_tags)}</Text>
+                    <Text>Other: {reduceListToHumanReadable(newClothing.other_tags)}</Text>
+                </View>
+                ); 
+        }
+        else{
+            setItemInfo(
+                defaultView
+                ); 
+        }
     }
+    
          
 
     return (<SafeAreaView style={styles.container}>
@@ -177,7 +186,7 @@ export function ClothingItemView(){ //unused for now
                 <Text style={styles.button_text}>Go to Home</Text>
             </Pressable>
             
-            {itemInfo}
+            {getItemInfo()}
             
         </View>
     </SafeAreaView>);
