@@ -14,10 +14,21 @@ export const TagType = Object.freeze({
 
 //global variable: can be used on all pages. 
 //used to track the selected clothing item for the single item view.
-window.global_selectedClothingItem = { _id: 'none' };
+window.global_selectedClothingItem = { 
+    _id: 'none',
+    name: "Loading Name...",
+    imageUri: "none",
+    brands: "Loading Brands...",
+    colors: "Loading Colors...",
+    types: "Loading Item Types...",
+    others: "Loading Other Properties...",
+    donationReminder: true,
+
+};
 
 //takes a list of strings [b, a, c]. returns "a, b, c".
 export function reduceListToHumanReadable(thisList){ 
+    if (thisList.length==0){return "None"}
     thisList = thisList.sort();
     return thisList.reduce(
         (accumulator, currentValue, index) => {
@@ -148,36 +159,31 @@ export function ClothingItemView(){ //unused for now
     const onGoToHome = () => {
         navigation.navigate('Home');
     };
+    const onGoToList = () => {
+        navigation.navigate('Clothing Item View');
+    };
 
 
     //const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
-    const defaultView = (<View>
-    <Text>Loading item info...</Text>
-</View>)
-    const [itemInfo, setItemInfo] = useState();
-    console.log(window.global_selectedClothingItem._id)
-    const newClothing = getItem(window.global_selectedClothingItem._id);
-    console.log(newClothing)
-    const getItemInfo = ()=>{
-        if ((newClothing.length) && (newClothing.length>0)){
-            setItemInfo(
-                <View>
-                    <Text>Name: {newClothing.name}</Text>
-                    <Text>Image: {newClothing.image_link}</Text>
-                    <Text>Brands: {reduceListToHumanReadable(newClothing.brand_tags)}</Text>
-                    <Text>Types: {reduceListToHumanReadable(newClothing.type_tags)}</Text>
-                    <Text>Colors: {reduceListToHumanReadable(newClothing.color_tags)}</Text>
-                    <Text>Other: {reduceListToHumanReadable(newClothing.other_tags)}</Text>
-                </View>
-                ); 
-        }
-        else{
-            setItemInfo(
-                defaultView
-                ); 
-        }
-    }
-    
+
+    //const [itemInfo, setItemInfo] = useState(defaultView);
+    //console.log(window.global_selectedClothingItem._id)
+    const newClothing = new ClothingItem(
+        window.global_selectedClothingItem.imageUri,
+        window.global_selectedClothingItem.name,
+        window.global_selectedClothingItem._id,
+        "12345", 
+      );
+      newClothing.color_tags = window.global_selectedClothingItem.colors
+      newClothing.brand_tags = window.global_selectedClothingItem.brands
+      newClothing.type_tags = window.global_selectedClothingItem.types
+      newClothing.other_tags = window.global_selectedClothingItem.others
+      newClothing.useDonationReminder = window.global_selectedClothingItem.donationReminder
+    //console.log(newClothing)
+    //const getItemInfo = ()=>{
+    //}
+    //getItemInfo();
+    //console.log(window.global_selectedClothingItem._id)
          
 
     return (<SafeAreaView style={styles.container}>
@@ -185,8 +191,27 @@ export function ClothingItemView(){ //unused for now
             <Pressable style={styles.button} onPress={onGoToHome}>
                 <Text style={styles.button_text}>Go to Home</Text>
             </Pressable>
-            
-            {getItemInfo()}
+            <View>
+                <Text>Name: {newClothing.name}</Text>
+                <Text>objectID: {newClothing.db_id}</Text>
+                <Image resizeMode= "contain" style={
+                {
+                    width: 300,
+                    height: 300,
+                    borderWidth: 1,
+                    borderColor: 'black'
+                }
+                }
+                source={{ uri: newClothing.image_link }} />
+                <Text>Brands: {reduceListToHumanReadable(newClothing.brand_tags)}</Text>
+                <Text>Types: {reduceListToHumanReadable(newClothing.type_tags)}</Text>
+                <Text>Colors: {reduceListToHumanReadable(newClothing.color_tags)}</Text>
+                <Text>Other: {reduceListToHumanReadable(newClothing.other_tags)}</Text>
+                <Text>Donation Reminders: {(String)(newClothing.useDonationReminder)}</Text>
+            </View>
+            <Pressable style={styles.button} onPress={onGoToList}>
+                <Text style={styles.button_text}>Back to List</Text>
+            </Pressable>
             
         </View>
     </SafeAreaView>);
@@ -200,27 +225,31 @@ export function ClothingItemListView(){
     };
 
     
-    function onGoToSingleItemView_createFunc(thisId){
-        window.global_selectedClothingItem._id = thisId;
+    function onGoToSingleItemView_createFunc(item){
+        
         return ()=>{
-            
+            window.global_selectedClothingItem._id = item._id;
+            window.global_selectedClothingItem.name = item.name;
+            window.global_selectedClothingItem.imageUri = item.image_link;
+            window.global_selectedClothingItem.colors = item.color_tags;
+            window.global_selectedClothingItem.brands = item.brand_tags;
+            window.global_selectedClothingItem.types = item.type_tags;
+            window.global_selectedClothingItem.others = item.other_tags;
+            window.global_selectedClothingItem.donationReminder = item.donation_reminders;
             navigation.navigate('Single Clothing Item View');
         }
     };
-    //postItem(testItem)
-    //console.log()
     const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
-    console.log(returnedData[0])
     //React complains if every item in a list doesn't have a unique 'key' prop
     const renderListItem = ({ item }) => (
         <View style={styles.listItem} key={item._id}> 
-        <Pressable onPress={onGoToSingleItemView_createFunc(item._id)}>
+        <Pressable onPress={onGoToSingleItemView_createFunc(item)}>
           <Text>Name: {item.name}</Text>
-          <Image style={
+          <Text>objectID: {item._id}</Text>
+          <Image resizeMode= "contain" style={
                 {
                     width: 300,
                     height: 300,
-                    resizeMode: "contain",
                     borderWidth: 1,
                     borderColor: 'black'
                 }
