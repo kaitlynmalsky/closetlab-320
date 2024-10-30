@@ -3,6 +3,7 @@ import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollV
 import styles, {testImg_b64} from './Stylesheet';
 import React, { useState } from 'react';
 import { logFetch, getItem,getAllItemsForUser,  postItem, deleteItem } from './APIContainer.js';
+
 //Tag Types. Items have 4 types of tags, each with any number of user-defined string properties.
 export const TagType = Object.freeze({
     COLOR: "color",
@@ -11,12 +12,17 @@ export const TagType = Object.freeze({
     OTHER: "other",
 });
 
+//global variable: can be used on all pages. 
+//used to track the selected clothing item for the single item view.
+window.global_selectedClothingItem = { _id: 'none' };
+
 export class ClothingItem{
     db_id = ""; //ObjectId in MongoDB of this item
     user_id = ""; //ObjectId in MongoDB of the user this belongs to
 
     useDonationReminder = true; //specific donation reminder for this item; use with account settings
-    
+    lastWornTime = Date(Date.today);
+
     name = "New Clothing Item"; //user-readable name of this item
     image_link = ""; //probably base64
 
@@ -119,8 +125,8 @@ const testItem = new ClothingItem(
     "67057228f80354e361ae2bf5"
   );
   testItem.addPropertyToCategory("shirt", TagType.ITEM_TYPE)
-  testItem.addPropertyToCategory("purple", TagType.COLOR)
-  testItem.addPropertyToCategory("yellow", TagType.COLOR)
+  testItem.addPropertyToCategory("red", TagType.COLOR)
+  testItem.addPropertyToCategory("blue", TagType.COLOR)
   testItem.addPropertyToCategory("Nike", TagType.BRAND)
   testItem.setIndividualDonationReminder(true)
   
@@ -133,20 +139,25 @@ export function ClothingItemView(userId, itemId){ //unused for now
     const onGoToHome = () => {
         navigation.navigate('Home');
     };
-    const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
-    
-    async function getDataFromBackend(){
-        const newClothing = await getMostRecentClothingItemFromBackend();
-        setTestElement(
-        <View>
-            <Text style={styles.button_text}>Name: {newClothing.name}</Text>
-            <Text style={styles.button_text}>Image: {newClothing.image_link}</Text>
-            <Text style={styles.button_text}>Brands: {newClothing.brand_tags.toString()}</Text>
-            <Text style={styles.button_text}>Types: {newClothing.type_tags.toString()}</Text>
-            <Text style={styles.button_text}>Colors: {newClothing.color_tags.toString()}</Text>
-        </View>
 
+
+    const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
+    const newClothing = getItem(window.global_selectedClothingItem._id);
+
+    async function getDataFromBackend(){ 
+        //console.log(window.global_selectedClothingItem._id);
+        
+        setTestElement(
+            <View>
+                <Text style={styles.button_text}>Name: {newClothing.name}</Text>
+                <Text style={styles.button_text}>Image: {newClothing.image_link}</Text>
+                <Text style={styles.button_text}>Brands: {newClothing.brand_tags.toString()}</Text>
+                <Text style={styles.button_text}>Types: {newClothing.type_tags.toString()}</Text>
+                <Text style={styles.button_text}>Colors: {newClothing.color_tags.toString()}</Text>
+            </View>
         )
+        
+
     }
       
 
@@ -178,6 +189,14 @@ export function ClothingItemListView(){
     const onGoToHome = () => {
         navigation.navigate('Home');
     };
+
+    
+    function onGoToSingleItemView_createFunc(thisId){
+        return ()=>{
+            window.global_selectedClothingItem._id = thisId;
+            navigation.navigate('Single Clothing Item View');
+        }
+    };
     //postItem(testItem)
     //console.log()
     const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
@@ -185,6 +204,7 @@ export function ClothingItemListView(){
     //React complains if every item in a list doesn't have a unique 'key' prop
     const renderListItem = ({ item }) => (
         <View style={styles.listItem} key={item._id}> 
+        <Pressable onPress={onGoToSingleItemView_createFunc(item._id)}>
           <Text>Name: {item.name}</Text>
           <Image style={
                 {
@@ -198,6 +218,7 @@ export function ClothingItemListView(){
                 source={{ uri: item.image }} />
           <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
           <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
+        </Pressable>
         </View>
     );
 

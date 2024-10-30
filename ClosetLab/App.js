@@ -77,6 +77,13 @@ export default function App() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name={'Single Clothing Item View'}
+          component={ClothingItemView}
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   )
