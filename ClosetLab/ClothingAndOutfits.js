@@ -16,6 +16,17 @@ export const TagType = Object.freeze({
 //used to track the selected clothing item for the single item view.
 window.global_selectedClothingItem = { _id: 'none' };
 
+//takes a list of strings [b, a, c]. returns "a, b, c".
+export function reduceListToHumanReadable(thisList){ 
+    thisList = thisList.sort();
+    return thisList.reduce(
+        (accumulator, currentValue, index) => {
+            if (index==0){return accumulator}
+            return accumulator + ", " + currentValue
+        },
+        thisList[0])
+}
+
 export class ClothingItem{
     db_id = ""; //ObjectId in MongoDB of this item
     user_id = ""; //ObjectId in MongoDB of the user this belongs to
@@ -129,11 +140,9 @@ const testItem = new ClothingItem(
   testItem.addPropertyToCategory("blue", TagType.COLOR)
   testItem.addPropertyToCategory("Nike", TagType.BRAND)
   testItem.setIndividualDonationReminder(true)
-  
 
 
-
-export function ClothingItemView(userId, itemId){ //unused for now
+export function ClothingItemView(){ //unused for now
     
     const navigation = useNavigation();
     const onGoToHome = () => {
@@ -141,48 +150,39 @@ export function ClothingItemView(userId, itemId){ //unused for now
     };
 
 
-    const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
+    //const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
+    const [itemInfo, setItemInfo] = useState(<View>
+        <Text>Loading item info...</Text>
+    </View>);
+    console.log(window.global_selectedClothingItem._id)
     const newClothing = getItem(window.global_selectedClothingItem._id);
-
-    async function getDataFromBackend(){ 
-        //console.log(window.global_selectedClothingItem._id);
-        
-        setTestElement(
+    console.log(newClothing)
+    if ((newClothing.length) && (newClothing.length>0)){
+        setItemInfo(
             <View>
-                <Text style={styles.button_text}>Name: {newClothing.name}</Text>
-                <Text style={styles.button_text}>Image: {newClothing.image_link}</Text>
-                <Text style={styles.button_text}>Brands: {newClothing.brand_tags.toString()}</Text>
-                <Text style={styles.button_text}>Types: {newClothing.type_tags.toString()}</Text>
-                <Text style={styles.button_text}>Colors: {newClothing.color_tags.toString()}</Text>
+                <Text>Name: {newClothing.name}</Text>
+                <Text>Image: {newClothing.image_link}</Text>
+                <Text>Brands: {reduceListToHumanReadable(newClothing.brand_tags)}</Text>
+                <Text>Types: {reduceListToHumanReadable(newClothing.type_tags)}</Text>
+                <Text>Colors: {reduceListToHumanReadable(newClothing.color_tags)}</Text>
+                <Text>Other: {reduceListToHumanReadable(newClothing.other_tags)}</Text>
             </View>
-        )
-        
-
+            ); 
     }
-      
+         
 
     return (<SafeAreaView style={styles.container}>
         <View>
             <Pressable style={styles.button} onPress={onGoToHome}>
                 <Text style={styles.button_text}>Go to Home</Text>
             </Pressable>
-            <Pressable style={styles.button} onPress={getDataFromBackend}>
-                {testElement}
-            </Pressable>
+            
+            {itemInfo}
             
         </View>
     </SafeAreaView>);
 }
 
-export function reduceListToHumanReadable(thisList){ //takes a list of strings [b, a, c]. returns "a, b, c".
-    thisList = thisList.sort();
-    return thisList.reduce(
-        (accumulator, currentValue, index) => {
-            if (index==0){return accumulator}
-            return accumulator + ", " + currentValue
-        },
-        thisList[0])
-}
 
 export function ClothingItemListView(){
     const navigation = useNavigation();
@@ -192,8 +192,9 @@ export function ClothingItemListView(){
 
     
     function onGoToSingleItemView_createFunc(thisId){
+        window.global_selectedClothingItem._id = thisId;
         return ()=>{
-            window.global_selectedClothingItem._id = thisId;
+            
             navigation.navigate('Single Clothing Item View');
         }
     };
