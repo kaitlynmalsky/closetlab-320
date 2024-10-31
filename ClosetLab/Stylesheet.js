@@ -152,18 +152,64 @@ const styles = StyleSheet.create({
         fontSize: 24,
     },
     tag: {
-        "backgroundColor": "#d6d6d6",
-        "color": "#1d1d1e",
         "borderRadius": "10px",
         "WebkitBoxDecorationBreak": "clone",
         "boxDecorationBreak": "clone",
         "padding": "0 5px 0 5px"
     },
+    tag_default: {
+        backgroundColor: "#d6d6d6",
+        color: "#000",
+    },
+    tag_red: {
+        backgroundColor: "#ff3333",
+        "color": "#000"
+    },
+    tag_orange: {
+        backgroundColor: "#ff9900",
+        color: "#000"
+    },
+    tag_yellow: {
+        backgroundColor: "#ffff33",
+        color: "#000"
+    },
+    tag_green: {
+        backgroundColor: "#33cc33",
+        color: "#000",
+    },
+    tag_blue: {
+        backgroundColor: "#0066ff",
+        color: "#000",
+    },
+    tag_purple: {
+        backgroundColor: "#9966cc",
+        color: "#000"
+    },
+    tag_pink: {
+        backgroundColor: "#ff99cc",
+        color: "#000"
+    },
+    tag_black: {
+        backgroundColor: "#000",
+        color: "#fff"
+    },
+    tag_gray: {
+        backgroundColor: "#999999",
+        color: "#000"
+    },
+    tag_brown: {
+        backgroundColor: "#996633",
+        color: "#000"
+    },
+
     center: {
         display: "block",
         marginLeft: "auto",
         marginRight: "auto",
         width: "50%"
+    },
+    pad_text: {
+        padding: 5,
     }
 });
 
