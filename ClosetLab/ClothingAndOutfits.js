@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList } from 'react-native';
-import styles, {testImg_b64} from './Stylesheet';
+import styles, {testImg_b64,  generateIcon} from './Stylesheet';
 import React, { useState } from 'react';
 import { logFetch, getItem,getAllItemsForUser,  postItem, deleteItem } from './APIContainer.js';
 
@@ -29,7 +29,7 @@ window.global_selectedClothingItem = {
 //takes a list of strings [b, a, c]. returns "a, b, c".
 export function reduceListToHumanReadable(thisList){ 
     if (thisList.length==0){return "None"}
-    thisList = thisList.sort();
+    if (thisList.sort) {thisList = thisList.sort();} //there's no list.sort on mobile?
     return thisList.reduce(
         (accumulator, currentValue, index) => {
             if (index==0){return accumulator}
@@ -187,11 +187,17 @@ export function ClothingItemView(){ //unused for now
          
 
     return (<SafeAreaView style={styles.container}>
-        <View>
-            <Pressable style={styles.button} onPress={onGoToHome}>
-                <Text style={styles.button_text}>Go to Home</Text>
-            </Pressable>
-            <View>
+        <View style={styles.container}>
+            <View style={styles.container_row}>
+                <Pressable style={styles.button} onPress={onGoToHome}>
+                {generateIcon('home', styles.button_iconCorner)}
+                </Pressable>
+                <Pressable style={styles.button} onPress={onGoToList}>
+                        <Text style={styles.button_text}>Back to List</Text>
+                </Pressable>
+                {generateIcon(newClothing.useDonationReminder?"donation_on":"donation_off", styles.button_corner)}
+            </View>
+            <View style={styles.container_underTopRow}>
                 <Text>Name: {newClothing.name}</Text>
                 <Text>objectID: {newClothing.db_id}</Text>
                 <Image resizeMode= "contain" style={
@@ -203,15 +209,13 @@ export function ClothingItemView(){ //unused for now
                 }
                 }
                 source={{ uri: newClothing.image_link }} />
-                <Text>Brands: {reduceListToHumanReadable(newClothing.brand_tags)}</Text>
-                <Text>Types: {reduceListToHumanReadable(newClothing.type_tags)}</Text>
-                <Text>Colors: {reduceListToHumanReadable(newClothing.color_tags)}</Text>
-                <Text>Other: {reduceListToHumanReadable(newClothing.other_tags)}</Text>
+                <Text style={styles.listItem}>Brands: {reduceListToHumanReadable(newClothing.brand_tags)}</Text>
+                <Text style={styles.listItem}>Types: {reduceListToHumanReadable(newClothing.type_tags)}</Text>
+                <Text style={styles.listItem}>Colors: {reduceListToHumanReadable(newClothing.color_tags)}</Text>
+                <Text style={styles.listItem}>Other: {reduceListToHumanReadable(newClothing.other_tags)}</Text>
                 <Text>Donation Reminders: {(String)(newClothing.useDonationReminder)}</Text>
             </View>
-            <Pressable style={styles.button} onPress={onGoToList}>
-                <Text style={styles.button_text}>Back to List</Text>
-            </Pressable>
+            
             
         </View>
     </SafeAreaView>);
@@ -278,7 +282,7 @@ export function ClothingItemListView(){
     
     return (<SafeAreaView style={styles.container}>
         <Pressable style={styles.button} onPress={onGoToHome}>
-            <Text style={styles.button_text}>Go to Home</Text>
+            {generateIcon('home', styles.button_iconCorner)}
         </Pressable>
         {getMaybeList(returnedData)}
     </SafeAreaView>);
