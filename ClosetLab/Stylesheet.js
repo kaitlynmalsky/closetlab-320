@@ -3,10 +3,10 @@ import { StyleSheet, Image, Platform } from "react-native";
 
 const iconResources = {
     flip: require("./assets/buttonIcons/icon_flip.png"),
-    home:require("./assets/buttonIcons/icon_home.png"),
-    cam:require("./assets/buttonIcons/icon_cam.png"),
-    donation_on:require("./assets/buttonIcons/icon_donation_on.png"),
-    donation_off:require("./assets/buttonIcons/icon_donation_off.png"),
+    home: require("./assets/buttonIcons/icon_home.png"),
+    cam: require("./assets/buttonIcons/icon_cam.png"),
+    donation_on: require("./assets/buttonIcons/icon_donation_on.png"),
+    donation_off: require("./assets/buttonIcons/icon_donation_off.png"),
 }
 const defaultIconStyle = {
     width: 100,
@@ -20,8 +20,8 @@ const defaultIconStyle = {
 
 export function generateIcon(name, optionalStyle = defaultIconStyle) {
     //console.log(name)
-    
-    if (!iconResources[name]){
+
+    if (!iconResources[name]) {
         console.log("using favicon")
         return (<Image
             style={optionalStyle}
@@ -32,8 +32,8 @@ export function generateIcon(name, optionalStyle = defaultIconStyle) {
     return (<Image
         style={optionalStyle}
         resizeMode={'contain'} // cover or contain its upto you view look
-        source={iconResources[name] } />)
-        //source={{ uri: iconResources[name] }} />)
+        source={iconResources[name]} />)
+    //source={{ uri: iconResources[name] }} />)
 }
 
 
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         position: 'relative',
         opacity: 0,
-        borderWidth:0,
+        borderWidth: 0,
     },
     container: {
         flex: 1,
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     },
     button_corner: {
         width: '25%',
-        height:'100%',
+        height: '100%',
         //margin: 7,
         alignItems: 'center',
         justifyContent: 'center',
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     },
     button_iconCorner: {
         width: 40,
-        height:40,
+        height: 40,
         //margin: 7,
         alignItems: 'center',
         justifyContent: 'bottom',
@@ -150,8 +150,21 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 24,
-        fontWeight: 'bold',
     },
+    tag: {
+        "backgroundColor": "#d6d6d6",
+        "color": "#1d1d1e",
+        "borderRadius": "10px",
+        "WebkitBoxDecorationBreak": "clone",
+        "boxDecorationBreak": "clone",
+        "padding": "0 5px 0 5px"
+    },
+    center: {
+        display: "block",
+        marginLeft: "auto",
+        marginRight: "auto",
+        width: "50%"
+    }
 });
 
 export default styles;
