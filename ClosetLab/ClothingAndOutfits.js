@@ -1,9 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { logFetch, getItem, getAllItemsForUser, postItem, deleteItem } from './APIContainer.js';
 import color_tag_styles from './ColorTags.js';
+import addTag from './AddTags.js';
 
 //Tag Types. Items have 4 types of tags, each with any number of user-defined string properties.
 export const TagType = Object.freeze({
@@ -172,6 +173,10 @@ export function ClothingItemView() { //unused for now
     const onGoToList = () => {
         navigation.navigate('Clothing Item View');
     };
+    const [brandModalVisible, setBrandModalVisible] = useState(false);
+    const [colorModalVisible, setColorModalVisible] = useState(false);
+    const [typeModalVisible, setTypeModalVisible] = useState(false);
+    const [otherModalVisible, setOtherModalVisible] = useState(false);
 
 
     //const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
@@ -194,6 +199,26 @@ export function ClothingItemView() { //unused for now
     //}
     //getItemInfo();
     //console.log(window.global_selectedClothingItem._id)
+    function generateTagItem(lead, listElement, modalFunc){
+        return (<View style={styles.container_tag}>
+            <View >
+                <Text style={styles.text_Left}>{lead}: {listElement}</Text>
+            </View>
+            <View >
+                <Pressable style={styles.button_small} onPress={()=>modalFunc(true)}>
+                    {generateIcon('add', styles.icon_general)}
+                </Pressable>
+            </View>
+        </View>
+        
+        )
+    }
+
+    function toggleDonations(){
+        
+        newClothing.setIndividualDonationReminder(!newClothing.useDonationReminder)
+        console.log(newClothing.useDonationReminder)
+    }
 
 
     return (<SafeAreaView style={styles.container}>
@@ -205,7 +230,9 @@ export function ClothingItemView() { //unused for now
                 <Pressable style={styles.button} onPress={onGoToList}>
                     <Text style={styles.button_text}>Back to List</Text>
                 </Pressable>
-                {generateIcon(newClothing.useDonationReminder ? "donation_on" : "donation_off", styles.button_corner)}
+                <Pressable style={styles.button_corner} onPress={toggleDonations}>
+                {generateIcon(newClothing.useDonationReminder ? "donation_on" : "donation_off", styles.button_iconCorner)}
+                </Pressable>
             </View>
             <View style={styles.container_underTopRow}>
                 <Text style={[styles.text, styles.pad_text]}>Name: {newClothing.name}</Text>
@@ -220,12 +247,18 @@ export function ClothingItemView() { //unused for now
                 }
                     source={{ uri: newClothing.image_link }} />
                 <Text>{"\n"}</Text>
-                <Text style={styles.text}>Brands: {reduceListToHumanReadable(newClothing.brand_tags)}</Text>
-                <Text style={styles.text}>Types: {reduceListToHumanReadable(newClothing.type_tags)}</Text>
-                <Text style={styles.text}>Colors: {reduceListToHumanReadable(newClothing.color_tags)}</Text>
-                <Text style={styles.text}>Other: {reduceListToHumanReadable(newClothing.other_tags)}</Text>
+                {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible)}
+                {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible)}
+                {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible)}
+                {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible)}
                 <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(newClothing.useDonationReminder)}</Text></Text>
             </View>
+
+            {addTag(newClothing, "brand", brandModalVisible, setBrandModalVisible)}
+            {addTag(newClothing, "color", colorModalVisible, setColorModalVisible)}
+            {addTag(newClothing, "type", typeModalVisible, setTypeModalVisible)}
+            {addTag(newClothing, "other", otherModalVisible, setOtherModalVisible)}
+
 
 
         </View>

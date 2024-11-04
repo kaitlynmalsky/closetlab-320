@@ -7,6 +7,7 @@ const iconResources = {
     cam: require("./assets/buttonIcons/icon_cam.png"),
     donation_on: require("./assets/buttonIcons/icon_donation_on.png"),
     donation_off: require("./assets/buttonIcons/icon_donation_off.png"),
+    add: require("./assets/buttonIcons/icon_add.png"),
 }
 const defaultIconStyle = {
     width: 100,
@@ -70,6 +71,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         position: 'relative'
     },
+    container_row_leftAlign: {
+        //flex: 1,
+        margin:0,
+        flexDirection: 'row',
+        alignItems: 'left',
+        justifyContent: 'flex-start',
+        position: 'relative'
+    },
+    container_row_rightAlign: {
+        //flex: 1,
+        margin: 0,
+        flexDirection: 'row',
+        alignItems: 'right',
+        justifyContent: 'right',
+        position: 'relative'
+    },
     container_underTopRow: {
         flex: 1,
         padding: 0,
@@ -103,6 +120,16 @@ const styles = StyleSheet.create({
         borderColor: '#022b6e',
         backgroundColor: '#bbd3fa',
     },
+    container_tag: {
+        padding: 10,
+        margin: 10,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: '#022b6e',
+        backgroundColor: '#bbd3fa',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
     button_camera: {
         backgroundColor: 'rgba(44, 44, 44, 0.2)',
         padding: 10,
@@ -129,6 +156,22 @@ const styles = StyleSheet.create({
         justifyContent: 'bottom',
         borderWidth: 0,
     },
+    button_small: {
+        width: 50,
+        height: 50,
+        //margin: 7,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 0,
+    },
+    icon_general: {
+        width: 50,
+        height: 50,
+        //margin: 7,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 0,
+    },
     button_text: {
         color: 'white',
         textAlign: 'center',
@@ -151,11 +194,19 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 24,
     },
+    text_Left: {
+        textAlign: 'left',
+        fontSize: 24,
+    },
+    text_Right: {
+        textAlign: 'right',
+        fontSize: 24,
+    },
     tag: {
         "borderRadius": "10px",
         "WebkitBoxDecorationBreak": "clone",
         "boxDecorationBreak": "clone",
-        "padding": "0 5px 0 5px"
+        padding: "0px"
     },
     tag_default: {
         backgroundColor: "#d6d6d6",
@@ -210,7 +261,37 @@ const styles = StyleSheet.create({
     },
     pad_text: {
         padding: 5,
-    }
+    },
+
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 20,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    modalText: {
+        marginBottom: 15,
+        textAlign: 'center',
+    },
+    input: {
+        padding: 10,
+        borderWidth: 0.5,
+        borderRadius: 4,
+    },
+    error_text: {
+        color: 'red',
+        fontSize: 20,
+        textAlign: 'center',
+    },
 });
 
 export default styles;
