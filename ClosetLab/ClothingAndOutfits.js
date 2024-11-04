@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList } from 'react-native';
+import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList,ImageBackground   } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
 import { logFetch, getItem, getAllItemsForUser, postItem, deleteItem } from './APIContainer.js';
@@ -173,6 +173,9 @@ export function ClothingItemView() { //unused for now
     const onGoToList = () => {
         navigation.navigate('Clothing Item View');
     };
+    const onGoToCam = () => {
+        navigation.navigate('Camera');
+    };
     const [brandModalVisible, setBrandModalVisible] = useState(false);
     const [colorModalVisible, setColorModalVisible] = useState(false);
     const [typeModalVisible, setTypeModalVisible] = useState(false);
@@ -237,15 +240,25 @@ export function ClothingItemView() { //unused for now
             <View style={styles.container_underTopRow}>
                 <Text style={[styles.text, styles.pad_text]}>Name: {newClothing.name}</Text>
                 <Text style={[styles.text, styles.pad_text]}>objectID: {newClothing.db_id}</Text>
-                <Image resizeMode="contain" style={
+                <View style={styles.spacer_row}>
+                    <ImageBackground resizeMode="contain" style={
                     {
                         width: 300,
                         height: 300,
                         borderWidth: 1,
-                        borderColor: 'black'
+                        borderColor: 'black',
+                        justifyContent: 'space-between',
                     }
-                }
-                    source={{ uri: newClothing.image_link }} />
+                    }
+                    source={{ uri: newClothing.image_link }}>
+                    <Pressable style={styles.icon_corner} onPress={onGoToCam}>
+                        {generateIcon('add', styles.button_iconCorner)}
+                    </Pressable>
+
+                    </ImageBackground>
+                    
+                </View>
+                
                 <Text>{"\n"}</Text>
                 {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible)}
                 {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible)}

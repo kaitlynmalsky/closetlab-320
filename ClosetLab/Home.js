@@ -40,7 +40,9 @@ export default Home = () => {
 
         }
     }
-
+    //<Pressable style={styles.button} onPress={onGoToCamera}>
+    //    <Text style={styles.button_text}>Go to video camera</Text>
+    //</Pressable>
     return (
         <SafeAreaView style={styles.container}>
             {imageElement}
@@ -50,6 +52,7 @@ export default Home = () => {
             <Pressable style={styles.button} onPress={onGoToCamera}>
                 <Text style={styles.button_text}>Go to video camera</Text>
             </Pressable>
+            
             <Pressable style={styles.button} onPress={onGoToClothingItemTest}>
                 <Text style={styles.button_text}>Go to clothing item test</Text>
             </Pressable>

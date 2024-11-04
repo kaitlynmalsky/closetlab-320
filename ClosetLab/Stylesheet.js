@@ -8,6 +8,8 @@ const iconResources = {
     donation_on: require("./assets/buttonIcons/icon_donation_on.png"),
     donation_off: require("./assets/buttonIcons/icon_donation_off.png"),
     add: require("./assets/buttonIcons/icon_add.png"),
+    yes: require("./assets/buttonIcons/icon_yes.png"),
+    no: require("./assets/buttonIcons/icon_no.png"),
 }
 const defaultIconStyle = {
     width: 100,
@@ -19,7 +21,7 @@ const defaultIconStyle = {
 }
 
 
-export function generateIcon(name, optionalStyle = defaultIconStyle) {
+export function generateIcon(name, optionalStyle = defaultIconStyle, resizeStyle = 'contain') {
     //console.log(name)
 
     if (!iconResources[name]) {
@@ -32,7 +34,7 @@ export function generateIcon(name, optionalStyle = defaultIconStyle) {
     //console.log("using normal")
     return (<Image
         style={optionalStyle}
-        resizeMode={'contain'} // cover or contain its upto you view look
+        resizeMode={resizeStyle} // cover or contain its upto you view look
         source={iconResources[name]} />)
     //source={{ uri: iconResources[name] }} />)
 }
@@ -40,14 +42,11 @@ export function generateIcon(name, optionalStyle = defaultIconStyle) {
 
 const styles = StyleSheet.create({
     spacer_row: {
-        paddingHorizontal: 100,
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
         position: 'relative',
-        opacity: 0,
         borderWidth: 0,
+        justifyContent: 'center',
     },
     container: {
         flex: 1,
@@ -57,18 +56,17 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     container_test: {
-        flex: 1,
-        flexDirection: 'row',
+        backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'relative'
+        position: 'relative',
     },
     container_row: {
         //flex: 1,
         margin: 0,
         flexDirection: 'row',
         alignItems: 'right',
-        justifyContent: 'center',
+        justifyContent: 'center', 
         position: 'relative'
     },
     container_row_leftAlign: {
@@ -97,7 +95,7 @@ const styles = StyleSheet.create({
         position: 'relative'
     },
     container_camera: {
-        width: '100%',
+        width: '100%', 
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
@@ -132,10 +130,10 @@ const styles = StyleSheet.create({
     },
     button_camera: {
         backgroundColor: 'rgba(44, 44, 44, 0.2)',
-        padding: 10,
+        padding: 10, 
         margin: 7,
-        width: 'calc(100vw/6)',
-        height: 'calc(100vw/6)',
+        width: 80,
+        height: 80,  
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: StyleSheet.hairlineWidth,
@@ -170,6 +168,13 @@ const styles = StyleSheet.create({
         //margin: 7,
         alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: 0,
+    },
+    icon_corner: {
+        width: 50,
+        height: 50,
+        alignItems: 'right',
+        justifyContent: 'bottom',
         borderWidth: 0,
     },
     button_text: {

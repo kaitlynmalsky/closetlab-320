@@ -2,9 +2,9 @@
 //https://docs.expo.dev/versions/latest/sdk/camera/#example-appjson-with-config-plugin
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useState } from 'react';
-import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image } from 'react-native';
+import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { saveImage, loadStoredImages, deleteImage, clearAllImages } from './Image_Storage';
+import { saveImage, loadStoredImages, deleteImage, clearAllImages, getStoredImages } from './Image_Storage';
 import styles, {generateIcon, icons} from './Stylesheet';
 
 
@@ -78,6 +78,17 @@ export default Camera_Test = () => {
     navigation.navigate('Home');
   };
 
+  const onSaveImage = () => {
+    if (window.global_selectedClothingItem==null){window.global_selectedClothingItem = {imageUri:"none"}}
+    window.global_selectedClothingItem.imageUri = usePhotoGallery().getRecentPhoto()
+    //console.log(window.global_selectedClothingItem.imageUri)
+    navigation.navigate('Single Clothing Item View');
+  };
+
+  const onCancelImage = () => {
+    navigation.navigate('Single Clothing Item View');
+  };
+
   const [facing, setFacing] = useState('back'); //facing dir of camera; should only ever be "back" or "front"
   const [camera, setCamera] = useState(null); //camera object.
   const [permission, requestPermission] = useCameraPermissions();
@@ -121,9 +132,12 @@ export default Camera_Test = () => {
         // Use the saveImage function from Image_storage.js to store the image
         const savedPath = await saveImage(newPic.base64); // Pass the base64 image data to saveImage
 
-        if (savedPath) {
-          photoTools.addPhoto(savedPath); // Add the file path to the gallery
+        if (savedPath && Platform.OS!=='web') {
+          photoTools.addPhoto(newPic.base64); // Add the important b64 to the gallery
           console.log('Photo URI stored in AsyncStorage:', savedPath);
+        }
+        else {
+          photoTools.addPhoto(newPic.base64);
         }
       } catch (error) {
         console.log('Error saving the photo:', error);
@@ -140,15 +154,19 @@ export default Camera_Test = () => {
         <View style={[styles.container_camera]}>
 
           <Pressable style={styles.button_camera} onPress={toggleCameraFacing}>
-            {generateIcon("flip")}
+            {generateIcon("flip", null, 'cover')}
           </Pressable>
 
           <Pressable style={styles.button_camera} onPress={takePictureAndStore}>
-          {generateIcon("cam")}
+          {generateIcon("cam", null, 'cover')}
           </Pressable>
 
-          <Pressable style={styles.button_camera} onPress={onGoToHome}>
-          {generateIcon("home")}
+          <Pressable style={styles.button_camera} onPress={onSaveImage}>
+          {generateIcon("yes", null, 'cover')}
+          </Pressable>
+
+          <Pressable style={styles.button_camera} onPress={onCancelImage}>
+          {generateIcon("no", null, 'cover')}
           </Pressable>
 
         </View>
