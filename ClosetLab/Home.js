@@ -17,6 +17,9 @@ export default Home = () => {
     const onGoToClothingItemTest = () => {
         navigation.navigate('Clothing Item View');
     };
+    const onGoToCalendar = () => {
+        navigation.navigate('Calendar')
+    }
     function getRecentTakenPhoto() {
         const maybeURI = photoTools.getRecentPhoto();
         if (maybeURI) {
@@ -53,7 +56,10 @@ export default Home = () => {
             <Pressable style={styles.button} onPress={onGoToClothingItemTest}>
                 <Text style={styles.button_text}>Go to clothing item test</Text>
             </Pressable>
-        
+            <Pressable style={styles.button} onPress={onGoToCalendar}>
+                <Text style={styles.button_text}>Go to calendar</Text>
+            </Pressable>
+
         </SafeAreaView>
     );
 };
