@@ -1,7 +1,7 @@
 # MongoDB Documentation
 
-## Databases
-Database list:
+## Collections
+Collection list:
 * calendars
     * `_id: ObjectID`
     * `user_id: ObjectID`
@@ -40,3 +40,5 @@ username: kmalsky
 password: Cw1ccE8Bq5VV8Lwe
 
 connection link: mongodb+srv://kmalsky:Cw1ccE8Bq5VV8Lwe@closetlab.q7yvq.mongodb.net/
+
+To connect in mongosh, connect using the connection link and `use closet_lab_db`.
