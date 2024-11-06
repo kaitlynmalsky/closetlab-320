@@ -279,62 +279,123 @@ export function ClothingItemView() { //unused for now
 }
 
 
-export function ClothingItemListView() {
+export function OutfitListView() {
     const navigation = useNavigation();
     const onGoToHome = () => {
         navigation.navigate('Home');
     };
 
 
-    function onGoToSingleItemView_createFunc(item) {
+    // function onGoToSingleItemView_createFunc(item) {
 
+    //     return () => {
+    //         window.global_selectedClothingItem._id = item._id;
+    //         window.global_selectedClothingItem.name = item.name;
+    //         window.global_selectedClothingItem.imageUri = item.image_link;
+    //         window.global_selectedClothingItem.colors = item.color_tags;
+    //         window.global_selectedClothingItem.brands = item.brand_tags;
+    //         window.global_selectedClothingItem.types = item.type_tags;
+    //         window.global_selectedClothingItem.others = item.other_tags;
+    //         window.global_selectedClothingItem.donationReminder = item.donation_reminders;
+    //         navigation.navigate('Single Clothing Item View');
+    //     }
+    // };
+
+    function onGoToSingleOutfitView_createFunc(outfit) {
         return () => {
-            window.global_selectedClothingItem._id = item._id;
-            window.global_selectedClothingItem.name = item.name;
-            window.global_selectedClothingItem.imageUri = item.image_link;
-            window.global_selectedClothingItem.colors = item.color_tags;
-            window.global_selectedClothingItem.brands = item.brand_tags;
-            window.global_selectedClothingItem.types = item.type_tags;
-            window.global_selectedClothingItem.others = item.other_tags;
-            window.global_selectedClothingItem.donationReminder = item.donation_reminders;
-            navigation.navigate('Single Clothing Item View');
+            window.global_selectedOutfit = {
+                db_id: outfit.db_id,
+                title: outfit.title,
+                clothingItems: outfit.clothingItems,
+            };
+            navigation.navigate('Single Outfit View');
         }
-    };
+    }
+
     const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
-    //React complains if every item in a list doesn't have a unique 'key' prop
-    const renderListItem = ({ item }) => (
-        <View style={styles.listItem} key={item._id}>
-            <Pressable onPress={onGoToSingleItemView_createFunc(item)}>
-                <Text>Name: {item.name}</Text>
-                <Text>objectID: {item._id}</Text>
-                <Image resizeMode="contain" style={
-                    {
-                        width: 300,
-                        height: 300,
-                        borderWidth: 1,
-                        borderColor: 'black'
-                    }
-                }
-                    source={{ uri: item.image }} />
-                <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
-                <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
+
+    const renderOutfitItem = ({ item }) => (
+        <View style={styles.listItem} key={item.db_id}>
+            <Pressable onPress={onGoToSingleOutfitView_createFunc(item)}>
+                <Text>Outfit Title: {item.title}</Text>
+                <Text>objectID: {item.db_id}</Text>
+                
+                {/* For each clothing item in the outfit, display it in a similar "blue box" format */}
+                <FlatList
+                    data={item.clothingItems}
+                    renderItem={({ item: clothingItem }) => (
+                        <View style={styles.clothingItemBox}>
+                            <Text>Name: {clothingItem.name}</Text>
+                            <Text>objectID: {clothingItem.db_id}</Text>
+                            <Image
+                                resizeMode="contain"
+                                style={{
+                                    width: 300,
+                                    height: 300,
+                                    borderWidth: 1,
+                                    borderColor: 'black'
+                                }}
+                                source={{ uri: clothingItem.image_link }}
+                            />
+                            <Text>Colors: {reduceListToHumanReadable(clothingItem.color_tags)}</Text>
+                            <Text>Brands: {reduceListToHumanReadable(clothingItem.brand_tags)}</Text>
+                        </View>
+                    )}
+                    keyExtractor={(clothingItem) => clothingItem.db_id}
+                />
             </Pressable>
         </View>
     );
 
+
+    //React complains if every item in a list doesn't have a unique 'key' prop
+    // const renderListItem = ({ item }) => (
+    //     <View style={styles.listItem} key={item._id}>
+    //         <Pressable onPress={onGoToSingleItemView_createFunc(item)}>
+    //             <Text>Name: {item.name}</Text>
+    //             <Text>objectID: {item._id}</Text>
+    //             <Image resizeMode="contain" style={
+    //                 {
+    //                     width: 300,
+    //                     height: 300,
+    //                     borderWidth: 1,
+    //                     borderColor: 'black'
+    //                 }
+    //             }
+    //                 source={{ uri: item.image }} />
+    //             <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
+    //             <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
+    //         </Pressable>
+    //     </View>
+    // );
+
+    // const getMaybeList = (returnedData) => {
+    //     var defaultList = (<Text>No Clothing Items Yet!</Text>)
+    //     if (returnedData.length > 0) {
+    //         return (<FlatList
+    //             data={returnedData}
+    //             renderItem={renderListItem}
+    //             keyExtractor={(item) => {
+    //                 return item._id;
+    //             }}
+    //         />)
+    //     }
+    //     return defaultList
+    // }
+
     const getMaybeList = (returnedData) => {
-        var defaultList = (<Text>No Clothing Items Yet!</Text>)
+        var defaultList = (<Text>No Outfits Yet!</Text>);
         if (returnedData.length > 0) {
-            return (<FlatList
-                data={returnedData}
-                renderItem={renderListItem}
-                keyExtractor={(item) => {
-                    return item._id;
-                }}
-            />)
+            return (
+                <FlatList
+                    data={returnedData}
+                    renderItem={renderOutfitItem}
+                    keyExtractor={(item) => item.db_id}
+                />
+            );
         }
-        return defaultList
-    }
+        return defaultList;
+    };
 
 
     return (<SafeAreaView style={styles.container}>
