@@ -1,9 +1,9 @@
 import styles from "./Stylesheet";
 import React, { useState } from 'react';
 import { Alert, Modal, Text, Pressable, View, Keyboard, TextInput } from 'react-native';
-import { postItem } from './APIContainer.js';
 import color_tag_styles from "./ColorTags.js";
-import { addItemTag, base_url, getItem } from "./APIContainer.js";
+import { postItem, addItemTag, base_url, getItem, fetchAPI } from "./APIContainer.js";
+import { ClothingItem } from "./ClothingAndOutfits.js";
 
 
 
@@ -102,3 +102,4 @@ export default addTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
     </View>
   </Modal>);
 }
+
