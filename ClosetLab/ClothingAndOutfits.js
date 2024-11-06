@@ -242,23 +242,23 @@ export function ClothingItemView() { //unused for now
                 <Text style={[styles.text, styles.pad_text]}>objectID: {newClothing.db_id}</Text>
                 <View style={styles.spacer_row}>
                     <ImageBackground resizeMode="contain" style={
-                    {
-                        width: 300,
-                        height: 300,
-                        borderWidth: 1,
-                        borderColor: 'black',
-                        justifyContent: 'space-between',
+                        {
+                            width: 300,
+                            height: 300,
+                            borderWidth: 1,
+                            borderColor: 'black',
+                            justifyContent: 'space-between',
+                        }
                     }
-                    }
-                    source={{ uri: newClothing.image_link }}>
-                    <Pressable style={styles.icon_corner} onPress={onGoToCam}>
-                        {generateIcon('add', styles.button_iconCorner)}
-                    </Pressable>
+                        source={{ uri: newClothing.image_link }}>
+                        <Pressable style={styles.icon_corner} onPress={onGoToCam}>
+                            {generateIcon('add', styles.button_iconCorner)}
+                        </Pressable>
 
                     </ImageBackground>
-                    
+
                 </View>
-                
+
                 <Text>{"\n"}</Text>
                 {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible)}
                 {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible)}
@@ -319,7 +319,7 @@ export function OutfitListView() {
             <Pressable onPress={onGoToSingleOutfitView_createFunc(item)}>
                 <Text>Outfit Title: {item.title}</Text>
                 <Text>objectID: {item.db_id}</Text>
-                
+
                 {/* For each clothing item in the outfit, display it in a similar "blue box" format */}
                 <FlatList
                     data={item.clothingItems}
