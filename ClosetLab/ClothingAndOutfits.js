@@ -406,6 +406,72 @@ export function OutfitListView() {
     </SafeAreaView>);
 }
 
+export function ClothingItemListView() {
+    const navigation = useNavigation();
+    const onGoToHome = () => {
+        navigation.navigate('Home');
+    };
+
+
+    function onGoToSingleItemView_createFunc(item) {
+
+        return () => {
+            window.global_selectedClothingItem._id = item._id;
+            window.global_selectedClothingItem.name = item.name;
+            window.global_selectedClothingItem.imageUri = item.image_link;
+            window.global_selectedClothingItem.colors = item.color_tags;
+            window.global_selectedClothingItem.brands = item.brand_tags;
+            window.global_selectedClothingItem.types = item.type_tags;
+            window.global_selectedClothingItem.others = item.other_tags;
+            window.global_selectedClothingItem.donationReminder = item.donation_reminders;
+            navigation.navigate('Single Clothing Item View');
+        }
+    };
+    const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
+    //React complains if every item in a list doesn't have a unique 'key' prop
+    const renderListItem = ({ item }) => (
+        <View style={styles.listItem} key={item._id}>
+            <Pressable onPress={onGoToSingleItemView_createFunc(item)}>
+                <Text>Name: {item.name}</Text>
+                <Text>objectID: {item._id}</Text>
+                <Image resizeMode="contain" style={
+                    {
+                        width: 300,
+                        height: 300,
+                        borderWidth: 1,
+                        borderColor: 'black'
+                    }
+                }
+                    source={{ uri: item.image }} />
+                <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
+                <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
+            </Pressable>
+        </View>
+    );
+
+    const getMaybeList = (returnedData) => {
+        var defaultList = (<Text>No Clothing Items Yet!</Text>)
+        if (returnedData.length > 0) {
+            return (<FlatList
+                data={returnedData}
+                renderItem={renderListItem}
+                keyExtractor={(item) => {
+                    return item._id;
+                }}
+            />)
+        }
+        return defaultList
+    }
+
+
+    return (<SafeAreaView style={styles.container}>
+        <Pressable style={styles.button} onPress={onGoToHome}>
+            {generateIcon('home', styles.button_iconCorner)}
+        </Pressable>
+        {getMaybeList(returnedData)}
+    </SafeAreaView>);
+}
+
 
 const sendClothingItem = async (clothingItemObject) => { //deprecated: use APIContainer functions instead
     try {
