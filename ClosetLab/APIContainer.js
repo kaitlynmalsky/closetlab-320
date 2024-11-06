@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Component } from 'react';
-// const base_url = "http://localhost:8000/api/" // local host, for dev
-const base_url = "http://3.16.25.91/api/"
+// export const base_url = "http://localhost:8000/api/" // local host, for dev
+export const base_url = "http://3.16.25.91/api/"
 
 function fetchAPI(path, options = undefined) {
     const [data, setData] = useState([]);
@@ -45,6 +45,20 @@ export const postItem = (item_data) => {
     }
     return fetchAPI('v1/clothing-items', options);
 }
+// Don't use this for now, it has issues.
+export function addItemTag(item_id, tag_data) {
+    options = {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+            tag_data
+        )
+    }
+    return fetchAPI('v1/clothing-items/' + item_id + '/add-tag', options)
+}
 
 export const deleteItem = (item_id) => {
     options = {
@@ -78,6 +92,7 @@ export const deleteOutfit = (outfit_id) => {
     path = 'v1/outfits/' + outfit_id;
     return fetchAPI(path);
 }
+
 
 
 

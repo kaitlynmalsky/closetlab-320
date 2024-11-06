@@ -35,6 +35,24 @@ def db_add_clothing_item(name: str = "", image_link: str = "", image: str = "", 
         print("Error adding item to database:", str(e))
         raise
 
+def db_add_clothing_item_tag(object_id: str, new_tag: str, tag_type: str):
+    try:
+        print("Editing clothing item " + object_id + " in database")
+        if not object_id or not new_tag or not tag_type:
+            return
+        if (tag_type not in ["color_tags", "type_tags", "brand_tags", "other_tags"]):
+            return
+        clothing_item = db_get_clothing_item(object_id)
+        clothing_item[tag_type].append(new_tag)
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        clothing_item_collection.update_one(
+            {'_id': ObjectId(object_id)},
+            {'$set': {tag_type: clothing_item[tag_type]}},
+        )
+    except Exception as e:
+        print("Error updating clothing item in database:", str(e))
+
+
 def db_get_clothing_item(object_id: str):
     try: 
         print("Getting clothing item from database")

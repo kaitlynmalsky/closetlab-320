@@ -10,7 +10,8 @@ from db_helpers import (
     db_delete_clothing_item,
     db_get_outfit,
     db_add_outfit,
-    db_delete_outfit
+    db_delete_outfit,
+    db_add_clothing_item_tag
 )
 
 app = Flask(__name__)
@@ -89,6 +90,20 @@ def get_clothing_item(item_id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# POST route to add tags to a clothing item by ID
+@app.route('/api/v1/clothing-items/add-tag/<string:item_id>/', methods=['POST'])
+def edit_clothing_item_tags(item_id):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        new_tag: str = data.get("new_tag")
+        tag_type: str = data.get("tag_type")
+        db_add_clothing_item_tag(item_id, new_tag, tag_type)
+        return jsonify({'message': 'Tag added successfully', 'id': item_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}, 500)
     
 # GET route to retrieve all clothing items belonging to user, by user ID
 @app.route('/api/v1/clothing-items-get-all/<string:user_id>', methods=['GET'])

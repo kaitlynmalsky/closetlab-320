@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     },
     container_row_leftAlign: {
         //flex: 1,
-        margin:0,
+        margin: 0,
         flexDirection: 'row',
         alignItems: 'left',
         justifyContent: 'flex-start',
@@ -207,6 +207,9 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         fontSize: 24,
     },
+    title: {
+        fontSize: 48,
+    },
     tag: {
         "borderRadius": "10px",
         "WebkitBoxDecorationBreak": "clone",
@@ -276,8 +279,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: {
-          width: 0,
-          height: 2,
+            width: 0,
+            height: 2,
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,

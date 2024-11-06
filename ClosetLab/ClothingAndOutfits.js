@@ -202,23 +202,23 @@ export function ClothingItemView() { //unused for now
     //}
     //getItemInfo();
     //console.log(window.global_selectedClothingItem._id)
-    function generateTagItem(lead, listElement, modalFunc){
+    function generateTagItem(lead, listElement, modalFunc) {
         return (<View style={styles.container_tag}>
             <View >
                 <Text style={styles.text_Left}>{lead}: {listElement}</Text>
             </View>
             <View >
-                <Pressable style={styles.button_small} onPress={()=>modalFunc(true)}>
+                <Pressable style={styles.button_small} onPress={() => modalFunc(true)}>
                     {generateIcon('add', styles.icon_general)}
                 </Pressable>
             </View>
         </View>
-        
+
         )
     }
 
-    function toggleDonations(){
-        
+    function toggleDonations() {
+
         newClothing.setIndividualDonationReminder(!newClothing.useDonationReminder)
         console.log(newClothing.useDonationReminder)
     }
@@ -234,7 +234,7 @@ export function ClothingItemView() { //unused for now
                     <Text style={styles.button_text}>Back to List</Text>
                 </Pressable>
                 <Pressable style={styles.button_corner} onPress={toggleDonations}>
-                {generateIcon(newClothing.useDonationReminder ? "donation_on" : "donation_off", styles.button_iconCorner)}
+                    {generateIcon(newClothing.useDonationReminder ? "donation_on" : "donation_off", styles.button_iconCorner)}
                 </Pressable>
             </View>
             <View style={styles.container_underTopRow}>
