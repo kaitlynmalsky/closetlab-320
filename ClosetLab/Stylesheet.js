@@ -8,6 +8,7 @@ const iconResources = {
     donation_on: require("./assets/buttonIcons/icon_donation_on.png"),
     donation_off: require("./assets/buttonIcons/icon_donation_off.png"),
     add: require("./assets/buttonIcons/icon_add.png"),
+    remove: require("./assets/buttonIcons/icon_remove.png"),
     yes: require("./assets/buttonIcons/icon_yes.png"),
     no: require("./assets/buttonIcons/icon_no.png"),
 }
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         position: 'relative',
         borderWidth: 0,
-        justifyContent: 'center',
+        justifyContent: 'space-between',
     },
     container: {
         flex: 1,
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
         margin: 0,
         flexDirection: 'row',
         alignItems: 'right',
-        justifyContent: 'right',
+        justifyContent: 'flex-end',
         position: 'relative'
     },
     container_underTopRow: {

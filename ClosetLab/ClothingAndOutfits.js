@@ -164,7 +164,7 @@ testItem.addPropertyToCategory("Nike", TagType.BRAND)
 testItem.setIndividualDonationReminder(true)
 
 
-export function ClothingItemView() { //unused for now
+export function ClothingItemView() { 
 
     const navigation = useNavigation();
     const onGoToHome = () => {
@@ -441,10 +441,11 @@ export const addClothingItem = (visibleVar, setVisibleVar) => {
           headers: {
               Accept: 'application/json',
               'Content-Type': 'application/json',
+              "Access-Control-Allow-Origin" : "*"
           },
           body: JSON.stringify(newItem)
         }
-        response = await fetch(base_url + 'v1/clothing-items/', options);
+        response = await fetch(base_url + 'v1/clothing-items', options);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -498,7 +499,56 @@ export const addClothingItem = (visibleVar, setVisibleVar) => {
         </View>
       </View>
     </Modal>);
-  }
+}
+
+export const deleteClothingItem = (visibleVar, setVisibleVar) => {
+
+    toDeleteID = window.global_selectedClothingItem._id
+    toDeleteName = window.global_selectedClothingItem.name
+  
+    const onDeleteItem = async () => {  
+      try {
+        
+        options = {
+            method: 'DELETE'
+        }
+        response = await fetch(base_url + 'v1/clothing-items/' + toDeleteID, options);
+        if (!response.ok) {
+          throw new Error('Network response was not ok for deletion');
+        }
+        //const responseData = await response.json();
+        console.log(toDeleteID + 'deleted successfully');
+      } catch (error) {
+        console.error("Error in deletion:", error)
+      }
+      setVisibleVar(false)
+    }
+  
+    return (<Modal
+      animationType="slide"
+      transparent={true}
+      visible={visibleVar}
+      onRequestClose={() => {
+        Alert.alert('Modal has been closed.');
+        setVisibleVar(false);
+      }}>
+      <View style={styles.container}>
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>Really delete "{toDeleteName}"?</Text>
+          <Pressable
+            style={styles.button}
+            onPress={onDeleteItem}>
+            <Text style={styles.button_text}>Delete</Text>
+          </Pressable>
+          <Pressable
+            style={styles.button}
+            onPress={() => { setVisibleVar(false) }}>
+            <Text style={styles.button_text}>Go Back</Text>
+          </Pressable>
+        </View>
+      </View>
+    </Modal>);
+}
 
 export function ClothingItemListView() {
     const navigation = useNavigation();
@@ -508,38 +558,67 @@ export function ClothingItemListView() {
     //addClothingItem
 
     const [addItemModalVisible, setAddItemModalVisible] = useState(false);
+    const [deleteItemModalVisible, setDeleteItemModalVisible] = useState(false);
 
+    function setGlobalViewOfItem(item){
+        window.global_selectedClothingItem._id = item._id;
+        if (item.db_id){
+            window.global_selectedClothingItem._id = item.db_id;
+        }
+        window.global_selectedClothingItem.name = item.name;
+        window.global_selectedClothingItem.imageUri = item.image_link;
+        window.global_selectedClothingItem.colors = item.color_tags;
+        window.global_selectedClothingItem.brands = item.brand_tags;
+        window.global_selectedClothingItem.types = item.type_tags;
+        window.global_selectedClothingItem.others = item.other_tags;
+        window.global_selectedClothingItem.donationReminder = item.donation_reminders;
+    }
 
     function onGoToSingleItemView_createFunc(item) {
-
         return () => {
-            window.global_selectedClothingItem._id = item._id;
-            window.global_selectedClothingItem.name = item.name;
-            window.global_selectedClothingItem.imageUri = item.image_link;
-            window.global_selectedClothingItem.colors = item.color_tags;
-            window.global_selectedClothingItem.brands = item.brand_tags;
-            window.global_selectedClothingItem.types = item.type_tags;
-            window.global_selectedClothingItem.others = item.other_tags;
-            window.global_selectedClothingItem.donationReminder = item.donation_reminders;
+            setGlobalViewOfItem(item)
             navigation.navigate('Single Clothing Item View');
         }
     };
-    const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
+
+    function onOpenDeleteItemModal_createFunc(item) {
+
+        return () => {
+            setGlobalViewOfItem(item)
+            setDeleteItemModalVisible(true)
+        }
+    };
+
+    //TODO: regenerate page on addItem and on deleteItem
+    const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5") 
+
+
     //React complains if every item in a list doesn't have a unique 'key' prop
     const renderListItem = ({ item }) => (
         <View style={styles.listItem} key={item._id}>
+            
             <Pressable onPress={onGoToSingleItemView_createFunc(item)}>
-                <Text>Name: {item.name}</Text>
-                <Text>objectID: {item._id}</Text>
-                <Image resizeMode="contain" style={
+                <View style={styles.spacer_row} key={item._id}>
+                    <View key={item._id}>
+                        <Text>Name: {item.name}</Text>
+                        <Text>objectID: {item._id}</Text>
+                    </View>
+                    <Pressable style={styles.button_small} onPress={onOpenDeleteItemModal_createFunc(item)}>
+                        {generateIcon('remove', styles.icon_general)}
+                    </Pressable>
+                </View>
+                <ImageBackground resizeMode="contain" style={
                     {
                         width: 300,
                         height: 300,
                         borderWidth: 1,
-                        borderColor: 'black'
+                        borderColor: 'black',
+                        justifyContent: 'flex-start',
+                        alignItems: 'flex-end',
                     }
                 }
-                    source={{ uri: item.image }} />
+                    source={{ uri: item.image }} >  
+                    </ImageBackground>
                 <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
                 <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
             </Pressable>
@@ -572,6 +651,7 @@ export function ClothingItemListView() {
         </View>
         
         {addClothingItem(addItemModalVisible, setAddItemModalVisible)}
+        {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible)}
         {getMaybeList(returnedData)}
     </SafeAreaView>);
 }
