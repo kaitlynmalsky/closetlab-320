@@ -33,12 +33,14 @@ window.global_selectedClothingItem = {
 export function reduceListToHumanReadable(thisList) {
     if (thisList.length == 0) { return "" }
     if (thisList.sort) { thisList = thisList.sort(); } //there's no list.sort on mobile?
-    return thisList.reduce(
+    if (thisList.reduce) {return thisList.reduce(
         (accumulator, currentValue, index) => {
             if (index == 0) { return <Text style={getStyleForTag(accumulator)}>{accumulator}</Text> }
             return <Text>{<Text style={getStyleForTag(accumulator)}>{accumulator}</Text>} {<Text style={getStyleForTag(currentValue)}>{currentValue}</Text>}</Text>
         },
-        thisList[0])
+        thisList[0]) }
+    return thisList
+    
 }
 
 function getStyleForTag(tag) {
@@ -408,7 +410,7 @@ export function OutfitListView() {
 
 
 
-export const addClothingItem = (visibleVar, setVisibleVar) => {
+export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
 
 
     const [text, setText] = useState("");
@@ -453,6 +455,8 @@ export const addClothingItem = (visibleVar, setVisibleVar) => {
         newItem.db_id = responseData.id;
         console.log(newItem.db_id)
         console.log('Data retrieved successfully:', responseData);
+        navigation.navigate('Home');
+        navigation.navigate('Clothing Item View');
       } catch (error) {
         console.error("Error:", error)
       }
@@ -481,7 +485,7 @@ export const addClothingItem = (visibleVar, setVisibleVar) => {
           <Text style={styles.modalText}>Choose name of new item:</Text>
           <TextInput
             style={styles.input}
-            placeholder="Type your tag here…"
+            placeholder="Type your name here…"
             onChangeText={newText => { setText(newText);}}
             onSubmitEditing={Keyboard.dismiss}
           />
@@ -501,7 +505,7 @@ export const addClothingItem = (visibleVar, setVisibleVar) => {
     </Modal>);
 }
 
-export const deleteClothingItem = (visibleVar, setVisibleVar) => {
+export const deleteClothingItem = (visibleVar, setVisibleVar, navigation) => {
 
     toDeleteID = window.global_selectedClothingItem._id
     toDeleteName = window.global_selectedClothingItem.name
@@ -517,7 +521,9 @@ export const deleteClothingItem = (visibleVar, setVisibleVar) => {
           throw new Error('Network response was not ok for deletion');
         }
         //const responseData = await response.json();
-        console.log(toDeleteID + 'deleted successfully');
+        console.log(toDeleteID + ' deleted successfully');
+        navigation.navigate('Home');
+        navigation.navigate('Clothing Item View');
       } catch (error) {
         console.error("Error in deletion:", error)
       }
@@ -559,6 +565,15 @@ export function ClothingItemListView() {
 
     const [addItemModalVisible, setAddItemModalVisible] = useState(false);
     const [deleteItemModalVisible, setDeleteItemModalVisible] = useState(false);
+    //TODO: regenerate page on addItem and on deleteItem
+    //var returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
+    const [returnedData, setReturnedData] = useState([]);
+    intermediateList = getAllItemsForUser("67057228f80354e361ae2bf5")
+    if (intermediateList.length!=returnedData.length){
+        setReturnedData(intermediateList)
+    }
+    //setReturnedData(intermediateList)
+    //console.log(intermediateList)
 
     function setGlobalViewOfItem(item){
         window.global_selectedClothingItem._id = item._id;
@@ -589,9 +604,7 @@ export function ClothingItemListView() {
         }
     };
 
-    //TODO: regenerate page on addItem and on deleteItem
-    const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5") 
-
+    
 
     //React complains if every item in a list doesn't have a unique 'key' prop
     const renderListItem = ({ item }) => (
@@ -650,8 +663,8 @@ export function ClothingItemListView() {
             </Pressable>
         </View>
         
-        {addClothingItem(addItemModalVisible, setAddItemModalVisible)}
-        {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible)}
+        {addClothingItem(addItemModalVisible, setAddItemModalVisible, navigation)}
+        {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible, returnedData, setReturnedData, navigation)}
         {getMaybeList(returnedData)}
     </SafeAreaView>);
 }
