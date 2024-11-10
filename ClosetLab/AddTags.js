@@ -67,7 +67,6 @@ export default addTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
     //clothingItem.addPropertyToCategory(text, tagType)
 
   }
-  console.log(text, tagType)
 
   return (<Modal
     animationType="slide"

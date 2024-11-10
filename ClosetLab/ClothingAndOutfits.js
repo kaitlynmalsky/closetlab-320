@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList,ImageBackground, Modal, TextInput   } from 'react-native';
+import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, ImageBackground, Modal, TextInput } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
 import { logFetch, getItem, base_url, getAllItemsForUser, postItem, deleteItem } from './APIContainer.js';
@@ -33,14 +33,16 @@ window.global_selectedClothingItem = {
 export function reduceListToHumanReadable(thisList) {
     if (thisList.length == 0) { return "" }
     if (thisList.sort) { thisList = thisList.sort(); } //there's no list.sort on mobile?
-    if (thisList.reduce) {return thisList.reduce(
-        (accumulator, currentValue, index) => {
-            if (index == 0) { return <Text style={getStyleForTag(accumulator)}>{accumulator}</Text> }
-            return <Text>{<Text style={getStyleForTag(accumulator)}>{accumulator}</Text>} {<Text style={getStyleForTag(currentValue)}>{currentValue}</Text>}</Text>
-        },
-        thisList[0]) }
+    if (thisList.reduce) {
+        return thisList.reduce(
+            (accumulator, currentValue, index) => {
+                if (index == 0) { return <Text style={getStyleForTag(accumulator)}>{accumulator}</Text> }
+                return <Text>{<Text style={getStyleForTag(accumulator)}>{accumulator}</Text>} {<Text style={getStyleForTag(currentValue)}>{currentValue}</Text>}</Text>
+            },
+            thisList[0])
+    }
     return thisList
-    
+
 }
 
 function getStyleForTag(tag) {
@@ -166,7 +168,7 @@ testItem.addPropertyToCategory("Nike", TagType.BRAND)
 testItem.setIndividualDonationReminder(true)
 
 
-export function ClothingItemView() { 
+export function ClothingItemView() {
 
     const navigation = useNavigation();
     const onGoToHome = () => {
@@ -209,9 +211,12 @@ export function ClothingItemView() {
             <View >
                 <Text style={styles.text_Left}>{lead}: {listElement}</Text>
             </View>
-            <View >
+            <View style={styles.container_row}>
                 <Pressable style={styles.button_small} onPress={() => modalFunc(true)}>
                     {generateIcon('add', styles.icon_general)}
+                </Pressable>
+                <Pressable style={styles.button_small} onPress={() => modalFunc(true)}>
+                    {generateIcon('remove', styles.icon_general)}
                 </Pressable>
             </View>
         </View>
@@ -415,93 +420,93 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
 
     const [text, setText] = useState("");
     function titleThis(text) {
-      if (typeof (text) == 'undefined') return undefined;
-      return text.trimLeft()[0].toUpperCase() + text.trim().substring(1).toLowerCase()
+        if (typeof (text) == 'undefined') return undefined;
+        return text.trimLeft()[0].toUpperCase() + text.trim().substring(1).toLowerCase()
     }
-  
+
     const [errorProp, setErrorProp] = useState(<Text></Text>);
     const defaultWrongNameMessage = "Invalid Name!"
     const duplicateNameMessage = "That name already exists!"
-  
+
     function generateErrorProp(thisText) {
-      return setErrorProp(<Text style={styles.error_text}>{thisText}</Text>)
+        return setErrorProp(<Text style={styles.error_text}>{thisText}</Text>)
     }
-  
-  
-  
+
+
+
     const onAddItem = async () => {
-      
-  
-      if (text === "") {
-        return generateErrorProp(defaultWrongNameMessage)
-      }
-  
-      try {
-        newItem = new ClothingItem("none", titleThis(text), "", "67057228f80354e361ae2bf5") //TODO: replace 4th arg with userId retrieved dynamically
-        options = {
-          method: 'POST',
-          headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json',
-              "Access-Control-Allow-Origin" : "*"
-          },
-          body: JSON.stringify(newItem)
+
+
+        if (text === "") {
+            return generateErrorProp(defaultWrongNameMessage)
         }
-        response = await fetch(base_url + 'v1/clothing-items', options);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+
+        try {
+            newItem = new ClothingItem("none", titleThis(text), "", "67057228f80354e361ae2bf5") //TODO: replace 4th arg with userId retrieved dynamically
+            options = {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: JSON.stringify(newItem)
+            }
+            response = await fetch(base_url + 'v1/clothing-items', options);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const responseData = await response.json();
+            newItem.db_id = responseData.id;
+            console.log(newItem.db_id)
+            console.log('Data retrieved successfully:', responseData);
+            navigation.navigate('Home');
+            navigation.navigate('Clothing Item View');
+        } catch (error) {
+            console.error("Error:", error)
         }
-        const responseData = await response.json();
-        newItem.db_id = responseData.id;
-        console.log(newItem.db_id)
-        console.log('Data retrieved successfully:', responseData);
-        navigation.navigate('Home');
-        navigation.navigate('Clothing Item View');
-      } catch (error) {
-        console.error("Error:", error)
-      }
-      //if (clothingItem[tagType + "_tags"].includes(titleThis(text))) {
-      //  return generateErrorProp(duplicateNameMessage)
-      //}
-  
-      setErrorProp(<Text></Text>)
-      setVisibleVar(false)
-  
-      //clothingItem.addPropertyToCategory(text, tagType)
-  
-    }
-  
-    return (<Modal
-      animationType="slide"
-      transparent={true}
-      visible={visibleVar}
-      onRequestClose={() => {
-        Alert.alert('Modal has been closed.');
+        //if (clothingItem[tagType + "_tags"].includes(titleThis(text))) {
+        //  return generateErrorProp(duplicateNameMessage)
+        //}
+
         setErrorProp(<Text></Text>)
-        setVisibleVar(false);
-      }}>
-      <View style={styles.container}>
-        <View style={styles.modalView}>
-          <Text style={styles.modalText}>Choose name of new item:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Type your name here…"
-            onChangeText={newText => { setText(newText);}}
-            onSubmitEditing={Keyboard.dismiss}
-          />
-          {errorProp}
-          <Pressable
-            style={styles.button}
-            onPress={onAddItem}>
-            <Text style={styles.button_text}>Create new Item</Text>
-          </Pressable>
-          <Pressable
-            style={styles.button}
-            onPress={() => { setErrorProp(<Text></Text>); setVisibleVar(false) }}>
-            <Text style={styles.button_text}>Cancel</Text>
-          </Pressable>
+        setVisibleVar(false)
+
+        //clothingItem.addPropertyToCategory(text, tagType)
+
+    }
+
+    return (<Modal
+        animationType="slide"
+        transparent={true}
+        visible={visibleVar}
+        onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setErrorProp(<Text></Text>)
+            setVisibleVar(false);
+        }}>
+        <View style={styles.container}>
+            <View style={styles.modalView}>
+                <Text style={styles.modalText}>Choose name of new item:</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Type your name here…"
+                    onChangeText={newText => { setText(newText); }}
+                // onSubmitEditing={Keyboard.dismiss}
+                />
+                {errorProp}
+                <Pressable
+                    style={styles.button}
+                    onPress={onAddItem}>
+                    <Text style={styles.button_text}>Create new Item</Text>
+                </Pressable>
+                <Pressable
+                    style={styles.button}
+                    onPress={() => { setErrorProp(<Text></Text>); setVisibleVar(false) }}>
+                    <Text style={styles.button_text}>Cancel</Text>
+                </Pressable>
+            </View>
         </View>
-      </View>
     </Modal>);
 }
 
@@ -509,50 +514,50 @@ export const deleteClothingItem = (visibleVar, setVisibleVar, navigation) => {
 
     toDeleteID = window.global_selectedClothingItem._id
     toDeleteName = window.global_selectedClothingItem.name
-  
-    const onDeleteItem = async () => {  
-      try {
-        
-        options = {
-            method: 'DELETE'
+
+    const onDeleteItem = async () => {
+        try {
+
+            options = {
+                method: 'DELETE'
+            }
+            response = await fetch(base_url + 'v1/clothing-items/' + toDeleteID, options);
+            if (!response.ok) {
+                throw new Error('Network response was not ok for deletion');
+            }
+            //const responseData = await response.json();
+            console.log(toDeleteID + ' deleted successfully');
+            navigation.navigate('Home');
+            navigation.navigate('Clothing Item View');
+        } catch (error) {
+            console.error("Error in deletion:", error)
         }
-        response = await fetch(base_url + 'v1/clothing-items/' + toDeleteID, options);
-        if (!response.ok) {
-          throw new Error('Network response was not ok for deletion');
-        }
-        //const responseData = await response.json();
-        console.log(toDeleteID + ' deleted successfully');
-        navigation.navigate('Home');
-        navigation.navigate('Clothing Item View');
-      } catch (error) {
-        console.error("Error in deletion:", error)
-      }
-      setVisibleVar(false)
+        setVisibleVar(false)
     }
-  
+
     return (<Modal
-      animationType="slide"
-      transparent={true}
-      visible={visibleVar}
-      onRequestClose={() => {
-        Alert.alert('Modal has been closed.');
-        setVisibleVar(false);
-      }}>
-      <View style={styles.container}>
-        <View style={styles.modalView}>
-          <Text style={styles.modalText}>Really delete "{toDeleteName}"?</Text>
-          <Pressable
-            style={styles.button}
-            onPress={onDeleteItem}>
-            <Text style={styles.button_text}>Delete</Text>
-          </Pressable>
-          <Pressable
-            style={styles.button}
-            onPress={() => { setVisibleVar(false) }}>
-            <Text style={styles.button_text}>Go Back</Text>
-          </Pressable>
+        animationType="slide"
+        transparent={true}
+        visible={visibleVar}
+        onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setVisibleVar(false);
+        }}>
+        <View style={styles.container}>
+            <View style={styles.modalView}>
+                <Text style={styles.modalText}>Really delete "{toDeleteName}"?</Text>
+                <Pressable
+                    style={styles.button}
+                    onPress={onDeleteItem}>
+                    <Text style={styles.button_text}>Delete</Text>
+                </Pressable>
+                <Pressable
+                    style={styles.button}
+                    onPress={() => { setVisibleVar(false) }}>
+                    <Text style={styles.button_text}>Go Back</Text>
+                </Pressable>
+            </View>
         </View>
-      </View>
     </Modal>);
 }
 
@@ -569,15 +574,15 @@ export function ClothingItemListView() {
     //var returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
     const [returnedData, setReturnedData] = useState([]);
     intermediateList = getAllItemsForUser("67057228f80354e361ae2bf5")
-    if (intermediateList.length!=returnedData.length){
+    if (intermediateList.length != returnedData.length) {
         setReturnedData(intermediateList)
     }
     //setReturnedData(intermediateList)
     //console.log(intermediateList)
 
-    function setGlobalViewOfItem(item){
+    function setGlobalViewOfItem(item) {
         window.global_selectedClothingItem._id = item._id;
-        if (item.db_id){
+        if (item.db_id) {
             window.global_selectedClothingItem._id = item.db_id;
         }
         window.global_selectedClothingItem.name = item.name;
@@ -604,12 +609,12 @@ export function ClothingItemListView() {
         }
     };
 
-    
+
 
     //React complains if every item in a list doesn't have a unique 'key' prop
     const renderListItem = ({ item }) => (
         <View style={styles.listItem} key={item._id}>
-            
+
             <Pressable onPress={onGoToSingleItemView_createFunc(item)}>
                 <View style={styles.spacer_row} key={item._id}>
                     <View key={item._id}>
@@ -630,8 +635,8 @@ export function ClothingItemListView() {
                         alignItems: 'flex-end',
                     }
                 }
-                    source={{ uri: item.image }} >  
-                    </ImageBackground>
+                    source={{ uri: item.image }} >
+                </ImageBackground>
                 <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
                 <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
             </Pressable>
@@ -662,7 +667,7 @@ export function ClothingItemListView() {
                 {generateIcon('add', styles.icon_general)}
             </Pressable>
         </View>
-        
+
         {addClothingItem(addItemModalVisible, setAddItemModalVisible, navigation)}
         {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible, returnedData, setReturnedData, navigation)}
         {getMaybeList(returnedData)}
