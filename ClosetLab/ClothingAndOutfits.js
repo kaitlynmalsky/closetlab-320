@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 import { logFetch, getItem, base_url, getAllItemsForUser, postItem, deleteItem } from './APIContainer.js';
 import color_tag_styles from './ColorTags.js';
 import addTag from './AddTags.js';
+import removeTag from './RemoveTags.js';
+
 
 //Tag Types. Items have 4 types of tags, each with any number of user-defined string properties.
 export const TagType = Object.freeze({
@@ -184,6 +186,10 @@ export function ClothingItemView() {
     const [colorModalVisible, setColorModalVisible] = useState(false);
     const [typeModalVisible, setTypeModalVisible] = useState(false);
     const [otherModalVisible, setOtherModalVisible] = useState(false);
+    const [removeBrandModalVisible, setRemoveBrandModalVisible] = useState(false);
+    const [removeColorModalVisible, setRemoveColorModalVisible] = useState(false);
+    const [removeTypeModalVisible, setRemoveTypeModalVisible] = useState(false);
+    const [removeOtherModalVisible, setRemoveOtherModalVisible] = useState(false);
 
 
     //const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
@@ -206,16 +212,16 @@ export function ClothingItemView() {
     //}
     //getItemInfo();
     //console.log(window.global_selectedClothingItem._id)
-    function generateTagItem(lead, listElement, modalFunc) {
+    function generateTagItem(lead, listElement, modalFuncAdd, modalFuncRemove) {
         return (<View style={styles.container_tag}>
             <View >
                 <Text style={styles.text_Left}>{lead}: {listElement}</Text>
             </View>
             <View style={styles.container_row}>
-                <Pressable style={styles.button_small} onPress={() => modalFunc(true)}>
+                <Pressable style={styles.button_small} onPress={() => modalFuncAdd(true)}>
                     {generateIcon('add', styles.icon_general)}
                 </Pressable>
-                <Pressable style={styles.button_small} onPress={() => modalFunc(true)}>
+                <Pressable style={styles.button_small} onPress={() => modalFuncRemove(true)}>
                     {generateIcon('remove', styles.icon_general)}
                 </Pressable>
             </View>
@@ -267,10 +273,10 @@ export function ClothingItemView() {
                 </View>
 
                 <Text>{"\n"}</Text>
-                {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible)}
-                {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible)}
-                {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible)}
-                {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible)}
+                {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible, setRemoveBrandModalVisible)}
+                {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible, setRemoveColorModalVisible)}
+                {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible, setRemoveTypeModalVisible)}
+                {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible, setRemoveOtherModalVisible)}
                 <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(newClothing.useDonationReminder)}</Text></Text>
             </View>
 
@@ -278,6 +284,10 @@ export function ClothingItemView() {
             {addTag(newClothing, "color", colorModalVisible, setColorModalVisible)}
             {addTag(newClothing, "type", typeModalVisible, setTypeModalVisible)}
             {addTag(newClothing, "other", otherModalVisible, setOtherModalVisible)}
+            {removeTag(newClothing, "brand", removeBrandModalVisible, setRemoveBrandModalVisible)}
+            {removeTag(newClothing, "color", removeColorModalVisible, setRemoveColorModalVisible)}
+            {removeTag(newClothing, "type", removeTypeModalVisible, setRemoveTypeModalVisible)}
+            {removeTag(newClothing, "other", removeOtherModalVisible, setRemoveOtherModalVisible)}
 
 
 

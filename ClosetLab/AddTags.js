@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Alert, Modal, Text, Pressable, View, Keyboard, TextInput } from 'react-native';
 import color_tag_styles from "./ColorTags.js";
 import { postItem, addItemTag, base_url, getItem, fetchAPI } from "./APIContainer.js";
-import { ClothingItem } from "./ClothingAndOutfits.js";
+// import { ClothingItem } from "./ClothingAndOutfits.js"; // cycle?
 
 
 
@@ -56,7 +56,6 @@ export default addTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
 
     }
 
-    //TODO: changes are not saved to database, and reset visually on re-retrieval
     console.log(clothingItem)
     console.log(base_url)
 

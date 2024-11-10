@@ -1,0 +1,105 @@
+import styles from "./Stylesheet";
+import React, { useState } from 'react';
+import { Alert, Modal, Text, Pressable, View, Keyboard, TextInput } from 'react-native';
+import color_tag_styles from "./ColorTags.js";
+import { postItem, addItemTag, base_url, getItem, fetchAPI } from "./APIContainer.js";
+// import { ClothingItem } from "./ClothingAndOutfits.js"; // cycle?
+import { Dropdown } from 'react-native-element-dropdown';
+
+
+
+export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
+
+    const [text, setText] = useState("");
+    const [data, setData] = useState({ "new_tag": '', "tag_type": '' })
+    const updateData = (text, type) => {
+        setData({
+            "new_tag": titleThis(text),
+            "tag_type": type + "_tags"
+        })
+        console.log("data updated", data)
+    }
+    function titleThis(text) {
+        if (typeof (text) == 'undefined') return undefined;
+        return text.trimLeft()[0].toUpperCase() + text.trim().substring(1).toLowerCase()
+    }
+
+    const [errorProp, setErrorProp] = useState(<Text></Text>);
+    const defaultWrongNameMessage = "Invalid Name!"
+    const duplicateNameMessage = "That tag already exists!"
+    const textArticle = (tagType == "other") ? "an" : "a"
+
+    function generateErrorProp(thisText) {
+        return setErrorProp(<Text style={styles.error_text}>{thisText}</Text>)
+    }
+
+
+
+    const onRemoveTag = async () => {
+        try {
+            const response = await fetch(base_url + 'v1/clothing-items/add-tag/' + clothingItem.db_id + "/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            const result = await response.json();
+            console.log(result)
+        } catch (error) {
+            console.error("Error:", error)
+        }
+
+        if (text === "") {
+            return generateErrorProp(defaultWrongNameMessage)
+        }
+        if (clothingItem[tagType + "_tags"].includes(titleThis(text))) {
+            return generateErrorProp(duplicateNameMessage)
+
+        }
+
+        console.log(clothingItem)
+        console.log(base_url)
+
+        clothingItem.addPropertyToCategory(titleThis(text), tagType)
+        setErrorProp(<Text></Text>)
+        setVisibleVar(false)
+
+        //clothingItem.addPropertyToCategory(text, tagType)
+
+    }
+
+    return (<Modal
+        animationType="slide"
+        transparent={true}
+        visible={visibleVar}
+        onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setErrorProp(<Text></Text>)
+            setVisibleVar(false);
+        }}>
+        <View style={styles.container}>
+            <View style={styles.modalView}>
+                <Text style={styles.modalText}>Choose {textArticle} {tagType} tag to remove.</Text>
+                {/* <TextInput
+                    style={styles.input}
+                    placeholder="Type your tag here…"
+                    onChangeText={newText => { setText(newText); updateData(newText, tagType) }}
+                    onSubmitEditing={Keyboard.dismiss}
+                /> */}
+                {errorProp}
+                <Pressable
+                    style={styles.button}
+                    onPress={onRemoveTag}>
+                    <Text style={styles.button_text}>Remove Tag</Text>
+                </Pressable>
+                <Pressable
+                    style={styles.button}
+                    onPress={() => { setErrorProp(<Text></Text>); setVisibleVar(false) }}>
+                    <Text style={styles.button_text}>Cancel</Text>
+                </Pressable>
+            </View>
+        </View>
+    </Modal>);
+}
+
