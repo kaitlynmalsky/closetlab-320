@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Alert, Modal, Text, Pressable, View, Keyboard, TextInput } from 'react-native';
 import color_tag_styles from "./ColorTags.js";
 import { postItem, addItemTag, base_url, getItem, fetchAPI } from "./APIContainer.js";
-// import { ClothingItem } from "./ClothingAndOutfits.js"; // cycle?
+import { ClothingItem } from "./ClothingAndOutfits.js"; // cycle?
 import { Dropdown } from 'react-native-element-dropdown';
 // import { DropDownPicker } from 'react-native-dropdown-picker';
 
@@ -14,7 +14,7 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
     const tag_data = clothingItem[tagType + "_tags"];
     const dropdown_data = [];
     for (i = 0; i < tag_data.length; i++) {
-        dropdown_data.push({ label: tag_data[i], value: i })
+        dropdown_data.push({ label: tag_data[i], value: tag_data[i] })
     }
 
     console.log(dropdown_data);
@@ -28,7 +28,7 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
     }
 
     const [errorProp, setErrorProp] = useState(<Text></Text>);
-    const defaultWrongNameMessage = "Invalid Name!";
+    const defaultEmptyTagMessage = "No tag chosen.";
     const duplicateNameMessage = "That tag already exists!";
     const textArticle = (tagType == "other") ? "an" : "a";
 
@@ -40,13 +40,19 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
 
 
     const onRemoveTag = async () => {
+        console.log("value is", value)
+        const api_body = {
+            tag_name: value,
+            tag_type: tagType + "_tags"
+        }
+        console.log("api_body is", api_body)
         try {
-            const response = await fetch(base_url + 'v1/clothing-items/remove-tag/' + clothingItem.db_id + "/", {
+            const response = await fetch(base_url + 'v1/clothing-items/remove-tag/' + clothingItem.db_id + '/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(api_body),
             });
             const result = await response.json();
             console.log(result)
@@ -54,18 +60,15 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
             console.error("Error:", error)
         }
 
-        if (text === "") {
-            return generateErrorProp(defaultWrongNameMessage)
+        if (value === "" || value == null) {
+            return generateErrorProp(defaultEmptyTagMessage)
         }
-        if (clothingItem[tagType + "_tags"].includes(titleThis(text))) {
-            return generateErrorProp(duplicateNameMessage)
 
-        }
 
         console.log(clothingItem)
         console.log(base_url)
 
-        clothingItem.addPropertyToCategory(titleThis(text), tagType)
+        clothingItem.removePropertyFromCategory(value, tagType)
         setErrorProp(<Text></Text>)
         setVisibleVar(false)
 
@@ -98,6 +101,7 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
                     onFocus={() => setIsFocus(true)}
                     onBlur={() => setIsFocus(false)}
                     value={value}
+                    maxHeight={300}
                     labelField="label"
                     valueField="value"
                     onChange={item => {

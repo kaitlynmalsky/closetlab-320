@@ -102,22 +102,22 @@ export class ClothingItem {
     removePropertyFromCategory(newStringProperty, category) {
         const cat_process = category.toLowerCase().trim()
         if (cat_process === TagType.COLOR) {
-            oldSize = this.color_tags.length;
+            const oldSize = this.color_tags.length;
             this.color_tags = this.color_tags.filter(function (el) { return el !== newStringProperty; })
             return oldSize !== this.color_tags.length;
         }
         else if (cat_process === TagType.ITEM_TYPE) {
-            oldSize = this.type_tags.length;
+            const oldSize = this.type_tags.length;
             this.type_tags = this.type_tags.filter(function (el) { return el !== newStringProperty; })
             return oldSize !== this.type_tags.length;
         }
         else if (cat_process === TagType.BRAND) {
-            oldSize = this.brand_tags.length;
+            const oldSize = this.brand_tags.length;
             this.brand_tags = this.brand_tags.filter(function (el) { return el !== newStringProperty; })
             return oldSize !== this.brand_tags.length;
         }
         else if (cat_process === TagType.OTHER) {
-            oldSize = this.other_tags.length;
+            const oldSize = this.other_tags.length;
             this.other_tags = this.other_tags.filter(function (el) { return el !== newStringProperty; })
             return oldSize !== this.other_tags.length;
         }

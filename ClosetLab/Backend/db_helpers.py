@@ -63,7 +63,7 @@ def db_remove_clothing_item_tag(object_id: str, tag_name: str, tag_type: str):
         if tag_type not in ["color_tags", "type_tags", "brand_tags", "color_tags"]:
             print("error: invalid tag type")
             return
-        clothing_item = db_add_clothing_item(object_id)
+        clothing_item = db_get_clothing_item(object_id)
         clothing_item[tag_type].remove(tag_name)
         clothing_item_collection = closet_lab_database["clothing_items"]
         clothing_item_collection.update_one(
