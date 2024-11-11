@@ -5,29 +5,33 @@ import color_tag_styles from "./ColorTags.js";
 import { postItem, addItemTag, base_url, getItem, fetchAPI } from "./APIContainer.js";
 // import { ClothingItem } from "./ClothingAndOutfits.js"; // cycle?
 import { Dropdown } from 'react-native-element-dropdown';
+// import { DropDownPicker } from 'react-native-dropdown-picker';
 
 
 
 export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
 
-    const [text, setText] = useState("");
-    const [data, setData] = useState({ "new_tag": '', "tag_type": '' })
-    const updateData = (text, type) => {
-        setData({
-            "new_tag": titleThis(text),
-            "tag_type": type + "_tags"
-        })
-        console.log("data updated", data)
+    const tag_data = clothingItem[tagType + "_tags"];
+    const dropdown_data = [];
+    for (i = 0; i < tag_data.length; i++) {
+        dropdown_data.push({ label: tag_data[i], value: i })
     }
+
+    console.log(dropdown_data);
+
+    const [value, setValue] = useState(null);
+    const [isFocus, setIsFocus] = useState(false);
+
     function titleThis(text) {
         if (typeof (text) == 'undefined') return undefined;
         return text.trimLeft()[0].toUpperCase() + text.trim().substring(1).toLowerCase()
     }
 
     const [errorProp, setErrorProp] = useState(<Text></Text>);
-    const defaultWrongNameMessage = "Invalid Name!"
-    const duplicateNameMessage = "That tag already exists!"
-    const textArticle = (tagType == "other") ? "an" : "a"
+    const defaultWrongNameMessage = "Invalid Name!";
+    const duplicateNameMessage = "That tag already exists!";
+    const textArticle = (tagType == "other") ? "an" : "a";
+
 
     function generateErrorProp(thisText) {
         return setErrorProp(<Text style={styles.error_text}>{thisText}</Text>)
@@ -37,7 +41,7 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
 
     const onRemoveTag = async () => {
         try {
-            const response = await fetch(base_url + 'v1/clothing-items/add-tag/' + clothingItem.db_id + "/", {
+            const response = await fetch(base_url + 'v1/clothing-items/remove-tag/' + clothingItem.db_id + "/", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,6 +91,20 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
                     onChangeText={newText => { setText(newText); updateData(newText, tagType) }}
                     onSubmitEditing={Keyboard.dismiss}
                 /> */}
+                <Dropdown
+                    placeholderStyle={styles.modalText}
+                    data={dropdown_data}
+                    placeholder={!isFocus ? 'Select tag' : '...'}
+                    onFocus={() => setIsFocus(true)}
+                    onBlur={() => setIsFocus(false)}
+                    value={value}
+                    labelField="label"
+                    valueField="value"
+                    onChange={item => {
+                        setValue(item.value);
+                        setIsFocus(false);
+                    }}
+                />
                 {errorProp}
                 <Pressable
                     style={styles.button}

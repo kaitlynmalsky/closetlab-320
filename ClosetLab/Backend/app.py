@@ -3,6 +3,7 @@ from flask_cors import CORS
 from bson.objectid import ObjectId
 
 from db_helpers import (
+    db_remove_clothing_item_tag,
     dummy_user_id,
     client,
     db_get_clothing_item,
@@ -102,6 +103,20 @@ def edit_clothing_item_tags(item_id):
         tag_type: str = data.get("tag_type")
         db_add_clothing_item_tag(item_id, new_tag, tag_type)
         return jsonify({'message': 'Tag added successfully', 'id': item_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}, 500)
+    
+# POST (not delete!) route to remove tags from a clothing item by ID
+@app.route('/api/v1/clothing-items/remove-tag/<string:item_id>/', methods=['POST'])
+def remove_clothing_item_tags(item_id):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        tag_name: str = data.get("tag_name")
+        tag_type: str =  data.get("tag_type")
+        db_remove_clothing_item_tag(item_id, tag_name, tag_type)
+        return jsonify({'message': 'Data added successfully', 'id': item_id}), 201
     except Exception as e:
         return jsonify({'error': str(e)}, 500)
     
