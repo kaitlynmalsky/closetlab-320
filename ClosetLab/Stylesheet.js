@@ -49,6 +49,14 @@ const styles = StyleSheet.create({
         borderWidth: 0,
         justifyContent: 'space-between',
     },
+    spacer_row_mobile: {
+        flexDirection: 'row',
+        //alignItems: 'center',
+        flex: 0.15,
+        position: 'relative',
+        borderWidth: 0,
+        justifyContent: 'space-between',
+    },
     container: {
         flex: 1,
         backgroundColor: '#fff',
@@ -146,6 +154,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         //borderWidth: 5,
+    },
+    button_donation: {
+        width: 60,
+        height: 60,
+        //margin: 7,
+        alignItems: 'center',
+        justifyContent: 'bottom',
+        borderWidth: 0,
     },
     button_iconCorner: {
         width: 40,

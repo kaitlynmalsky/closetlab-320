@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList,ImageBackground, Modal, TextInput   } from 'react-native';
+import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList,ImageBackground, Modal, TextInput   } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
 import { logFetch, getItem, base_url, getAllItemsForUser, postItem, deleteItem } from './APIContainer.js';
@@ -228,7 +228,7 @@ export function ClothingItemView() {
 
     return (<SafeAreaView style={styles.container}>
         <View style={styles.container}>
-            <View style={styles.container_row}>
+            <View style={styles.spacer_row_mobile}>
                 <Pressable style={styles.button} onPress={onGoToHome}>
                     {generateIcon('home', styles.button_iconCorner)}
                 </Pressable>
@@ -236,7 +236,7 @@ export function ClothingItemView() {
                     <Text style={styles.button_text}>Back to List</Text>
                 </Pressable>
                 <Pressable style={styles.button_corner} onPress={toggleDonations}>
-                    {generateIcon(newClothing.useDonationReminder ? "donation_on" : "donation_off", styles.button_iconCorner)}
+                    {generateIcon(newClothing.useDonationReminder ? "donation_on" : "donation_off", styles.button_donation)}
                 </Pressable>
             </View>
             <View style={styles.container_underTopRow}>
@@ -262,11 +262,13 @@ export function ClothingItemView() {
                 </View>
 
                 <Text>{"\n"}</Text>
+                <ScrollView>
                 {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible)}
                 {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible)}
                 {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible)}
                 {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible)}
                 <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(newClothing.useDonationReminder)}</Text></Text>
+                </ScrollView>
             </View>
 
             {addTag(newClothing, "brand", brandModalVisible, setBrandModalVisible)}
