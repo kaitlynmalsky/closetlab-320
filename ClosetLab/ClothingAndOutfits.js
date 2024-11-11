@@ -26,6 +26,8 @@ window.global_selectedClothingItem = {
     others: "Loading Other Properties...",
     donationReminder: true,
 
+    imageNeedsUpdate: false,
+
 };
 
 //takes a list of strings [b, a, c]. returns "a, b, c".
@@ -156,7 +158,7 @@ export class Outfit {
 const testItem = new ClothingItem(
     "./assets/buttonIcons/icon_cam.png",
     "Test Clothing Item",
-    "12345",
+    "12345", //userID
     "67057228f80354e361ae2bf5"
 );
 testItem.addPropertyToCategory("shirt", TagType.ITEM_TYPE)
@@ -183,27 +185,19 @@ export function ClothingItemView() {
     const [typeModalVisible, setTypeModalVisible] = useState(false);
     const [otherModalVisible, setOtherModalVisible] = useState(false);
 
-
-    //const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
-
-    //const [itemInfo, setItemInfo] = useState(defaultView);
-    //console.log(window.global_selectedClothingItem._id)
     const newClothing = new ClothingItem(
         window.global_selectedClothingItem.imageUri,
         window.global_selectedClothingItem.name,
         window.global_selectedClothingItem._id,
-        "12345",
+        "12345", //TODO change to userID
     );
     newClothing.color_tags = window.global_selectedClothingItem.colors
     newClothing.brand_tags = window.global_selectedClothingItem.brands
     newClothing.type_tags = window.global_selectedClothingItem.types
     newClothing.other_tags = window.global_selectedClothingItem.others
     newClothing.useDonationReminder = window.global_selectedClothingItem.donationReminder
-    //console.log(newClothing)
-    //const getItemInfo = ()=>{
-    //}
-    //getItemInfo();
-    //console.log(window.global_selectedClothingItem._id)
+    const [visibleDonationsOn, setVisibleDonationsOn] = useState(newClothing.useDonationReminder);
+    
     function generateTagItem(lead, listElement, modalFunc) {
         return (<View style={styles.container_tag}>
             <View >
@@ -220,9 +214,10 @@ export function ClothingItemView() {
     }
 
     function toggleDonations() {
-
-        newClothing.setIndividualDonationReminder(!newClothing.useDonationReminder)
-        console.log(newClothing.useDonationReminder)
+        window.global_selectedClothingItem.donationReminder = !window.global_selectedClothingItem.donationReminder
+        setVisibleDonationsOn(window.global_selectedClothingItem.donationReminder)
+        newClothing.useDonationReminder = window.global_selectedClothingItem.donationReminder
+        //TODO: update database with new individual donation reminder setting
     }
 
 
@@ -236,7 +231,7 @@ export function ClothingItemView() {
                     <Text style={styles.button_text}>Back to List</Text>
                 </Pressable>
                 <Pressable style={styles.button_corner} onPress={toggleDonations}>
-                    {generateIcon(newClothing.useDonationReminder ? "donation_on" : "donation_off", styles.button_donation)}
+                    {generateIcon(visibleDonationsOn ? "donation_on" : "donation_off", styles.button_donation)}
                 </Pressable>
             </View>
             <View style={styles.container_underTopRow}>
@@ -267,7 +262,7 @@ export function ClothingItemView() {
                 {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible)}
                 {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible)}
                 {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible)}
-                <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(newClothing.useDonationReminder)}</Text></Text>
+                <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(visibleDonationsOn)}</Text></Text>
                 </ScrollView>
             </View>
 
