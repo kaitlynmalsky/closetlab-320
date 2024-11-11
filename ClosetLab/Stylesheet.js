@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         margin: 0,
         flexDirection: 'row',
         alignItems: 'right',
-        justifyContent: 'center', 
+        justifyContent: 'center',
         position: 'relative'
     },
     container_row_leftAlign: {
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
         position: 'relative'
     },
     container_camera: {
-        width: '100%', 
+        width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
@@ -131,10 +131,10 @@ const styles = StyleSheet.create({
     },
     button_camera: {
         backgroundColor: 'rgba(44, 44, 44, 0.2)',
-        padding: 10, 
+        padding: 10,
         margin: 7,
         width: 80,
-        height: 80,  
+        height: 80,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: StyleSheet.hairlineWidth,
@@ -301,6 +301,10 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
     },
+    dropdown: {
+        width: 150,
+        height: 50,
+    }
 });
 
 export default styles;

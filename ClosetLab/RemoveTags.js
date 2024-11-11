@@ -5,7 +5,7 @@ import color_tag_styles from "./ColorTags.js";
 import { postItem, addItemTag, base_url, getItem, fetchAPI } from "./APIContainer.js";
 import { ClothingItem } from "./ClothingAndOutfits.js"; // cycle?
 import { Dropdown } from 'react-native-element-dropdown';
-// import { DropDownPicker } from 'react-native-dropdown-picker';
+
 
 
 
@@ -29,7 +29,6 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
 
     const [errorProp, setErrorProp] = useState(<Text></Text>);
     const defaultEmptyTagMessage = "No tag chosen.";
-    const duplicateNameMessage = "That tag already exists!";
     const textArticle = (tagType == "other") ? "an" : "a";
 
 
@@ -68,7 +67,10 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
         console.log(clothingItem)
         console.log(base_url)
 
-        clothingItem.removePropertyFromCategory(value, tagType)
+        console.log(clothingItem[tagType + "_tags"])
+        clothingItem.removePropertyFromCategory(clothingItem, tagType)
+        // clothingItem[tagType + "_tags"] = clothingItem[tagType + "_tags"].filter(tag => tag != value);
+        console.log(clothingItem[tagType + "_tags"])
         setErrorProp(<Text></Text>)
         setVisibleVar(false)
 
@@ -97,11 +99,13 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
                 <Dropdown
                     placeholderStyle={styles.modalText}
                     data={dropdown_data}
+                    style={styles.dropdown}
                     placeholder={!isFocus ? 'Select tag' : '...'}
                     onFocus={() => setIsFocus(true)}
                     onBlur={() => setIsFocus(false)}
                     value={value}
                     maxHeight={300}
+
                     labelField="label"
                     valueField="value"
                     onChange={item => {
