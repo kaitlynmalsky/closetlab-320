@@ -188,6 +188,10 @@ export function ClothingItemView() {
     const [colorModalVisible, setColorModalVisible] = useState(false);
     const [typeModalVisible, setTypeModalVisible] = useState(false);
     const [otherModalVisible, setOtherModalVisible] = useState(false);
+    const [removeBrandModalVisible, setRemoveBrandModalVisible] = useState(false);
+    const [removeColorModalVisible, setRemoveColorModalVisible] = useState(false);
+    const [removeTypeModalVisible, setRemoveTypeModalVisible] = useState(false);
+    const [removeOtherModalVisible, setRemoveOtherModalVisible] = useState(false);
 
 
     //const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
@@ -270,10 +274,10 @@ export function ClothingItemView() {
 
                 <Text>{"\n"}</Text>
                 <ScrollView>
-                    {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible)}
-                    {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible)}
-                    {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible)}
-                    {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible)}
+                    {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible, setRemoveBrandModalVisible)}
+                    {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible, setRemoveColorModalVisible)}
+                    {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible, setRemoveBrandModalVisible)}
+                    {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible, setRemoveOtherModalVisible)}
                     <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(visibleDonationsOn)}</Text></Text>
                 </ScrollView>
             </View>
