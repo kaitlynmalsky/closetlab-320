@@ -18,7 +18,8 @@ export default addTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
     console.log("data updated", data)
   }
   function titleThis(text) {
-    if (typeof (text) == 'undefined') return undefined;
+    if (typeof (text) === 'undefined') return undefined;
+    if ((typeof(text.trimLeft()[0])=== 'undefined')||(!text.trimLeft()[0].length)||(text.trimLeft()[0].length==0)){return ""}
     return text.trimLeft()[0].toUpperCase() + text.trim().substring(1).toLowerCase()
   }
 
