@@ -17,4 +17,6 @@ Also, if you get an error that looks like this...
 
 ... then run `npm uninstall watchman`.
 
-##
+## Testing
+
+To run unit tests, run the command `npm run test` in the ClosetLab directory.
