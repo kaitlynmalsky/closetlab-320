@@ -11,7 +11,7 @@ COPY requirements.txt /app/requirements.txt
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY entrypoint.sh /app/entrypoint.sh
+# COPY entrypoint.sh /app/entrypoint.sh
 # Make the entrypoint script executable
 RUN chmod +x entrypoint.sh
 
