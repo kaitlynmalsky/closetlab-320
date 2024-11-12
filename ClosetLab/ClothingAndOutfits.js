@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, ImageBackground, Modal, TextInput } from 'react-native';
+import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, ImageBackground, Modal, TextInput } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
 import { logFetch, getItem, base_url, getAllItemsForUser, postItem, deleteItem } from './APIContainer.js';
@@ -27,6 +27,8 @@ window.global_selectedClothingItem = {
     types: "Loading Item Types...",
     others: "Loading Other Properties...",
     donationReminder: true,
+
+    imageNeedsUpdate: false,
 
 };
 
@@ -160,7 +162,7 @@ export class Outfit {
 const testItem = new ClothingItem(
     "./assets/buttonIcons/icon_cam.png",
     "Test Clothing Item",
-    "12345",
+    "12345", //userID
     "67057228f80354e361ae2bf5"
 );
 testItem.addPropertyToCategory("shirt", TagType.ITEM_TYPE)
@@ -186,10 +188,6 @@ export function ClothingItemView() {
     const [colorModalVisible, setColorModalVisible] = useState(false);
     const [typeModalVisible, setTypeModalVisible] = useState(false);
     const [otherModalVisible, setOtherModalVisible] = useState(false);
-    const [removeBrandModalVisible, setRemoveBrandModalVisible] = useState(false);
-    const [removeColorModalVisible, setRemoveColorModalVisible] = useState(false);
-    const [removeTypeModalVisible, setRemoveTypeModalVisible] = useState(false);
-    const [removeOtherModalVisible, setRemoveOtherModalVisible] = useState(false);
 
 
     //const [testElement, setTestElement] = useState(<Text style={styles.button_text}>Press to get Recent Uploaded Clothing Item</Text>);
@@ -200,18 +198,15 @@ export function ClothingItemView() {
         window.global_selectedClothingItem.imageUri,
         window.global_selectedClothingItem.name,
         window.global_selectedClothingItem._id,
-        "12345",
+        "12345", //TODO change to userID
     );
     newClothing.color_tags = window.global_selectedClothingItem.colors
     newClothing.brand_tags = window.global_selectedClothingItem.brands
     newClothing.type_tags = window.global_selectedClothingItem.types
     newClothing.other_tags = window.global_selectedClothingItem.others
     newClothing.useDonationReminder = window.global_selectedClothingItem.donationReminder
-    //console.log(newClothing)
-    //const getItemInfo = ()=>{
-    //}
-    //getItemInfo();
-    //console.log(window.global_selectedClothingItem._id)
+    const [visibleDonationsOn, setVisibleDonationsOn] = useState(newClothing.useDonationReminder);
+
     function generateTagItem(lead, listElement, modalFuncAdd, modalFuncRemove) {
         return (<View style={styles.container_tag}>
             <View >
@@ -231,15 +226,16 @@ export function ClothingItemView() {
     }
 
     function toggleDonations() {
-
-        newClothing.setIndividualDonationReminder(!newClothing.useDonationReminder)
-        console.log(newClothing.useDonationReminder)
+        window.global_selectedClothingItem.donationReminder = !window.global_selectedClothingItem.donationReminder
+        setVisibleDonationsOn(window.global_selectedClothingItem.donationReminder)
+        newClothing.useDonationReminder = window.global_selectedClothingItem.donationReminder
+        //TODO: update database with new individual donation reminder setting
     }
 
 
     return (<SafeAreaView style={styles.container}>
         <View style={styles.container}>
-            <View style={styles.container_row}>
+            <View style={styles.spacer_row_mobile}>
                 <Pressable style={styles.button} onPress={onGoToHome}>
                     {generateIcon('home', styles.button_iconCorner)}
                 </Pressable>
@@ -247,7 +243,7 @@ export function ClothingItemView() {
                     <Text style={styles.button_text}>Back to List</Text>
                 </Pressable>
                 <Pressable style={styles.button_corner} onPress={toggleDonations}>
-                    {generateIcon(newClothing.useDonationReminder ? "donation_on" : "donation_off", styles.button_iconCorner)}
+                    {generateIcon(visibleDonationsOn ? "donation_on" : "donation_off", styles.button_donation)}
                 </Pressable>
             </View>
             <View style={styles.container_underTopRow}>
@@ -273,11 +269,13 @@ export function ClothingItemView() {
                 </View>
 
                 <Text>{"\n"}</Text>
-                {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible, setRemoveBrandModalVisible)}
-                {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible, setRemoveColorModalVisible)}
-                {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible, setRemoveTypeModalVisible)}
-                {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible, setRemoveOtherModalVisible)}
-                <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(newClothing.useDonationReminder)}</Text></Text>
+                <ScrollView>
+                    {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible)}
+                    {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible)}
+                    {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible)}
+                    {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible)}
+                    <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(visibleDonationsOn)}</Text></Text>
+                </ScrollView>
             </View>
 
             {addTag(newClothing, "brand", brandModalVisible, setBrandModalVisible)}

@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Alert, Modal, Text, Pressable, View, Keyboard, TextInput } from 'react-native';
 import color_tag_styles from "./ColorTags.js";
 import { postItem, addItemTag, base_url, getItem, fetchAPI } from "./APIContainer.js";
-// import { ClothingItem } from "./ClothingAndOutfits.js"; // cycle?
 
 
 
