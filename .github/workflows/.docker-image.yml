@@ -1,0 +1,31 @@
+
+name: Build and Deploy Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Stop and remove existing container
+        run: |
+          docker stop my-flask-app || true
+          docker rm my-flask-app || true
+
+      - name: Build Docker image
+        run: |
+          docker build -t my-flask-app:latest .
+
+      - name: Run Docker container
+        run: |
+          docker run -d -p 5000:5000 --name my-flask-app my-flask-app:latest
