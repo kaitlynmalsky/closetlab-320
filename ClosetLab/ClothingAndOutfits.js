@@ -429,7 +429,6 @@ export function OutfitListView() {
 
 export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
 
-
     const [text, setText] = useState("");
     function titleThis(text) {
         if (typeof (text) == 'undefined') return undefined;
@@ -443,8 +442,6 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
     function generateErrorProp(thisText) {
         return setErrorProp(<Text style={styles.error_text}>{thisText}</Text>)
     }
-
-
 
     const onAddItem = async () => {
 
@@ -681,7 +678,7 @@ export function ClothingItemListView() {
         </View>
 
         {addClothingItem(addItemModalVisible, setAddItemModalVisible, navigation)}
-        {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible, returnedData, setReturnedData, navigation)}
+        {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible, navigation)}
         {getMaybeList(returnedData)}
     </SafeAreaView>);
 }

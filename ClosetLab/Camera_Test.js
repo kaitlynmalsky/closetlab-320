@@ -157,12 +157,8 @@ export default Camera_Test = () => {
             {generateIcon("flip", null, 'cover')}
           </Pressable>
 
-          <Pressable style={styles.button_camera} onPress={takePictureAndStore}>
+          <Pressable style={styles.button_camera} onPress={()=>{takePictureAndStore(); onSaveImage();}}>
           {generateIcon("cam", null, 'cover')}
-          </Pressable>
-
-          <Pressable style={styles.button_camera} onPress={onSaveImage}>
-          {generateIcon("yes", null, 'cover')}
           </Pressable>
 
           <Pressable style={styles.button_camera} onPress={onCancelImage}>
