@@ -208,7 +208,7 @@ export function ClothingItemView() {
     newClothing.brand_tags = window.global_selectedClothingItem.brands
     newClothing.type_tags = window.global_selectedClothingItem.types
     newClothing.other_tags = window.global_selectedClothingItem.others
-    newClothing.useDonationReminder = window.global_selectedClothingItem.donationReminder
+    newClothing.setIndividualDonationReminder(window.global_selectedClothingItem.donationReminder)
     const [visibleDonationsOn, setVisibleDonationsOn] = useState(newClothing.useDonationReminder);
 
     function generateTagItem(lead, listElement, modalFuncAdd, modalFuncRemove) {
