@@ -15,4 +15,6 @@ Also, if you get an error that looks like this...
 
 <img src="react_native_error_1.png" width="300">
 
-... then run `npm uninstall watchman`. This fixed the error for me, I have no idea why.
+... then run `npm uninstall watchman`.
+
+##
