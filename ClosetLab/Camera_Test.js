@@ -78,13 +78,6 @@ export default Camera_Test = () => {
     navigation.navigate('Home');
   };
 
-  const onSaveImage = () => {
-    if (window.global_selectedClothingItem==null){window.global_selectedClothingItem = {imageUri:"none"}}
-    window.global_selectedClothingItem.imageUri = usePhotoGallery().getRecentPhoto()
-    //console.log(window.global_selectedClothingItem.imageUri)
-    navigation.navigate('Single Clothing Item View');
-  };
-
   const onCancelImage = () => {
     navigation.navigate('Single Clothing Item View');
   };
@@ -129,6 +122,17 @@ export default Camera_Test = () => {
       //const newPic_noBG = await removeImageBackground(newPic);
 
       try {
+        
+       
+        if (window.global_selectedClothingItem==null){window.global_selectedClothingItem = {imageUri:"none"}}
+        window.global_selectedClothingItem.imageUri = newPic.base64
+        //TODO: update database with changed image 
+        //navigation.navigate('Home');
+        console.log(window.global_selectedClothingItem.imageUri)
+        navigation.navigate('Single Clothing Item View');
+
+
+
         // Use the saveImage function from Image_storage.js to store the image
         const savedPath = await saveImage(newPic.base64); // Pass the base64 image data to saveImage
 
@@ -139,6 +143,7 @@ export default Camera_Test = () => {
         else {
           photoTools.addPhoto(newPic.base64);
         }
+        
       } catch (error) {
         console.log('Error saving the photo:', error);
       }
@@ -157,7 +162,7 @@ export default Camera_Test = () => {
             {generateIcon("flip", null, 'cover')}
           </Pressable>
 
-          <Pressable style={styles.button_camera} onPress={()=>{takePictureAndStore(); onSaveImage();}}>
+          <Pressable style={styles.button_camera} onPress={takePictureAndStore}>
           {generateIcon("cam", null, 'cover')}
           </Pressable>
 

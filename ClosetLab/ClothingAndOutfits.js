@@ -210,6 +210,21 @@ export function ClothingItemView() {
     newClothing.other_tags = window.global_selectedClothingItem.others
     newClothing.setIndividualDonationReminder(window.global_selectedClothingItem.donationReminder)
     const [visibleDonationsOn, setVisibleDonationsOn] = useState(newClothing.useDonationReminder);
+    const [visibleImageURI, setVisibleImageURI] = useState(window.global_selectedClothingItem.imageUri);
+    
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            console.log("page loaded :)")
+            setVisibleImageURI(window.global_selectedClothingItem.imageUri)
+          // The screen is focused
+        });
+        // Return the function to unsubscribe from the event so it gets removed on unmount
+        return unsubscribe;
+    }, [navigation]);
+
+
+
+
 
     function generateTagItem(lead, listElement, modalFuncAdd, modalFuncRemove) {
         return (<View style={styles.container_tag}>
@@ -263,7 +278,7 @@ export function ClothingItemView() {
                             justifyContent: 'space-between',
                         }
                     }
-                        source={{ uri: newClothing.image_link }}>
+                        source={{ uri: visibleImageURI }}>
                         <Pressable style={styles.icon_corner} onPress={onGoToCam}>
                             {generateIcon('add', styles.button_iconCorner)}
                         </Pressable>
@@ -580,9 +595,9 @@ export function ClothingItemListView() {
     const [addItemModalVisible, setAddItemModalVisible] = useState(false);
     const [deleteItemModalVisible, setDeleteItemModalVisible] = useState(false);
     //TODO: regenerate page on addItem and on deleteItem
-    //var returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
+    
     const [returnedData, setReturnedData] = useState([]);
-    intermediateList = getAllItemsForUser("67057228f80354e361ae2bf5")
+    intermediateList = getAllItemsForUser("67057228f80354e361ae2bf5") //TODO: use actual user ID
     if (intermediateList.length != returnedData.length) {
         setReturnedData(intermediateList)
     }
