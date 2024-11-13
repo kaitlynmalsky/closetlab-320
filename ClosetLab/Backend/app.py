@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from bson.objectid import ObjectId
 
-from db_helpers import (
+from .db_helpers import (
     db_add_clothing_item_image,
     db_remove_clothing_item_tag,
     db_set_donation_reminders,
