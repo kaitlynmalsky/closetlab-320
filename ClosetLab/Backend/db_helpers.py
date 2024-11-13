@@ -187,3 +187,47 @@ def db_delete_outfit(object_id: str):
     except Exception as e:
         print("Error deleting outfit from database:", str(e))
         raise
+
+def db_get_calendar_by_user(user_id: str = dummy_user_id):
+    try:
+        print("Getting calendar of user " + str(user_id) + " from database")
+        calendar_collection = closet_lab_database["calendars"]
+        calendar = calendar_collection.find_one({'user_id': ObjectId(user_id)})
+        if calendar == None:
+            print("Calendar was not found for user " + user_id + ", creating one")
+            calendar = {
+                'user_id': user_id,
+                'days': []
+            }
+            calendar_collection.insert_one(calendar)
+        else:
+            print("Existing calendar for user " + user_id + " found")
+        return calendar
+    except Exception as e:
+        print("Error getting calendar from database:", str(e))
+        raise
+    
+
+def db_add_day(date: datetime, user_id: str = dummy_user_id):
+    try:
+        print("Adding calendar day " + str(datetime) + " to user " + user_id)
+        day_collection = closet_lab_database["days"]
+        calendar = db_get_calendar_by_user(user_id)
+        day = {
+            'calendar_id': calendar['_id'],
+            'outfits': [],
+            'date': date # not sure about this, check if typing was dpne right
+        }
+        day_collection.insert_one(day)
+    except Exception as e:
+        print("Error adding day to database:", str(e))
+        raise
+
+# def db_add_outfit_to_day(date: datetime, outfit_id: str,  user_id: str = dummy_user_id):
+#     try:
+#         print("Adding outfit " + outfit_id + " to day " + str(date))
+#         day_collection = closet_lab_database["days"]
+#         day = day_collection.find_one({'day': date}) # go back and fix this?
+#         if day == None:
+#             # Add the needed day if it doesn't exist already.
+#             db_add_day(date, user_id)
