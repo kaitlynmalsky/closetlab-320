@@ -1,7 +1,11 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from bson.objectid import ObjectId
 
 from .db_helpers import (
+    db_add_clothing_item_image,
+    db_remove_clothing_item_tag,
+    db_set_donation_reminders,
     dummy_user_id,
     client,
     db_get_clothing_item,
@@ -9,7 +13,8 @@ from .db_helpers import (
     db_delete_clothing_item,
     db_get_outfit,
     db_add_outfit,
-    db_delete_outfit
+    db_delete_outfit,
+    db_add_clothing_item_tag
 )
 
 app = Flask(__name__)
@@ -88,26 +93,75 @@ def get_clothing_item(item_id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# POST route to add tags to a clothing item by ID
+@app.route('/api/v1/clothing-items/add-tag/<string:item_id>/', methods=['POST'])
+def edit_clothing_item_tags(item_id):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        new_tag: str = data.get("new_tag")
+        tag_type: str = data.get("tag_type")
+        db_add_clothing_item_tag(item_id, new_tag, tag_type)
+        return jsonify({'message': 'Tag added successfully', 'id': item_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}, 500)
+    
+# POST (not delete!) route to remove tags from a clothing item by ID
+@app.route('/api/v1/clothing-items/remove-tag/<string:item_id>/', methods=['POST'])
+def remove_clothing_item_tags(item_id):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        tag_name: str = data.get("tag_name")
+        tag_type: str =  data.get("tag_type")
+        db_remove_clothing_item_tag(item_id, tag_name, tag_type)
+        return jsonify({'message': 'Data added successfully', 'id': item_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}, 500)
+
+# POST route to update image link of a clothing item
+@app.route('/api/v1/clothing-items/set-image-link/<string:item_id>/', methods=['POST'])
+def update_image_link_item(item_id):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        image_link = data.get("image_link")
+        db_add_clothing_item_image(item_id, image_link)
+        return jsonify({'message': 'Image set successfully', 'id': item_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}, 500)
+    
+# POST route to update donation reminders for an item
+@app.route('/api/v1/clothing-items/donation-reminders/<string:item_id>/', methods=['GET'])
+def set_donation_reminders(item_id):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        donation_reminders = data.get("donation_reminders")
+        db_set_donation_reminders(item_id, donation_reminders)
+        return jsonify({'message': 'Donation reminders updated successfully', 'id': item_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}, 500)
     
 # GET route to retrieve all clothing items belonging to user, by user ID
 @app.route('/api/v1/clothing-items-get-all/<string:user_id>', methods=['GET'])
 def get_all_clothing_items(user_id):
-    #print("hello")
     try:
-        #print("hello2")
-        item_collection = closet_lab_database["clothing_items"].find()
+        # Convert user_id to ObjectId if necessary
+        user_id_obj = ObjectId(user_id)
+        item_collection = closet_lab_database["clothing_items"].find({"user_id": user_id_obj})
         returnItems = []
-        for item in item_collection.to_list():
-            #print("hello3")
-            if (str(user_id) == str(item["user_id"])):
-            #    try:
-            #       print(item["name"])
-                returnItems.append(db_get_clothing_item(item["_id"]))  
-            #    except Exception as e:
-            #        return jsonify({'error': 'Clothing item not found'}), 404
-        #print("hello4")
-        #print(returnItems)
+
+        for item in item_collection:
+            returnItems.append(db_get_clothing_item(item["_id"]))
+
         return jsonify(returnItems), 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
