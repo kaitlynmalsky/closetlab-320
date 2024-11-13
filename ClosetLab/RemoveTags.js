@@ -55,6 +55,9 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
             });
             const result = await response.json();
             console.log(result)
+            console.log(tagType)
+            clothingItem.removePropertyFromCategory(value, tagType)
+            console.log(clothingItem[tagType+"_tags"])
         } catch (error) {
             console.error("Error:", error)
         }

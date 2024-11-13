@@ -64,7 +64,10 @@ def db_add_clothing_item_image(object_id: str, image_link: str):
             print("error: image_link not defined")
             return
         clothing_item = db_get_clothing_item(object_id)
-        clothing_item.update_one(
+        clothing_item.image_link = image_link
+        clothing_item.image = image_link
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        clothing_item_collection.update_one(
             {'_id': ObjectId(object_id) },
             {'$set': {image_link: image_link}}
         )

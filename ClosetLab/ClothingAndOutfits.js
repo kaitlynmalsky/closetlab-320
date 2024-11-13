@@ -214,7 +214,7 @@ export function ClothingItemView() {
     
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
-            console.log("page loaded :)")
+            //console.log("page loaded :)")
             setVisibleImageURI(window.global_selectedClothingItem.imageUri)
           // The screen is focused
         });
@@ -284,7 +284,6 @@ export function ClothingItemView() {
                         </Pressable>
 
                     </ImageBackground>
-
                 </View>
 
                 <Text>{"\n"}</Text>

@@ -6,6 +6,7 @@ import { SafeAreaView, Button, StyleSheet, Text, Pressable, View, Image, Platfor
 import { useNavigation } from '@react-navigation/native';
 import { saveImage, loadStoredImages, deleteImage, clearAllImages, getStoredImages } from './Image_Storage';
 import styles, {generateIcon, icons} from './Stylesheet';
+import { base_url } from './APIContainer.js';
 
 
 //https://medium.com/@programer7823/how-to-remove-image-background-in-nodejs-without-any-api-02abad4a7b3a
@@ -126,9 +127,23 @@ export default Camera_Test = () => {
        
         if (window.global_selectedClothingItem==null){window.global_selectedClothingItem = {imageUri:"none"}}
         window.global_selectedClothingItem.imageUri = newPic.base64
+        //options = {
+        //  method: 'POST',
+        //  headers: {
+        //      Accept: 'application/json',
+        //      'Content-Type': 'application/json',
+        //  },
+        //  body: JSON.stringify({"image_link":newPic.base64})
+        //}
+        //response = await fetch(base_url + 'v1/clothing-items/set-image-link/' +window.global_selectedClothingItem._id+ '/', options);
+        //if (!response.ok) {
+        //  throw new Error('Network response was not ok');
+        //}
+        //const responseData = await response.json();
+        //console.log(responseData);
         //TODO: update database with changed image 
         //navigation.navigate('Home');
-        console.log(window.global_selectedClothingItem.imageUri)
+        //console.log(window.global_selectedClothingItem.imageUri)
         navigation.navigate('Single Clothing Item View');
 
 

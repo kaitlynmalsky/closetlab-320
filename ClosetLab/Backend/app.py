@@ -123,7 +123,7 @@ def remove_clothing_item_tags(item_id):
         return jsonify({'error': str(e)}, 500)
 
 # POST route to update image link of a clothing item
-@app.route('api/v1/clothing-items/set-image-link/<string:item_id>/', methods=['POST'])
+@app.route('/api/v1/clothing-items/set-image-link/<string:item_id>/', methods=['POST'])
 def update_image_link_item(item_id):
     try:
         data = request.json
@@ -136,7 +136,7 @@ def update_image_link_item(item_id):
         return jsonify({'error': str(e)}, 500)
     
 # POST route to update donation reminders for an item
-@app.route('api/v1/clothing-items/donation-reminders/<string:item_id>/', methods=['GET'])
+@app.route('/api/v1/clothing-items/donation-reminders/<string:item_id>/', methods=['GET'])
 def set_donation_reminders(item_id):
     try:
         data = request.json
