@@ -2,9 +2,6 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from .db_helpers import (
-    db_add_clothing_item_image,
-    db_remove_clothing_item_tag,
-    db_set_donation_reminders,
     dummy_user_id,
     client,
     db_get_clothing_item,
