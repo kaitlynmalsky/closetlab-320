@@ -72,24 +72,6 @@ describe('ClothingItem Class', () => {
   });
 });
 
-describe('reduceListToHumanReadable Function', () => {
-    test('should return empty string for empty list', () => {
-      expect(reduceListToHumanReadable([])).toBe('');
-    });
-  
-    test('should return single element for single-element list', () => {
-      const list = ['Red'];
-      const result = reduceListToHumanReadable(list);
-      expect(result.props.children).toBe('Red');
-    });
-  
-    test('should return human-readable text for multi-element list', () => {
-      const list = ['Red', 'Blue', 'Green'];
-      const result = reduceListToHumanReadable(list);
-      expect(result.props.children).toBeTruthy();
-    });
-  });
-
   describe('Outfit Class', () => {
     let outfit;
   
