@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+import datetime
 
 # Initialize the database connection
 client = MongoClient("mongodb+srv://kmalsky:Cw1ccE8Bq5VV8Lwe@closetlab.q7yvq.mongodb.net/?retryWrites=true&w=majority&appName=ClosetLab")  
@@ -23,7 +24,9 @@ def db_add_clothing_item(name: str = "", image_link: str = "", image: str = "", 
             "color_tags": color_tags or [],
             "other_tags": other_tags or [],
             "type_tags": type_tags or [],
-            "donation_reminders": donation_reminders
+            "donation_reminders": donation_reminders,
+            "date_added": datetime.datetime.now(tz=datetime.timezone.utc),
+            "last_worn": datetime.datetime.now(tz=datetime.timezone.utc)
         }
         result = clothing_item_collection.insert_one(clothing_item)
         print("Clothing item added successfully with ID:", result.inserted_id)
@@ -31,6 +34,82 @@ def db_add_clothing_item(name: str = "", image_link: str = "", image: str = "", 
     except Exception as e:
         print("Error adding item to database:", str(e))
         raise
+
+def db_add_clothing_item_tag(object_id: str, new_tag: str, tag_type: str):
+    try:
+        print("Editing clothing item " + object_id + " in database")
+        if not object_id or not new_tag or not tag_type:
+            print("error: object_id, new_tag, or tag_type was not defined")
+            return
+        if (tag_type not in ["color_tags", "type_tags", "brand_tags", "other_tags"]):
+            print("error: invalid tag type")
+            return
+        clothing_item = db_get_clothing_item(object_id)
+        clothing_item[tag_type].append(new_tag)
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        clothing_item_collection.update_one(
+            {'_id': ObjectId(object_id)},
+            {'$set': {tag_type: clothing_item[tag_type]}},
+        )
+    except Exception as e:
+        print("Error updating clothing item in database:", str(e))
+
+def db_add_clothing_item_image(object_id: str, image_link: str):
+    try:
+        print("Adding image_link (URI) " + image_link + " to clothing item " + object_id)
+        if not object_id:
+            print("error: object_id was not defined")
+            return
+        if not image_link:
+            print("error: image_link not defined")
+            return
+        clothing_item = db_get_clothing_item(object_id)
+        clothing_item.image_link = image_link
+        clothing_item.image = image_link
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        clothing_item_collection.update_one(
+            {'_id': ObjectId(object_id) },
+            {'$set': {image_link: image_link}}
+        )
+    except Exception as e:
+        print("Error updating clothing item in database:", str(e))
+
+def db_set_donation_reminders(object_id: str, donation_reminders: bool):
+    try:
+        print("Setting donation reminders of clothing item " + object_id + " to " + str(donation_reminders))
+        if not object_id:
+            print("error: object_id was not defined")
+            return
+        if not donation_reminders:
+            print("error: donation_reminders not defined")
+            return
+        clothing_item = db_get_clothing_item(object_id)
+        clothing_item.update_one(
+            {'_id': ObjectId(object_id)},
+            {'$set': {donation_reminders: donation_reminders}}
+        )
+    except Exception as e:
+        print("Error updating clothing item in database:", str(e))
+
+def db_remove_clothing_item_tag(object_id: str, tag_name: str, tag_type: str):
+    try:
+        print("Removing tag " + tag_name + " from clothing item " + object_id + " in database")
+        if not object_id or not tag_name or not tag_type:
+            print("error: object_id, tag_name, or tag_type was not defined")
+            return
+        if tag_type not in ["color_tags", "type_tags", "brand_tags", "color_tags"]:
+            print("error: invalid tag type")
+            return
+        clothing_item = db_get_clothing_item(object_id)
+        clothing_item[tag_type].remove(tag_name)
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        clothing_item_collection.update_one(
+            {'_id': ObjectId(object_id)},
+            {'$set': {tag_type: clothing_item[tag_type]}}
+        )
+    except Exception as e:
+        print("Error updating clothing item in database: ", str(e))
+
 
 def db_get_clothing_item(object_id: str):
     try: 
@@ -105,6 +184,9 @@ def db_delete_outfit(object_id: str):
             return False
         print("Outfit deleted successfully.")
         return True
+    except Exception as e:
+        print("Error deleting outfit from database:", str(e))
+        raise
     except Exception as e:
         print("Error deleting outfit from database:", str(e))
         raise
