@@ -3,7 +3,9 @@ from flask_cors import CORS
 from bson.objectid import ObjectId
 
 from db_helpers import (
+    db_add_clothing_item_image,
     db_remove_clothing_item_tag,
+    db_set_donation_reminders,
     dummy_user_id,
     client,
     db_get_clothing_item,
@@ -117,6 +119,32 @@ def remove_clothing_item_tags(item_id):
         tag_type: str =  data.get("tag_type")
         db_remove_clothing_item_tag(item_id, tag_name, tag_type)
         return jsonify({'message': 'Data added successfully', 'id': item_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}, 500)
+
+# POST route to update image link of a clothing item
+@app.route('api/v1/clothing-items/set-image-link/<string:item_id>/', methods=['POST'])
+def update_image_link_item(item_id):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        image_link = data.get("image_link")
+        db_add_clothing_item_image(item_id, image_link)
+        return jsonify({'message': 'Image set successfully', 'id': item_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}, 500)
+    
+# POST route to update donation reminders for an item
+@app.route('api/v1/clothing-items/donation-reminders/<string:item_id>/', methods=['GET'])
+def set_donation_reminders(item_id):
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        donation_reminders = data.get("donation_reminders")
+        db_set_donation_reminders(item_id, donation_reminders)
+        return jsonify({'message': 'Donation reminders updated successfully', 'id': item_id}), 201
     except Exception as e:
         return jsonify({'error': str(e)}, 500)
     

@@ -54,6 +54,40 @@ def db_add_clothing_item_tag(object_id: str, new_tag: str, tag_type: str):
     except Exception as e:
         print("Error updating clothing item in database:", str(e))
 
+def db_add_clothing_item_image(object_id: str, image_link: str):
+    try:
+        print("Adding image_link (URI) " + image_link + " to clothing item " + object_id)
+        if not object_id:
+            print("error: object_id was not defined")
+            return
+        if not image_link:
+            print("error: image_link not defined")
+            return
+        clothing_item = db_get_clothing_item(object_id)
+        clothing_item.update_one(
+            {'_id': ObjectId(object_id) },
+            {'$set': {image_link: image_link}}
+        )
+    except Exception as e:
+        print("Error updating clothing item in database:", str(e))
+
+def db_set_donation_reminders(object_id: str, donation_reminders: bool):
+    try:
+        print("Setting donation reminders of clothing item " + object_id + " to " + str(donation_reminders))
+        if not object_id:
+            print("error: object_id was not defined")
+            return
+        if not donation_reminders:
+            print("error: donation_reminders not defined")
+            return
+        clothing_item = db_get_clothing_item(object_id)
+        clothing_item.update_one(
+            {'_id': ObjectId(object_id)},
+            {'$set': {donation_reminders: donation_reminders}}
+        )
+    except Exception as e:
+        print("Error updating clothing item in database:", str(e))
+
 def db_remove_clothing_item_tag(object_id: str, tag_name: str, tag_type: str):
     try:
         print("Removing tag " + tag_name + " from clothing item " + object_id + " in database")
