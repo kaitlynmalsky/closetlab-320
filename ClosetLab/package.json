@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
-    "metro": "^0.80.8"
+    "metro": "^0.80.8",
     "jest": "^29.7.0",
     "jest-expo": "^52.0.0",
     "metro": "^0.80.8",
@@ -57,4 +57,4 @@
     "react-hooks/exhaustive-deps": "warn"
   },
   "private": true
-}}
+}
