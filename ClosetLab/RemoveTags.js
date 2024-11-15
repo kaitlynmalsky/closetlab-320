@@ -39,6 +39,12 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
 
 
     const onRemoveTag = async () => {
+
+        
+        if (value === "" || value == null) {
+            return generateErrorProp(defaultEmptyTagMessage)
+        }
+        
         console.log("value is", value)
         const api_body = {
             tag_name: value,
@@ -62,16 +68,13 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
             console.error("Error:", error)
         }
 
-        if (value === "" || value == null) {
-            return generateErrorProp(defaultEmptyTagMessage)
-        }
-
 
         console.log(clothingItem)
         console.log(base_url)
 
         console.log(clothingItem[tagType + "_tags"])
         clothingItem.removePropertyFromCategory(clothingItem, tagType)
+        window.global_itemListNeedsUpdate = true
         // clothingItem[tagType + "_tags"] = clothingItem[tagType + "_tags"].filter(tag => tag != value);
         console.log(clothingItem[tagType + "_tags"])
         setErrorProp(<Text></Text>)

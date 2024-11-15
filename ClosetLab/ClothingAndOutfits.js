@@ -32,6 +32,8 @@ window.global_selectedClothingItem = {
 
 };
 
+window.global_itemListNeedsUpdate = false
+
 //takes a list of strings [b, a, c]. returns "a, b, c".
 // as of 10/31 3:46 pm, returns a text component instead
 export function reduceListToHumanReadable(thisList) {
@@ -593,13 +595,7 @@ export function ClothingItemListView() {
 
     const [addItemModalVisible, setAddItemModalVisible] = useState(false);
     const [deleteItemModalVisible, setDeleteItemModalVisible] = useState(false);
-    //TODO: regenerate page on addItem and on deleteItem
     
-    const [returnedData, setReturnedData] = useState([]);
-    intermediateList = getAllItemsForUser("67057228f80354e361ae2bf5") //TODO: use actual user ID
-    if (intermediateList.length != returnedData.length) {
-        setReturnedData(intermediateList)
-    }
     //setReturnedData(intermediateList)
     //console.log(intermediateList)
 
@@ -679,6 +675,34 @@ export function ClothingItemListView() {
         }
         return defaultList
     }
+
+    //TODO: regenerate page on addItem and on deleteItem
+    
+    const [returnedData, setReturnedData] = useState([]);
+    intermediateList = getAllItemsForUser("67057228f80354e361ae2bf5") //TODO: use actual user ID
+    if (intermediateList.length != returnedData.length) {
+        setReturnedData(intermediateList)
+    }
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+            console.log("page loaded !!")
+            if (window.global_itemListNeedsUpdate){
+                console.log("tried update")
+                const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
+        
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const responseData = await response.json();
+            
+                setReturnedData(responseData)
+                window.global_itemListNeedsUpdate = false
+            }
+          // The screen is focused
+        });
+        // Return the function to unsubscribe from the event so it gets removed on unmount
+        return unsubscribe;
+    }, [navigation]);
 
 
     return (<SafeAreaView style={styles.container}>

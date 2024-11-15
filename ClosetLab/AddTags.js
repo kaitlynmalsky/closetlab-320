@@ -34,6 +34,14 @@ export default addTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
 
 
   const onAddTag = async () => {
+    if (text === "") {
+      return generateErrorProp(defaultWrongNameMessage)
+    }
+    if (clothingItem[tagType + "_tags"].includes(titleThis(text))) {
+      return generateErrorProp(duplicateNameMessage)
+
+    }
+
     try {
       const response = await fetch(base_url + 'v1/clothing-items/add-tag/' + clothingItem.db_id + "/", {
         method: 'POST',
@@ -48,20 +56,13 @@ export default addTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
       console.error("Error:", error)
     }
 
-    if (text === "") {
-      return generateErrorProp(defaultWrongNameMessage)
-    }
-    if (clothingItem[tagType + "_tags"].includes(titleThis(text))) {
-      return generateErrorProp(duplicateNameMessage)
-
-    }
-
     console.log(clothingItem)
     console.log(base_url)
 
     clothingItem.addPropertyToCategory(titleThis(text), tagType)
     setErrorProp(<Text></Text>)
     setVisibleVar(false)
+    window.global_itemListNeedsUpdate = true
 
     //clothingItem.addPropertyToCategory(text, tagType)
 
