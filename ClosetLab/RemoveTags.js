@@ -3,11 +3,7 @@ import React, { useState } from 'react';
 import { Alert, Modal, Text, Pressable, View, Keyboard, TextInput } from 'react-native';
 import color_tag_styles from "./ColorTags.js";
 import { postItem, addItemTag, base_url, getItem, fetchAPI } from "./APIContainer.js";
-import { ClothingItem } from "./ClothingAndOutfits.js"; // cycle?
 import { Dropdown } from 'react-native-element-dropdown';
-
-
-
 
 export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
 
@@ -17,7 +13,7 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
         dropdown_data.push({ label: tag_data[i], value: tag_data[i] })
     }
 
-    console.log(dropdown_data);
+    //console.log(dropdown_data);
 
     const [value, setValue] = useState(null);
     const [isFocus, setIsFocus] = useState(false);
@@ -36,21 +32,18 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
         return setErrorProp(<Text style={styles.error_text}>{thisText}</Text>)
     }
 
-
-
     const onRemoveTag = async () => {
-
         
         if (value === "" || value == null) {
             return generateErrorProp(defaultEmptyTagMessage)
         }
         
-        console.log("value is", value)
+        //console.log("value is", value)
         const api_body = {
             tag_name: value,
             tag_type: tagType + "_tags"
         }
-        console.log("api_body is", api_body)
+        //console.log("api_body is", api_body)
         try {
             const response = await fetch(base_url + 'v1/clothing-items/remove-tag/' + clothingItem.db_id + '/', {
                 method: 'POST',
@@ -60,25 +53,17 @@ export default removeTag = (clothingItem, tagType, visibleVar, setVisibleVar) =>
                 body: JSON.stringify(api_body),
             });
             const result = await response.json();
-            console.log(result)
-            console.log(tagType)
-            clothingItem.removePropertyFromCategory(value, tagType)
-            console.log(clothingItem[tagType+"_tags"])
+            //console.log(result)
+            //clothingItem.removePropertyFromCategory(value, tagType)
         } catch (error) {
             console.error("Error:", error)
         }
 
-
-        console.log(clothingItem)
-        console.log(base_url)
-
-        console.log(clothingItem[tagType + "_tags"])
-        clothingItem.removePropertyFromCategory(clothingItem, tagType)
-        window.global_itemListNeedsUpdate = true
-        // clothingItem[tagType + "_tags"] = clothingItem[tagType + "_tags"].filter(tag => tag != value);
-        console.log(clothingItem[tagType + "_tags"])
+        clothingItem.removePropertyFromCategory(value, tagType)
+        
         setErrorProp(<Text></Text>)
         setVisibleVar(false)
+        window.global_itemListNeedsUpdate = true
 
         //clothingItem.addPropertyToCategory(text, tagType)
 

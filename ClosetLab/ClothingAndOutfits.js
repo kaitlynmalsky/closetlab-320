@@ -32,7 +32,7 @@ window.global_selectedClothingItem = {
 
 };
 
-window.global_itemListNeedsUpdate = false
+window.global_itemListNeedsUpdate = true
 
 //takes a list of strings [b, a, c]. returns "a, b, c".
 // as of 10/31 3:46 pm, returns a text component instead
@@ -42,10 +42,10 @@ export function reduceListToHumanReadable(thisList) {
     if (thisList.reduce) {
         return thisList.reduce(
             (accumulator, currentValue, index) => {
-                if (index == 0) { return <Text style={getStyleForTag(accumulator)}>{accumulator}</Text> }
-                return <Text>{<Text style={getStyleForTag(accumulator)}>{accumulator}</Text>} {<Text style={getStyleForTag(currentValue)}>{currentValue}</Text>}</Text>
+                if (index == 0) { return accumulator }
+                return <Text>{accumulator} {<Text style={getStyleForTag(currentValue)}>{currentValue}</Text>}</Text>
             },
-            thisList[0])
+            <Text style={getStyleForTag(thisList[0])}>{thisList[0]}</Text>)
     }
     return thisList
 
@@ -89,41 +89,14 @@ export class ClothingItem {
     }
     addPropertyToCategory(newStringProperty, category) {
         const cat_process = category.toLowerCase().trim()
-        if (cat_process === TagType.COLOR) {
-            return this.color_tags.push(newStringProperty)
-        }
-        else if (cat_process === TagType.ITEM_TYPE) {
-            return this.type_tags.push(newStringProperty)
-        }
-        else if (cat_process === TagType.BRAND) {
-            return this.brand_tags.push(newStringProperty)
-        }
-        else if (cat_process === TagType.OTHER) {
-            return this.other_tags.push(newStringProperty)
-        }
-        return false
+        return this[cat_process+"_tags"].push(newStringProperty)
     }
     removePropertyFromCategory(newStringProperty, category) {
         const cat_process = category.toLowerCase().trim()
-        if (cat_process === TagType.COLOR) {
-            const oldSize = this.color_tags.length;
-            this.color_tags = this.color_tags.filter(function (el) { return el !== newStringProperty; })
-            return oldSize !== this.color_tags.length;
-        }
-        else if (cat_process === TagType.ITEM_TYPE) {
-            const oldSize = this.type_tags.length;
-            this.type_tags = this.type_tags.filter(function (el) { return el !== newStringProperty; })
-            return oldSize !== this.type_tags.length;
-        }
-        else if (cat_process === TagType.BRAND) {
-            const oldSize = this.brand_tags.length;
-            this.brand_tags = this.brand_tags.filter(function (el) { return el !== newStringProperty; })
-            return oldSize !== this.brand_tags.length;
-        }
-        else if (cat_process === TagType.OTHER) {
-            const oldSize = this.other_tags.length;
-            this.other_tags = this.other_tags.filter(function (el) { return el !== newStringProperty; })
-            return oldSize !== this.other_tags.length;
+        const index = this[cat_process+"_tags"].indexOf(newStringProperty);
+        if (index > -1) { 
+            this[cat_process+"_tags"].splice(index, 1);
+            return true;
         }
         return false;
     }
@@ -298,15 +271,15 @@ export function ClothingItemView() {
                 </ScrollView>
             </View>
 
-            {addTag(newClothing, "brand", brandModalVisible, setBrandModalVisible)}
-            {addTag(newClothing, "color", colorModalVisible, setColorModalVisible)}
-            {addTag(newClothing, "type", typeModalVisible, setTypeModalVisible)}
-            {addTag(newClothing, "other", otherModalVisible, setOtherModalVisible)}
+            
             {removeTag(newClothing, "brand", removeBrandModalVisible, setRemoveBrandModalVisible)}
             {removeTag(newClothing, "color", removeColorModalVisible, setRemoveColorModalVisible)}
             {removeTag(newClothing, "type", removeTypeModalVisible, setRemoveTypeModalVisible)}
             {removeTag(newClothing, "other", removeOtherModalVisible, setRemoveOtherModalVisible)}
-
+            {addTag(newClothing, "brand", brandModalVisible, setBrandModalVisible)}
+            {addTag(newClothing, "color", colorModalVisible, setColorModalVisible)}
+            {addTag(newClothing, "type", typeModalVisible, setTypeModalVisible)}
+            {addTag(newClothing, "other", otherModalVisible, setOtherModalVisible)}
 
 
         </View>
@@ -589,6 +562,7 @@ export const deleteClothingItem = (visibleVar, setVisibleVar, navigation) => {
 export function ClothingItemListView() {
     const navigation = useNavigation();
     const onGoToHome = () => {
+        window.global_itemListNeedsUpdate = true
         navigation.navigate('Home');
     };
     //addClothingItem
@@ -663,7 +637,10 @@ export function ClothingItemListView() {
     );
 
     const getMaybeList = (returnedData) => {
-        var defaultList = (<Text>No Clothing Items Yet!</Text>)
+        if (returnedData instanceof Promise){ 
+            return (<Text>No Clothing Items Yet!</Text>)
+        } //TODO: detect difference between not collected and not collected *yet*
+
         if (returnedData.length > 0) {
             return (<FlatList
                 data={returnedData}
@@ -673,21 +650,24 @@ export function ClothingItemListView() {
                 }}
             />)
         }
-        return defaultList
+        return (<Text>Loading Clothing Items...</Text>) //default
     }
 
     //TODO: regenerate page on addItem and on deleteItem
     
-    const [returnedData, setReturnedData] = useState([]);
-    intermediateList = getAllItemsForUser("67057228f80354e361ae2bf5") //TODO: use actual user ID
-    if (intermediateList.length != returnedData.length) {
-        setReturnedData(intermediateList)
-    }
+    const [returnedData, setReturnedData] = useState(getAllItemsForUser("67057228f80354e361ae2bf5"));
+    //intermediateList =  //TODO: use actual user ID
+    //if ((intermediateList.length != returnedData.length)||window.global_itemListNeedsUpdate) {
+    //    setReturnedData(intermediateList)
+    //    window.global_itemListNeedsUpdate=false
+    //}
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
-            console.log("page loaded !!")
+            //console.log("page loaded !!")
             if (window.global_itemListNeedsUpdate){
-                console.log("tried update")
+                setReturnedData([])
+                //console.log(returnedData)
+                //console.log("tried update")
                 const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
         
                 if (!response.ok) {

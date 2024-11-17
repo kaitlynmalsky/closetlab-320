@@ -15,7 +15,7 @@ export default addTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
       "new_tag": titleThis(text),
       "tag_type": type + "_tags"
     })
-    console.log("data updated", data)
+    //console.log("data updated", data)
   }
   function titleThis(text) {
     if (typeof (text) === 'undefined') return undefined;
@@ -34,7 +34,7 @@ export default addTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
 
 
   const onAddTag = async () => {
-    if (text === "") {
+    if ((text === "")||(text==undefined)) {
       return generateErrorProp(defaultWrongNameMessage)
     }
     if (clothingItem[tagType + "_tags"].includes(titleThis(text))) {
@@ -51,15 +51,16 @@ export default addTag = (clothingItem, tagType, visibleVar, setVisibleVar) => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      console.log(result)
+      //console.log(result)
     } catch (error) {
       console.error("Error:", error)
     }
 
-    console.log(clothingItem)
-    console.log(base_url)
+    //console.log(clothingItem)
+    //console.log(base_url)
 
     clothingItem.addPropertyToCategory(titleThis(text), tagType)
+    //clothingItem.removePropertyFromCategory(titleThis(text), tagType)
     setErrorProp(<Text></Text>)
     setVisibleVar(false)
     window.global_itemListNeedsUpdate = true
