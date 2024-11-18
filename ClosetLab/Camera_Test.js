@@ -127,20 +127,21 @@ export default Camera_Test = () => {
        
         if (window.global_selectedClothingItem==null){window.global_selectedClothingItem = {imageUri:"none"}}
         window.global_selectedClothingItem.imageUri = newPic.base64
-        //options = {
-        //  method: 'POST',
-        //  headers: {
-        //      Accept: 'application/json',
-        //      'Content-Type': 'application/json',
-        //  },
-        //  body: JSON.stringify({"image_link":newPic.base64})
-        //}
-        //response = await fetch(base_url + 'v1/clothing-items/set-image-link/' +window.global_selectedClothingItem._id+ '/', options);
-        //if (!response.ok) {
-        //  throw new Error('Network response was not ok');
-        //}
-        //const responseData = await response.json();
-        //console.log(responseData);
+        options = {
+          method: 'POST',
+          headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({"image_link":newPic.base64})
+        }
+        response = await fetch(base_url + 'v1/clothing-items/set-image-link/' +window.global_selectedClothingItem._id+ '/', options);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const responseData = await response.json();
+        console.log(responseData);
+        window.global_itemListNeedsUpdate = true
         //TODO: update database with changed image 
         //navigation.navigate('Home');
         //console.log(window.global_selectedClothingItem.imageUri)

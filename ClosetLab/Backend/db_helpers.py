@@ -64,12 +64,16 @@ def db_add_clothing_item_image(object_id: str, image_link: str):
             print("error: image_link not defined")
             return
         clothing_item = db_get_clothing_item(object_id)
-        clothing_item.image_link = image_link
-        clothing_item.image = image_link
+        #clothing_item.image_link = image_link
+        #clothing_item.image = image_link
         clothing_item_collection = closet_lab_database["clothing_items"]
         clothing_item_collection.update_one(
             {'_id': ObjectId(object_id) },
-            {'$set': {image_link: image_link}}
+            {'$set': {"image_link": image_link}}
+        )
+        clothing_item_collection.update_one(
+            {'_id': ObjectId(object_id) },
+            {'$set': {"image": image_link}}
         )
     except Exception as e:
         print("Error updating clothing item in database:", str(e))
@@ -80,13 +84,14 @@ def db_set_donation_reminders(object_id: str, donation_reminders: bool):
         if not object_id:
             print("error: object_id was not defined")
             return
-        if not donation_reminders:
+        if donation_reminders == None:
             print("error: donation_reminders not defined")
             return
-        clothing_item = db_get_clothing_item(object_id)
-        clothing_item.update_one(
+        #clothing_item = db_get_clothing_item(object_id)
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        clothing_item_collection.update_one(
             {'_id': ObjectId(object_id)},
-            {'$set': {donation_reminders: donation_reminders}}
+            {'$set': {"donation_reminders": donation_reminders}}
         )
     except Exception as e:
         print("Error updating clothing item in database:", str(e))

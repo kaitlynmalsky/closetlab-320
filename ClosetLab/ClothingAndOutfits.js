@@ -53,10 +53,10 @@ export function reduceListToHumanReadable(thisList) {
 
 function getStyleForTag(tag) {
     const colors = ["red", "orange", "yellow", "green", "blue", "purple", "pink", "white", "black", "gray", "brown"]
-    if (!colors.includes(tag)) {
+    if (!colors.includes(tag.toLowerCase())) {
         return [styles.tag, styles.tag_default];
     }
-    return [styles.tag, color_tag_styles[tag]]
+    return [styles.tag, color_tag_styles[tag.toLowerCase()]]
 }
 
 export class ClothingItem {
@@ -219,10 +219,26 @@ export function ClothingItemView() {
         )
     }
 
-    function toggleDonations() {
+    async function toggleDonations() {
         window.global_selectedClothingItem.donationReminder = !window.global_selectedClothingItem.donationReminder
+        options = {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                "Access-Control-Allow-Origin": "*"
+            },
+            body: JSON.stringify({donation_reminders:window.global_selectedClothingItem.donationReminder})
+        }
+        response = await fetch(base_url + 'v1/clothing-items/donation-reminders/'+window.global_selectedClothingItem._id+'/', options);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const responseData = await response.json();
+        console.log(responseData);
         setVisibleDonationsOn(window.global_selectedClothingItem.donationReminder)
         newClothing.useDonationReminder = window.global_selectedClothingItem.donationReminder
+        window.global_itemListNeedsUpdate = true
         //TODO: update database with new individual donation reminder setting
     }
 
@@ -628,7 +644,7 @@ export function ClothingItemListView() {
                         alignItems: 'flex-end',
                     }
                 }
-                    source={{ uri: item.image }} >
+                    source={{ uri: item.image_link }} >
                 </ImageBackground>
                 <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
                 <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>

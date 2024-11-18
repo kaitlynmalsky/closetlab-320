@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from bson.objectid import ObjectId
 
-from .db_helpers import (
+from db_helpers import (
     db_add_clothing_item_image,
     db_remove_clothing_item_tag,
     db_set_donation_reminders,
@@ -136,7 +136,7 @@ def update_image_link_item(item_id):
         return jsonify({'error': str(e)}, 500)
     
 # POST route to update donation reminders for an item
-@app.route('/api/v1/clothing-items/donation-reminders/<string:item_id>/', methods=['GET'])
+@app.route('/api/v1/clothing-items/donation-reminders/<string:item_id>/', methods=['POST'])
 def set_donation_reminders(item_id):
     try:
         data = request.json
@@ -144,7 +144,7 @@ def set_donation_reminders(item_id):
             return jsonify({'error': 'No data provided'}), 400
         donation_reminders = data.get("donation_reminders")
         db_set_donation_reminders(item_id, donation_reminders)
-        return jsonify({'message': 'Donation reminders updated successfully', 'id': item_id}), 201
+        return jsonify({'message': 'Donation reminders updated successfully with ' + str(donation_reminders), 'id': item_id}), 201
     except Exception as e:
         return jsonify({'error': str(e)}, 500)
     
