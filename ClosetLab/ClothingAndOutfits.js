@@ -151,9 +151,11 @@ export function ClothingItemView() {
 
     const navigation = useNavigation();
     const onGoToHome = () => {
+        window.global_itemListNeedsUpdate = true
         navigation.navigate('Home');
     };
     const onGoToList = () => {
+        window.global_itemListNeedsUpdate = true
         navigation.navigate('Clothing Item View');
     };
     const onGoToCam = () => {
@@ -644,7 +646,7 @@ export function ClothingItemListView() {
                         alignItems: 'flex-end',
                     }
                 }
-                    source={{ uri: item.image_link }} >
+                source={{ uri: item.image_link}} >
                 </ImageBackground>
                 <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
                 <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
