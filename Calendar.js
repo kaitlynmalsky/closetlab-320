@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SafeAreaView, Text, View, Pressable, TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './Stylesheet';
@@ -11,80 +11,118 @@ export default function CalendarView() {
     };
 
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    
-    const [row1Values, setRow1Values] = useState(Array(7).fill(''));
-    const [row2Values, setRow2Values] = useState(Array(7).fill(''));
+    const [currentDate, setCurrentDate] = useState(new Date());
+    const [monthDays, setMonthDays] = useState([]);
+    const [monthEvents, setMonthEvents] = useState({});
+    const [monthOutfits, setMonthOutfits] = useState({});
 
-    const handleRow1Change = (text, index) => {
-        const newValues = [...row1Values];
-        newValues[index] = text;
-        setRow1Values(newValues);
+    const changeMonth = (delta) => {
+        const newDate = new Date(currentDate);
+        newDate.setMonth(currentDate.getMonth() + delta);
+        setCurrentDate(newDate);
     };
 
-    const handleRow2Change = (text, index) => {
-        const newValues = [...row2Values];
-        newValues[index] = text;
-        setRow2Values(newValues);
+    useEffect(() => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        let calendarDays = Array(firstDay).fill(null);
+        for (let i = 1; i <= daysInMonth; i++) {
+            calendarDays.push(i);
+        }
+        
+        while (calendarDays.length < 35) {
+            calendarDays.push(null);
+        }
+        
+        setMonthDays(calendarDays);
+    }, [currentDate]);
+
+    const handleEventChange = (day, text) => {
+        const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`;
+        setMonthEvents(prev => ({
+            ...prev,
+            [monthKey]: text
+        }));
     };
 
-    const renderCell = (content, index, isHeader = false) => (
-        <View key={index} style={[
-            styles.calendarCell,
-            index === 6 && { borderRightWidth: 0 },
-        ]}>
-            {isHeader ? (
-                <Text style={styles.calendarHeaderText}>{content}</Text>
-            ) : (
-                <TextInput
-                    style={styles.calendarInput}
-                    value={content}
-                    onChangeText={(text) => handleRow1Change(text, index)}
-                    placeholder="Add Events"
-                />
-            )}
-        </View>
-    );
+    const handleOutfitChange = (day, text) => {
+        const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`;
+        setMonthOutfits(prev => ({
+            ...prev,
+            [monthKey]: text
+        }));
+    };
+
+    const getEventValue = (day) => {
+        const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`;
+        return monthEvents[monthKey] || '';
+    };
+
+    const getOutfitValue = (day) => {
+        const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`;
+        return monthOutfits[monthKey] || '';
+    };
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.calendarContainer}>
-                <View style={styles.calendarRow}>
-                    {days.map((day, index) => renderCell(day, index, true))}
+                <View style={styles.calendarHeader}>
+                    <Pressable style={styles.monthButton} onPress={() => changeMonth(-1)}>
+                        <Text style={styles.monthButtonText}>←</Text>
+                    </Pressable>
+                    <Text style={styles.calendarTitle}>
+                        {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                    </Text>
+                    <Pressable style={styles.monthButton} onPress={() => changeMonth(1)}>
+                        <Text style={styles.monthButtonText}>→</Text>
+                    </Pressable>
                 </View>
-
+                
                 <View style={styles.calendarRow}>
-                    {days.map((_, index) => (
-                        <View key={index} style={[
-                            styles.calendarCell,
-                            index === 6 && { borderRightWidth: 0 }
-                        ]}>
-                            <TextInput
-                                style={styles.calendarInput}
-                                value={row1Values[index]}
-                                onChangeText={(text) => handleRow1Change(text, index)}
-                                placeholder="Add Events"
-                                placeholderTextColor="#999"
-                            />
+                    {days.map((day, index) => (
+                        <View key={index} style={styles.calendarHeaderCell}>
+                            <Text style={styles.calendarHeaderText}>{day}</Text>
                         </View>
                     ))}
                 </View>
 
-                <View style={[styles.calendarRow, { borderBottomWidth: 0 }]}>
-                    {days.map((_, index) => (
-                        <View key={index} style={[
-                            styles.calendarCell,
-                            index === 6 && { borderRightWidth: 0 }
-                        ]}>
-                            <TextInput
-                                style={styles.calendarInput}
-                                value={row2Values[index]}
-                                onChangeText={(text) => handleRow2Change(text, index)}
-                                placeholder="Add Outfit"
-                                placeholderTextColor="#999"
-                            />
-                        </View>
-                    ))}
-                </View>
+                {Array(5).fill(null).map((_, weekIndex) => (
+                    <View key={weekIndex} style={styles.calendarRow}>
+                        {Array(7).fill(null).map((_, dayIndex) => {
+                            const dayNumber = monthDays[weekIndex * 7 + dayIndex];
+                            return (
+                                <View key={dayIndex} style={[
+                                    styles.calendarCell,
+                                    dayIndex === 6 && { borderRightWidth: 0 },
+                                    weekIndex === 4 && { borderBottomWidth: 0 }
+                                ]}>
+                                    {dayNumber && (
+                                        <View style={styles.calendarDayContent}>
+                                            <Text style={styles.calendarDayNumber}>{dayNumber}</Text>
+                                            <TextInput
+                                                style={styles.calendarInput}
+                                                value={getEventValue(dayNumber)}
+                                                onChangeText={(text) => handleEventChange(dayNumber, text)}
+                                                placeholder="Event"
+                                                placeholderTextColor="#999"
+                                            />
+                                            <TextInput
+                                                style={styles.calendarInput}
+                                                value={getOutfitValue(dayNumber)}
+                                                onChangeText={(text) => handleOutfitChange(dayNumber, text)}
+                                                placeholder="Outfit"
+                                                placeholderTextColor="#999"
+                                            />
+                                        </View>
+                                    )}
+                                </View>
+                            );
+                        })}
+                    </View>
+                ))}
             </View>
 
             <Pressable style={[styles.button, styles.calendarBackButton]} onPress={onGoToHome}>
