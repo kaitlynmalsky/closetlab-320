@@ -1,6 +1,6 @@
 // import React, { useState } from 'react';
 import { StyleSheet, Image, Platform } from "react-native";
-
+//Test19
 const iconResources = {
     flip: require("./assets/buttonIcons/icon_flip.png"),
     home: require("./assets/buttonIcons/icon_home.png"),
