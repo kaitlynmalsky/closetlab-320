@@ -213,6 +213,23 @@ def get_outfit(outfit_id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+# GET route to retrieve all outfits belonging to user, by user ID
+@app.route('/api/v1/outfits-get-all/<string:user_id>', methods=['GET'])
+def get_all_outfits(user_id):
+    try:
+        # Convert user_id to ObjectId if necessary
+        user_id_obj = ObjectId(user_id)
+        item_collection = closet_lab_database["outfits"].find({"user_id": user_id_obj})
+        returnItems = []
+
+        for item in item_collection:
+            returnItems.append(db_get_outfit(item["_id"]))
+
+        return jsonify(returnItems), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # DELETE route to delete an outfit by ID
 @app.route('/api/v1/outfits/<string:outfit_id>', methods=['DELETE'])

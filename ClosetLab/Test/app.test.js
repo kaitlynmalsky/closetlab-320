@@ -80,13 +80,14 @@ describe('Outfit Class', () => {
   });
 
   test('should add items to outfit', () => {
-    const item = new ClothingItem('image_link', 'Shirt', 'item_db_id', 'user_id');
+    const item = "12345";//new ClothingItem('image_link', 'Shirt', 'item_db_id', 'user_id');
     outfit.addItemToOutfit(item);
     expect(outfit.clothingItems).toContain(item);
   });
 
   test('should remove item from outfit', () => {
-    const item = new ClothingItem('image_link', 'Shirt', 'item_db_id', 'user_id');
+    //outfits now only store db_ids of their items, to reflect changes in the items themselves
+    const item = "12345"; //new ClothingItem('image_link', 'Shirt', 'item_db_id', 'user_id');
     outfit.addItemToOutfit(item);
     outfit.removeItemFromOutfit(item);
     expect(outfit.clothingItems).not.toContain(item);

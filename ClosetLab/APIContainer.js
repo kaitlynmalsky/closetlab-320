@@ -33,6 +33,10 @@ export function getAllItemsForUser(user_id) {
     const path = 'v1/clothing-items-get-all/' + user_id;
     return fetchAPI(path);
 }
+export function getAllOutfitsForUser(user_id) {
+    const path = 'v1/outfits-get-all/' + user_id;
+    return fetchAPI(path);
+}
 
 
 export const postItem = (item_data) => {
@@ -83,7 +87,7 @@ export const postOutfit = (outfit_data) => {
         },
         body: JSON.stringify(outfit_data)
     }
-    return fetchAPI('v1/outfits/', options)
+    return fetchAPI('v1/outfits', options)
 }
 
 export const deleteOutfit = (outfit_id) => {

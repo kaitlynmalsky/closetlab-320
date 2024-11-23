@@ -108,7 +108,7 @@ export class Outfit {
 
     title = "New Outfit"; //user-readable name of this outfit
 
-    clothingItems = [] //array of ClothingItems
+    clothingItems = [] //array of db_ids of ClothingItems
 
     constructor(title, dbId, userId) {
         this.title = title;
@@ -120,13 +120,12 @@ export class Outfit {
         this.clothingItems.push(item);
     }
     removeItemFromOutfit(item) { //also removes all non-ClothingItem items
-        this.clothingItems = this.clothingItems.filter(
-            function (itemEl) {
-                if (itemEl.title == null) { return false }
-                if (!itemEl.imageInfo == null) { return false }
-                return (itemEl.title !== item.title) || (itemEl.imageInfo !== item.imageInfo);
-            }
-        )
+        const index = this.clothingItems.indexOf(item);
+        if (index > -1) { 
+            this.clothingItems.splice(index, 1);
+            return true;
+        }
+        return false;
     }
     setTitle(newTitle) {
         this.title = newTitle;
@@ -304,136 +303,6 @@ export function ClothingItemView() {
     </SafeAreaView>);
 }
 
-
-export function OutfitListView() {
-    const navigation = useNavigation();
-    const onGoToHome = () => {
-        navigation.navigate('Home');
-    };
-
-
-    // function onGoToSingleItemView_createFunc(item) {
-
-    //     return () => {
-    //         window.global_selectedClothingItem._id = item._id;
-    //         window.global_selectedClothingItem.name = item.name;
-    //         window.global_selectedClothingItem.imageUri = item.image_link;
-    //         window.global_selectedClothingItem.colors = item.color_tags;
-    //         window.global_selectedClothingItem.brands = item.brand_tags;
-    //         window.global_selectedClothingItem.types = item.type_tags;
-    //         window.global_selectedClothingItem.others = item.other_tags;
-    //         window.global_selectedClothingItem.donationReminder = item.donation_reminders;
-    //         navigation.navigate('Single Clothing Item View');
-    //     }
-    // };
-
-    function onGoToSingleOutfitView_createFunc(outfit) {
-        return () => {
-            window.global_selectedOutfit = {
-                db_id: outfit.db_id,
-                title: outfit.title,
-                clothingItems: outfit.clothingItems,
-            };
-            navigation.navigate('Single Outfit View');
-        }
-    }
-
-    const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
-
-    const renderOutfitItem = ({ item }) => (
-        <View style={styles.listItem} key={item.db_id}>
-            <Pressable onPress={onGoToSingleOutfitView_createFunc(item)}>
-                <Text>Outfit Title: {item.title}</Text>
-                <Text>objectID: {item.db_id}</Text>
-
-                {/* For each clothing item in the outfit, display it in a similar "blue box" format */}
-                <FlatList
-                    data={item.clothingItems}
-                    renderItem={({ item: clothingItem }) => (
-                        <View style={styles.clothingItemBox}>
-                            <Text>Name: {clothingItem.name}</Text>
-                            <Text>objectID: {clothingItem.db_id}</Text>
-                            <Image
-                                resizeMode="contain"
-                                style={{
-                                    width: 300,
-                                    height: 300,
-                                    borderWidth: 1,
-                                    borderColor: 'black'
-                                }}
-                                source={{ uri: clothingItem.image_link }}
-                            />
-                            <Text>Colors: {reduceListToHumanReadable(clothingItem.color_tags)}</Text>
-                            <Text>Brands: {reduceListToHumanReadable(clothingItem.brand_tags)}</Text>
-                        </View>
-                    )}
-                    keyExtractor={(clothingItem) => clothingItem.db_id}
-                />
-            </Pressable>
-        </View>
-    );
-
-
-    //React complains if every item in a list doesn't have a unique 'key' prop
-    // const renderListItem = ({ item }) => (
-    //     <View style={styles.listItem} key={item._id}>
-    //         <Pressable onPress={onGoToSingleItemView_createFunc(item)}>
-    //             <Text>Name: {item.name}</Text>
-    //             <Text>objectID: {item._id}</Text>
-    //             <Image resizeMode="contain" style={
-    //                 {
-    //                     width: 300,
-    //                     height: 300,
-    //                     borderWidth: 1,
-    //                     borderColor: 'black'
-    //                 }
-    //             }
-    //                 source={{ uri: item.image }} />
-    //             <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
-    //             <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
-    //         </Pressable>
-    //     </View>
-    // );
-
-    // const getMaybeList = (returnedData) => {
-    //     var defaultList = (<Text>No Clothing Items Yet!</Text>)
-    //     if (returnedData.length > 0) {
-    //         return (<FlatList
-    //             data={returnedData}
-    //             renderItem={renderListItem}
-    //             keyExtractor={(item) => {
-    //                 return item._id;
-    //             }}
-    //         />)
-    //     }
-    //     return defaultList
-    // }
-
-    const getMaybeList = (returnedData) => {
-        var defaultList = (<Text>No Outfits Yet!</Text>);
-        if (returnedData.length > 0) {
-            return (
-                <FlatList
-                    data={returnedData}
-                    renderItem={renderOutfitItem}
-                    keyExtractor={(item) => item.db_id}
-                />
-            );
-        }
-        return defaultList;
-    };
-
-
-    return (<SafeAreaView style={styles.container}>
-        <Pressable style={styles.button} onPress={onGoToHome}>
-            {generateIcon('home', styles.button_iconCorner)}
-        </Pressable>
-        {getMaybeList(returnedData)}
-    </SafeAreaView>);
-}
-
-
-
 export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
 
     const [text, setText] = useState("");
@@ -443,7 +312,7 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
     }
 
     const [errorProp, setErrorProp] = useState(<Text></Text>);
-    const defaultWrongNameMessage = "Invalid Name!"
+    const defaultWrongNameMessage = "Invalid bame!"
     const duplicateNameMessage = "That name already exists!"
 
     function generateErrorProp(thisText) {

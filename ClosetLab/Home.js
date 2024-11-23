@@ -20,6 +20,9 @@ export default Home = () => {
     const onGoToCalendar = () => {
         navigation.navigate('Calendar')
     }
+    const onGoToOutfitList = () => {
+        navigation.navigate('Outfit List View');
+    };
     function getRecentTakenPhoto() {
         const maybeURI = photoTools.getRecentPhoto();
         if (maybeURI) {
@@ -47,19 +50,14 @@ export default Home = () => {
     //    <Text style={styles.button_text}>Go to video camera</Text>
     //</Pressable>
 
-    //<Pressable style={styles.button} onPress={onGoToCamera}>
-    //    <Text style={styles.button_text}>Go to video camera</Text>
-    //</Pressable>
-
 
     //{imageElement}
-            //<Pressable style={styles.button} onPress={getRecentTakenPhoto}>
-            //    <Text style={styles.button_text}>Update Image</Text>
-            //</Pressable>
     return (
         <SafeAreaView style={styles.container}>
             
-            
+            <Pressable style={styles.button} onPress={onGoToOutfitList}>
+                <Text style={styles.button_text}>Outfit List Test</Text>
+            </Pressable>
             <Pressable style={styles.button} onPress={onGoToClothingItemTest}>
                 <Text style={styles.button_text}>Go to clothing item test</Text>
             </Pressable>
