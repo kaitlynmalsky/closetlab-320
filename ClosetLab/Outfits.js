@@ -9,17 +9,32 @@ import removeTag from './RemoveTags.js';
 import { TagType, ClothingItem, Outfit} from './ClothingAndOutfits.js';
 import { CheckBox } from 'react-native-elements';
 
-export function reduceListToHumanReadable_Enter(thisList) {
+function convertItemObjectID_ToListItem(id, itemCache){
+    const defaultInfo = {
+        name:"Error: no name found",
+        image_link:"none"
+    }
+    const properItem = itemCache.reduce(
+        (accumulator, currentValue) => {
+            if (currentValue._id===id) { return currentValue }
+            return accumulator
+        },
+        defaultInfo)
+    return properItem.name + " " + properItem._id
+}
+
+export function reduceListToHumanReadable_Super(thisList, itemCache) {
     if (thisList.length == 0) { return <Text></Text> }
+    
     if (thisList.sort) { thisList = thisList.sort(); } //there's no list.sort on mobile?
     const nl = "\n";
     if (thisList.reduce) {
         return thisList.reduce(
             (accumulator, currentValue, index) => {
                 if (index == 0) { return accumulator }
-                return <Text>{accumulator} {nl}{<Text >{currentValue}</Text>}</Text>
+                return <Text>{accumulator}{nl}{<Text >{convertItemObjectID_ToListItem(currentValue, itemCache)}</Text>}</Text>
             },
-            <Text>{thisList[0]}</Text>)
+            <Text>{convertItemObjectID_ToListItem(thisList[0], itemCache)}</Text>)
     }
     return thisList
 
@@ -50,7 +65,7 @@ window.global_selectedOutfit = {
 
 window.global_outfitListNeedsUpdate = true;
 
-export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
+export const addOutfit = (visibleVar, setVisibleVar, navigation) => {
 
     const [text, setText] = useState("");
     function titleThis(text) {
@@ -314,6 +329,7 @@ export function OutfitListView() {
     };
 
     const [returnedData, setReturnedData] = useState( getAllOutfitsForUser("67057228f80354e361ae2bf5"))
+    const [clothingItemCache, setClothingItemCache] = useState( getAllItemsForUser("67057228f80354e361ae2bf5"))
 
     const renderOutfitItem = ({ item }) => (
         <View style={styles.listItem} key={item._id}>
@@ -323,7 +339,7 @@ export function OutfitListView() {
                     <View key={item._id}>
                         <Text>Name: {item.name}</Text>
                         <Text>objectID: {item._id}</Text>
-                        <Text>Items: {reduceListToHumanReadable_Enter(item.items)}</Text>
+                        <Text>Items: {reduceListToHumanReadable_Super(item.items, clothingItemCache)}</Text>
                         
                     </View>
                     <Pressable style={styles.button_small} onPress={onOpenDeleteItemModal_createFunc(item)}>
@@ -352,14 +368,21 @@ export function OutfitListView() {
         const unsubscribe = navigation.addListener('focus', async () => {
             if (window.global_outfitListNeedsUpdate){
                 setReturnedData([])
+
+                const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
+                if (!response2.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const itemCache = await response2.json();
+                setClothingItemCache(itemCache)
+
                 const response = await fetch(base_url+'v1/outfits-get-all/' + "67057228f80354e361ae2bf5");
-        
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 const responseData = await response.json();
-            
                 setReturnedData(responseData)
+                
                 window.global_outfitListNeedsUpdate = false
             }
           // The screen is focused
@@ -379,7 +402,7 @@ export function OutfitListView() {
             </Pressable>
         </View>
         {getMaybeList(returnedData)}
-        {addClothingItem(addItemModalVisible, setAddItemModalVisible, navigation)}
+        {addOutfit(addItemModalVisible, setAddItemModalVisible, navigation)}
         {deleteOutfit(deleteItemModalVisible, setDeleteItemModalVisible, navigation)}
     </SafeAreaView>);
 }
