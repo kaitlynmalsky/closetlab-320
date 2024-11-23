@@ -37,7 +37,7 @@ window.global_itemListNeedsUpdate = true
 //takes a list of strings [b, a, c]. returns "a, b, c".
 // as of 10/31 3:46 pm, returns a text component instead
 export function reduceListToHumanReadable(thisList) {
-    if (thisList.length == 0) { return "" }
+    if (thisList.length == 0) { return <Text></Text> }
     if (thisList.sort) { thisList = thisList.sort(); } //there's no list.sort on mobile?
     if (thisList.reduce) {
         return thisList.reduce(

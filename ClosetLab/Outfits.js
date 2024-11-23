@@ -9,6 +9,22 @@ import removeTag from './RemoveTags.js';
 import { TagType, ClothingItem, Outfit} from './ClothingAndOutfits.js';
 import { CheckBox } from 'react-native-elements';
 
+export function reduceListToHumanReadable_Enter(thisList) {
+    if (thisList.length == 0) { return <Text></Text> }
+    if (thisList.sort) { thisList = thisList.sort(); } //there's no list.sort on mobile?
+    const nl = "\n";
+    if (thisList.reduce) {
+        return thisList.reduce(
+            (accumulator, currentValue, index) => {
+                if (index == 0) { return accumulator }
+                return <Text>{accumulator} {nl}{<Text >{currentValue}</Text>}</Text>
+            },
+            <Text>{thisList[0]}</Text>)
+    }
+    return thisList
+
+}
+
 const testItem = new Outfit(
     "Test Outfit 1",
     "12345", //db_id
@@ -16,6 +32,14 @@ const testItem = new Outfit(
 );
 testItem.addItemToOutfit("671d4e8c32b7d8628aef41d8")
 testItem.addItemToOutfit("671d4f8c0cf12a6dbdba569c")
+
+function convertOutfitToMessage(outfit){
+    return {
+        name:outfit.title,
+        user_id: outfit.owner,
+        items: outfit.clothingItems
+    }
+}
 
 
 window.global_selectedOutfit = {
@@ -42,7 +66,11 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
     function generateErrorProp(thisText) {
         return setErrorProp(<Text style={styles.error_text}>{thisText}</Text>)
     }
-    const [toggleCheckBox, setToggleCheckBox] = useState(false)
+    const [selectedItems, setSelectedItems] = useState({});//maps objectID->selected-or-not boolean
+    function objMap(obj, func) {  //obj is the dict, func is (key, value) => new value
+        //why is this not built-in
+        return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, func(k, v)]));
+    }
 
     const renderClothingItem = ({ item }) => (
         <View style={styles.listItem} key={item._id}>
@@ -51,7 +79,17 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
                     <Text>Name: {item.name}</Text>
                     <Text>objectID: {item._id}</Text>
                 </View>
-                
+                <CheckBox
+                    checked={selectedItems[item._id]}
+                    onPress={() => //when a dict is in a useState, the whole dict must be replaced 
+                        {setSelectedItems(objMap(selectedItems, 
+                            (key, val)=>{
+                                if (key===item._id){ return !val }
+                                else{ return val }
+                            }
+                        ));}
+                    }
+                />
             </View>
         </View>
     );
@@ -66,15 +104,19 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
         if (returnedData instanceof Promise){ 
             return (<Text>Loading Clothing Items...</Text>)
         } //TODO: detect difference between not collected and not collected *yet*
-
-        if (returnedData.length > 0) {
+        if (returnedData.length===undefined){return (<Text>Loading Clothing Items...</Text>)}
+        if ((returnedData.length > 0)) {
+            if ((returnedData.length!=Object.keys(selectedItems).length)){
+                //console.log(returnedData.length)
+                //setSelectedItems({});
+                for (item in returnedData){
+                    selectedItems[returnedData[item]._id]=false;
+                }
+            }
+            
             return (
             <ScrollView style={{ height: 400 }}>
-                <CheckBox
-                    title='Click Here'
-                    checked={toggleCheckBox}
-                    onPress={() => setToggleCheckBox(!toggleCheckBox)}
-                />
+                
                 <FlatList
                     data={returnedData}
                     renderItem={renderClothingItem}
@@ -94,28 +136,40 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
         if (text === "") {
             return generateErrorProp(defaultWrongNameMessage)
         }
+        //check if at least one item is selected; empty outfits are not allowed
+        var atLeastOneSelected_array = Object.entries(selectedItems).reduce(([prevK, prevV], [currK, currV],) => [prevK, prevV||currV], ["any", false])
+        if (!atLeastOneSelected_array[1]) {
+            return generateErrorProp(mustHaveItemMessage)
+        }
 
         try {
             newItem = new Outfit(titleThis(text), "12345", "67057228f80354e361ae2bf5") //TODO: replace 3rd arg with userId retrieved dynamically
-            //options = {
-            //    method: 'POST',
-            //    headers: {
-            //        Accept: 'application/json',
-            //        'Content-Type': 'application/json',
-            //        "Access-Control-Allow-Origin": "*"
-            //    },
-            //    body: JSON.stringify(newItem)
-            //}
-            //response = await fetch(base_url + 'v1/clothing-items', options);
-            //if (!response.ok) {
-            //    throw new Error('Network response was not ok');
-            //}
-            //const responseData = await response.json();
-            //newItem.db_id = responseData.id;
+            Object.entries(selectedItems).forEach(
+                ([k,v])=>{
+                    if (v){
+                        newItem.addItemToOutfit(k)
+                    }
+                }
+            )
+            options = {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: JSON.stringify(convertOutfitToMessage(newItem))
+            }
+            response = await fetch(base_url + 'v1/outfits', options);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const responseData = await response.json();
+            newItem.db_id = responseData.id;
             //console.log(newItem.db_id)
-            //console.log('Data retrieved successfully:', responseData);
-            //navigation.navigate('Home');
-            //navigation.navigate('Clothing Item View');
+            console.log('Data retrieved successfully:', responseData);
+            navigation.navigate('Home');
+            navigation.navigate('Outfit List View');
         } catch (error) {
             console.error("Error:", error)
         }
@@ -269,6 +323,8 @@ export function OutfitListView() {
                     <View key={item._id}>
                         <Text>Name: {item.name}</Text>
                         <Text>objectID: {item._id}</Text>
+                        <Text>Items: {reduceListToHumanReadable_Enter(item.items)}</Text>
+                        
                     </View>
                     <Pressable style={styles.button_small} onPress={onOpenDeleteItemModal_createFunc(item)}>
                         {generateIcon('remove', styles.icon_general)}
@@ -279,7 +335,7 @@ export function OutfitListView() {
     );
 
     const getMaybeList = (returnedData) => {
-        var defaultList = (<Text>No Outfits Yet!</Text>);
+        var defaultList = (<Text>Loading Outfits...</Text>);
         if (returnedData.length > 0) {
             return (
                 <FlatList
