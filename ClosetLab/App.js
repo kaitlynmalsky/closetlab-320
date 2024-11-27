@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Pressable, Image } from 'react-native';
 import Camera_Test from './Camera_Test.js';
 import Home from './Home.js';
 import { ClothingItemView, ClothingItemListView } from './ClothingAndOutfits.js';
-import { OutfitListView } from './Outfits.js';
+import { OutfitListView, SingleOutfitView } from './Outfits.js';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -95,7 +95,7 @@ export default function App() {
         />
         <Stack.Screen
           name={'Single Outfit View'}
-          component={OutfitListView}
+          component={SingleOutfitView}
           options={{
             headerShown: false,
           }}

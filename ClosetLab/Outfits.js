@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, ImageBackground, Modal, TextInput } from 'react-native';
+import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, ScrollView, FlatList, Modal, TextInput, ImageBackground, Image } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
 import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteItem, getAllItemsForUser } from './APIContainer.js';
@@ -8,6 +8,8 @@ import addTag from './AddTags.js';
 import removeTag from './RemoveTags.js';
 import { TagType, ClothingItem, Outfit} from './ClothingAndOutfits.js';
 import { CheckBox } from 'react-native-elements';
+
+import {getCollage} from './ItemLayerOrganize.js'
 
 function convertItemObjectID_ToListItem(id, itemCache){
     const defaultInfo = {
@@ -311,11 +313,7 @@ export function OutfitListView() {
 
     function onGoToSingleOutfitView_createFunc(outfit) {
         return () => {
-            window.global_selectedOutfit = {
-                db_id: outfit.db_id,
-                title: outfit.title,
-                clothingItems: outfit.clothingItems,
-            };
+            setGlobalViewOfItem(outfit)
             navigation.navigate('Single Outfit View');
         }
     }
@@ -408,4 +406,66 @@ export function OutfitListView() {
 }
 
 
+export function SingleOutfitView(){
+    const navigation = useNavigation();
+    const onGoToHome = () => {
+        window.global_itemListNeedsUpdate = true
+        navigation.navigate('Home');
+    };
+    const onGoToList = () => {
+        window.global_itemListNeedsUpdate = true
+        navigation.navigate('Outfit List View');
+    };
+    const newOutfit = new Outfit(
+        window.global_selectedOutfit.title,
+        window.global_selectedOutfit.db_id,
+        "67057228f80354e361ae2bf5"
+    );
+    newOutfit.clothingItems = window.global_selectedOutfit.clothingItems
+
+    const [needUpdate, setNeedUpdate] = useState(true)
+    const [collage, setCollage] = useState( <Text>Loading Collage...</Text>)
+    getCollage(newOutfit.clothingItems, setCollage, needUpdate, setNeedUpdate)
+    //console.log(newOutfit)
+    return (<SafeAreaView style={styles.container}>
+        <View style={styles.container}>
+            <View style={styles.spacer_row_mobile}>
+                <Pressable style={styles.button} onPress={onGoToHome}>
+                    {generateIcon('home', styles.button_iconCorner)}
+                </Pressable>
+                <Pressable style={styles.button} onPress={onGoToList}>
+                    <Text style={styles.button_text}>Back to Outfits</Text>
+                </Pressable>
+            </View>
+            <View style={styles.container_underTopRow}>
+                <Text style={[styles.text, styles.pad_text]}>Name: {newOutfit.title}</Text>
+                <Text style={[styles.text, styles.pad_text]}>objectID: {newOutfit.db_id}</Text>
+                <View>
+                    {collage}
+                </View>
+                <View style={styles.container}>
+                    <View style={styles.spacer_row_even}>
+                        <Pressable style={styles.button_outfit_2x2} >
+                            <Text style={styles.button_text}>Edit Outfit</Text>
+                        </Pressable>
+                        <Pressable style={styles.button_outfit_2x2} >
+                            <Text style={styles.button_text}>Save Outfit{"\n"}to Calendar</Text>
+                        </Pressable>
+                    </View>
+                    <View style={styles.spacer_row_even}>
+                        <Pressable style={styles.button_outfit_2x2} >
+                            <Text style={styles.button_text}>Discard Outfit</Text>
+                        </Pressable>
+                        <Pressable style={styles.button_outfit_2x2} >
+                            <Text style={styles.button_text}>Other Button</Text>
+                        </Pressable>
+                    </View>
+                </View>
+
+                <Text>{"\n"}</Text>
+            </View>
+
+        </View>
+    </SafeAreaView>);
+}
 

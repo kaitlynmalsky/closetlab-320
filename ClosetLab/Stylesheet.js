@@ -49,6 +49,15 @@ const styles = StyleSheet.create({
         borderWidth: 0,
         justifyContent: 'space-between',
     },
+    spacer_row_even: {
+        flexDirection: 'row',
+        alignItems: 'stretch',
+        alignContent: 'stretch',
+        position: 'relative',
+        borderWidth: 0,
+        width:'100%',
+        justifyContent: 'space-evenly',
+    },
     spacer_row_mobile: {
         flexDirection: 'row',
         //alignItems: 'center',
@@ -118,6 +127,15 @@ const styles = StyleSheet.create({
         borderColor: '#f0f0f0',
         backgroundColor: '#2c2c2c',
         justifyContent: 'center',
+    },
+    button_outfit_2x2: {
+        padding: 20,
+        margin: 10,
+        borderWidth: StyleSheet.hairlineWidth,
+        borderColor: '#f0f0f0',
+        backgroundColor: '#2c2c2c',
+        width:'50%',
+        justifyContent: 'space-evenly',
     },
     listItem: {
         padding: 20,
