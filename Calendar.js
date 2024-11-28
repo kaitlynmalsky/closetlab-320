@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, View, Pressable, TextInput } from 'react-native';
+import { SafeAreaView, Text, View, Pressable, TextInput, StyleSheet, Modal, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './Stylesheet';
-//Test19
 
 export default function CalendarView() {
     const navigation = useNavigation();
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedDay, setSelectedDay] = useState(null);
+    const [botModalVisible, setBotModalVisible] = useState(false);
+    const [topModalVisible, setTopModalVisible] = useState(false);
+    const [selectedTop, setSelectedTop] = useState(null);
+    const [selectedBot, setSelectedBot] = useState(null);
     
     const onGoToHome = () => {
         navigation.navigate('Home');
@@ -49,12 +54,31 @@ export default function CalendarView() {
         }));
     };
 
-    const handleOutfitChange = (day, text) => {
-        const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`;
-        setMonthOutfits(prev => ({
-            ...prev,
-            [monthKey]: text
-        }));
+    const handleOutfitButtonPress = (dayNumber) => {
+        setSelectedDay(dayNumber);
+        setModalVisible(true);
+    };
+
+    const handleOutfitSelect = (selection) => {
+        if (selection === 'Top') {
+            setModalVisible(false);
+            setTopModalVisible(true);
+        } else if (selection === 'Bot') {
+            setModalVisible(false);
+            setBotModalVisible(true);
+        } else {
+            setModalVisible(false);
+        }
+    };
+
+    const handleBotSelection = (botChoice) => {
+        setSelectedBot(botChoice);
+        // Don't close modal immediately so user can see selection
+    };
+
+    const handleTopSelection = (topChoice) => {
+        setSelectedTop(topChoice);
+        // Don't close modal immediately so user can see selection
     };
 
     const getEventValue = (day) => {
@@ -110,13 +134,14 @@ export default function CalendarView() {
                                                 placeholder="Event"
                                                 placeholderTextColor="#999"
                                             />
-                                            <TextInput
-                                                style={styles.calendarInput}
-                                                value={getOutfitValue(dayNumber)}
-                                                onChangeText={(text) => handleOutfitChange(dayNumber, text)}
-                                                placeholder="Outfit"
-                                                placeholderTextColor="#999"
-                                            />
+                                            <Pressable 
+                                                style={styles.outfitButton}
+                                                onPress={() => handleOutfitButtonPress(dayNumber)}
+                                            >
+                                                <Text style={styles.outfitButtonText}>
+                                                    {getOutfitValue(dayNumber) || '                   Outfit'}
+                                                </Text>
+                                            </Pressable>
                                         </View>
                                     )}
                                 </View>
@@ -129,6 +154,230 @@ export default function CalendarView() {
             <Pressable style={[styles.button, styles.calendarBackButton]} onPress={onGoToHome}>
                 <Text style={styles.button_text}>Back to Home</Text>
             </Pressable>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={modalStyles.centeredView}>
+                    <View style={modalStyles.modalView}>
+                        <Pressable
+                            style={modalStyles.modalButton}
+                            onPress={() => handleOutfitSelect('Top')}
+                        >
+                            <Text style={modalStyles.modalButtonText}>Top</Text>
+                        </Pressable>
+                        <Pressable
+                            style={modalStyles.modalButton}
+                            onPress={() => handleOutfitSelect('Bot')}
+                        >
+                            <Text style={modalStyles.modalButtonText}>Bot</Text>
+                        </Pressable>
+                        <Pressable
+                            style={[modalStyles.modalButton, modalStyles.cancelButton]}
+                            onPress={() => setModalVisible(false)}
+                        >
+                            <Text style={modalStyles.modalButtonText}>Create</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={botModalVisible}
+                onRequestClose={() => setBotModalVisible(false)}
+            >
+                <View style={modalStyles.centeredView}>
+                    <View style={modalStyles.modalView}>
+                        <View style={modalStyles.imageContainer}>
+                            <Pressable 
+                                style={[
+                                    modalStyles.imageButton,
+                                    selectedBot === 'bot1' && modalStyles.selectedImage
+                                ]}
+                                onPress={() => handleBotSelection('bot1')}
+                            >
+                                <Image 
+                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
+                                    style={modalStyles.image}
+                                />
+                                {selectedBot === 'bot1' && (
+                                    <View style={modalStyles.checkmark}>
+                                        <Text style={modalStyles.checkmarkText}>✓</Text>
+                                    </View>
+                                )}
+                            </Pressable>
+                            <Pressable 
+                                style={[
+                                    modalStyles.imageButton,
+                                    selectedBot === 'bot2' && modalStyles.selectedImage
+                                ]}
+                                onPress={() => handleBotSelection('bot2')}
+                            >
+                                <Image 
+                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
+                                    style={modalStyles.image}
+                                />
+                                {selectedBot === 'bot2' && (
+                                    <View style={modalStyles.checkmark}>
+                                        <Text style={modalStyles.checkmarkText}>✓</Text>
+                                    </View>
+                                )}
+                            </Pressable>
+                        </View>
+                        <Pressable
+                            style={[modalStyles.modalButton, modalStyles.cancelButton]}
+                            onPress={() => {
+                                setSelectedBot(null);
+                                setBotModalVisible(false);
+                            }}
+                        >
+                            <Text style={modalStyles.modalButtonText}>Cancel</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={topModalVisible}
+                onRequestClose={() => setTopModalVisible(false)}
+            >
+                <View style={modalStyles.centeredView}>
+                    <View style={modalStyles.modalView}>
+                        <View style={modalStyles.imageContainer}>
+                            <Pressable 
+                                style={[
+                                    modalStyles.imageButton,
+                                    selectedTop === 'top1' && modalStyles.selectedImage
+                                ]}
+                                onPress={() => handleTopSelection('top1')}
+                            >
+                                <Image 
+                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
+                                    style={modalStyles.image}
+                                />
+                                {selectedTop === 'top1' && (
+                                    <View style={modalStyles.checkmark}>
+                                        <Text style={modalStyles.checkmarkText}>✓</Text>
+                                    </View>
+                                )}
+                            </Pressable>
+                            <Pressable 
+                                style={[
+                                    modalStyles.imageButton,
+                                    selectedTop === 'top2' && modalStyles.selectedImage
+                                ]}
+                                onPress={() => handleTopSelection('top2')}
+                            >
+                                <Image 
+                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
+                                    style={modalStyles.image}
+                                />
+                                {selectedTop === 'top2' && (
+                                    <View style={modalStyles.checkmark}>
+                                        <Text style={modalStyles.checkmarkText}>✓</Text>
+                                    </View>
+                                )}
+                            </Pressable>
+                        </View>
+                        <Pressable
+                            style={[modalStyles.modalButton, modalStyles.cancelButton]}
+                            onPress={() => {
+                                setSelectedTop(null);
+                                setTopModalVisible(false);
+                            }}
+                        >
+                            <Text style={modalStyles.modalButtonText}>Cancel</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Modal>
         </SafeAreaView>
     );
-} 
+}
+
+const modalStyles = StyleSheet.create({
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalView: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+        width: 200,
+    },
+    modalButton: {
+        backgroundColor: '#2196F3',
+        borderRadius: 5,
+        padding: 10,
+        elevation: 2,
+        marginVertical: 5,
+        width: '100%',
+    },
+    cancelButton: {
+        backgroundColor: '#FF3B30',
+        marginTop: 10,
+    },
+    modalButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    imageContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+        marginBottom: 10,
+    },
+    imageButton: {
+        padding: 5,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        margin: 5,
+    },
+    image: {
+        width: 80,
+        height: 80,
+        resizeMode: 'cover',
+        borderRadius: 5,
+    },
+    selectedImage: {
+        borderColor: '#4CAF50',
+        borderWidth: 2,
+    },
+    checkmark: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+        backgroundColor: '#4CAF50',
+        borderRadius: 12,
+        width: 24,
+        height: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    checkmarkText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+}); 
