@@ -338,7 +338,87 @@ const styles = StyleSheet.create({
     dropdown: {
         width: 150,
         height: 50,
-    }
+    },
+
+    calendarContainer: {
+        marginTop: 20,
+        width: '95%',
+        borderWidth: 1,
+        borderColor: '#2c2c2c',
+        backgroundColor: '#fff',
+    },
+    calendarTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        padding: 10,
+        backgroundColor: '#2c2c2c',
+        color: '#fff',
+    },
+    calendarRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderBottomWidth: 1,
+        borderBottomColor: '#2c2c2c',
+    },
+    calendarHeaderCell: {
+        flex: 1,
+        padding: 8,
+        borderRightWidth: 1,
+        borderRightColor: '#2c2c2c',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0',
+    },
+    calendarCell: {
+        flex: 1,
+        height: 80,
+        borderRightWidth: 1,
+        borderRightColor: '#2c2c2c',
+        padding: 2,
+    },
+    calendarHeaderText: {
+        fontWeight: 'bold',
+        fontSize: 12,
+        color: '#2c2c2c',
+    },
+    calendarDayContent: {
+        flex: 1,
+    },
+    calendarDayNumber: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        marginBottom: 2,
+    },
+    calendarInput: {
+        fontSize: 10,
+        padding: 2,
+        marginBottom: 2,
+        width: '100%',
+        height: 20,
+        textAlign: 'center',
+        backgroundColor: '#f9f9f9',
+        borderRadius: 2,
+    },
+    calendarBackButton: {
+        marginTop: 20,
+    },
+    calendarHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: '#2c2c2c',
+        padding: 10,
+    },
+    monthButton: {
+        padding: 10,
+        borderRadius: 5,
+        backgroundColor: '#444',
+    },
+    monthButtonText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
 });
 
 export default styles;
