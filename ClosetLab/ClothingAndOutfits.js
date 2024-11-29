@@ -303,7 +303,7 @@ export function ClothingItemView() {
     </SafeAreaView>);
 }
 
-export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
+export const addClothingItem = (visibleVar, setVisibleVar, navigation,setSecondaryUpdate) => {
 
     const [text, setText] = useState("");
     function titleThis(text) {
@@ -345,6 +345,8 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
             newItem.db_id = responseData.id;
             console.log(newItem.db_id)
             console.log('Data retrieved successfully:', responseData);
+            setSecondaryUpdate(true)
+            window.global_itemListNeedsUpdate = true
             navigation.navigate('Home');
             navigation.navigate('Clothing Item View');
         } catch (error) {
@@ -395,7 +397,7 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
     </Modal>);
 }
 
-export const deleteClothingItem = (visibleVar, setVisibleVar, navigation) => {
+export const deleteClothingItem = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
 
     toDeleteID = window.global_selectedClothingItem._id
     toDeleteName = window.global_selectedClothingItem.name
@@ -412,6 +414,8 @@ export const deleteClothingItem = (visibleVar, setVisibleVar, navigation) => {
             }
             //const responseData = await response.json();
             console.log(toDeleteID + ' deleted successfully');
+            window.global_itemListNeedsUpdate = true
+            setSecondaryUpdate(true)
             navigation.navigate('Home');
             navigation.navigate('Clothing Item View');
         } catch (error) {
@@ -539,10 +543,31 @@ export function ClothingItemListView() {
         }
         return (<Text>Loading Clothing Items...</Text>) //default
     }
+    
 
     //TODO: regenerate page on addItem and on deleteItem
-    
+    const [secondaryUpdateRequired, setSecondaryUpdate] = useState(false);
     const [returnedData, setReturnedData] = useState(getAllItemsForUser("67057228f80354e361ae2bf5"));
+    async function updatePage(){
+        setReturnedData([])
+        setSecondaryUpdate(false)
+        //console.log(returnedData)
+        console.log("tried update")
+        const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const responseData = await response.json();
+    
+        setReturnedData(responseData)
+        window.global_itemListNeedsUpdate = false
+        if (secondaryUpdateRequired){setSecondaryUpdate(false)}
+    }
+    if (secondaryUpdateRequired){
+        updatePage()
+    }
+    
     //intermediateList =  //TODO: use actual user ID
     //if ((intermediateList.length != returnedData.length)||window.global_itemListNeedsUpdate) {
     //    setReturnedData(intermediateList)
@@ -550,20 +575,9 @@ export function ClothingItemListView() {
     //}
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
-            //console.log("page loaded !!")
+            console.log("page loaded !!")
             if (window.global_itemListNeedsUpdate){
-                setReturnedData([])
-                //console.log(returnedData)
-                //console.log("tried update")
-                const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
-        
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const responseData = await response.json();
-            
-                setReturnedData(responseData)
-                window.global_itemListNeedsUpdate = false
+                updatePage()
             }
           // The screen is focused
         });
@@ -582,8 +596,8 @@ export function ClothingItemListView() {
             </Pressable>
         </View>
 
-        {addClothingItem(addItemModalVisible, setAddItemModalVisible, navigation)}
-        {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible, navigation)}
+        {addClothingItem(addItemModalVisible, setAddItemModalVisible, navigation, setSecondaryUpdate)}
+        {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible, navigation, setSecondaryUpdate)}
         {getMaybeList(returnedData)}
     </SafeAreaView>);
 }

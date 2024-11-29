@@ -67,7 +67,7 @@ window.global_selectedOutfit = {
 
 window.global_outfitListNeedsUpdate = true;
 
-export const addOutfit = (visibleVar, setVisibleVar, navigation) => {
+export const addOutfit = (visibleVar, setVisibleVar, navigation,setSecondaryUpdate) => {
 
     const [text, setText] = useState("");
     function titleThis(text) {
@@ -185,6 +185,7 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation) => {
             newItem.db_id = responseData.id;
             //console.log(newItem.db_id)
             console.log('Data retrieved successfully:', responseData);
+            setSecondaryUpdate(true)
             navigation.navigate('Home');
             navigation.navigate('Outfit List View');
         } catch (error) {
@@ -237,7 +238,7 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation) => {
     </Modal>);
 }
 
-export const deleteOutfit = (visibleVar, setVisibleVar, navigation) => {
+export const deleteOutfit = (visibleVar, setVisibleVar, navigation,setSecondaryUpdate) => {
 
     toDeleteID = window.global_selectedOutfit.db_id
     toDeleteName = window.global_selectedOutfit.title
@@ -255,6 +256,7 @@ export const deleteOutfit = (visibleVar, setVisibleVar, navigation) => {
             //const responseData = await response.json();
             console.log(toDeleteID + ' deleted successfully');
             navigation.navigate('Home');
+            setSecondaryUpdate(true)
             window.global_outfitListNeedsUpdate = true
             navigation.navigate('Outfit List View');
         } catch (error) {
@@ -326,8 +328,36 @@ export function OutfitListView() {
         }
     };
 
+    const [secondaryUpdateRequired, setSecondaryUpdate] = useState(false);
     const [returnedData, setReturnedData] = useState( getAllOutfitsForUser("67057228f80354e361ae2bf5"))
     const [clothingItemCache, setClothingItemCache] = useState( getAllItemsForUser("67057228f80354e361ae2bf5"))
+
+    async function updatePage(){
+        setReturnedData([])
+        setSecondaryUpdate(false)
+        //console.log("finished items")
+        const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
+        if (!response2.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const itemCache = await response2.json();
+        setClothingItemCache(itemCache)
+        //console.log("finished items")
+        const response = await fetch(base_url+'v1/outfits-get-all/' + "67057228f80354e361ae2bf5");
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const responseData = await response.json();
+        setReturnedData(responseData)
+        //console.log("finished outfits")
+        
+        window.global_outfitListNeedsUpdate = false
+    }
+
+    if (secondaryUpdateRequired){
+        updatePage()
+    }
+
 
     const renderOutfitItem = ({ item }) => (
         <View style={styles.listItem} key={item._id}>
@@ -365,24 +395,7 @@ export function OutfitListView() {
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
             if (window.global_outfitListNeedsUpdate){
-                setReturnedData([])
-                //console.log("finished items")
-                const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
-                if (!response2.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const itemCache = await response2.json();
-                setClothingItemCache(itemCache)
-                //console.log("finished items")
-                const response = await fetch(base_url+'v1/outfits-get-all/' + "67057228f80354e361ae2bf5");
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const responseData = await response.json();
-                setReturnedData(responseData)
-                //console.log("finished outfits")
-                
-                window.global_outfitListNeedsUpdate = false
+                updatePage()
             }
           // The screen is focused
         });
@@ -401,8 +414,8 @@ export function OutfitListView() {
             </Pressable>
         </View>
         {getMaybeList(returnedData)}
-        {addOutfit(addItemModalVisible, setAddItemModalVisible, navigation)}
-        {deleteOutfit(deleteItemModalVisible, setDeleteItemModalVisible, navigation)}
+        {addOutfit(addItemModalVisible, setAddItemModalVisible, navigation,setSecondaryUpdate)}
+        {deleteOutfit(deleteItemModalVisible, setDeleteItemModalVisible, navigation,setSecondaryUpdate)}
     </SafeAreaView>);
 }
 
