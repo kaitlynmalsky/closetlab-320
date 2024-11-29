@@ -366,20 +366,21 @@ export function OutfitListView() {
         const unsubscribe = navigation.addListener('focus', async () => {
             if (window.global_outfitListNeedsUpdate){
                 setReturnedData([])
-
+                //console.log("finished items")
                 const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
                 if (!response2.ok) {
                     throw new Error('Network response was not ok');
                 }
                 const itemCache = await response2.json();
                 setClothingItemCache(itemCache)
-
+                //console.log("finished items")
                 const response = await fetch(base_url+'v1/outfits-get-all/' + "67057228f80354e361ae2bf5");
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 const responseData = await response.json();
                 setReturnedData(responseData)
+                //console.log("finished outfits")
                 
                 window.global_outfitListNeedsUpdate = false
             }

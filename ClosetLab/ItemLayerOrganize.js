@@ -94,7 +94,7 @@ export function convertItemsToLayeredComponent(miniItemList, totalWidth, totalHe
         return (<View></View>)
     }
     notFirstOpacity = 0.75
-    console.log(miniItemList[0].name)
+    //console.log(miniItemList[0].name)
     return <ImageBackground resizeMode="cover" style={
         {
             width: miniItemList.length*totalWidth/totalItems,
@@ -127,7 +127,7 @@ export async function getCollage(items, setState, updateVar, setNeedUpdate){
     if (!updateVar){
         return
     }
-    console.log(items)
+    //console.log(items)
     const errorImage = require("./assets/buttonIcons/icon_cam.png");
     if (items.length==0){
         const returnVal = (<ImageBackground resizeMode="contain" style={
@@ -150,7 +150,7 @@ export async function getCollage(items, setState, updateVar, setNeedUpdate){
     shoes = []
     accessories = []
     for (let i=0; i<items.length; i=i+1){
-        console.log(items[i])
+        //console.log(items[i])
         const response = await fetch(base_url+'v1/clothing-items/' + items[i]);
         if (!response.ok) {
             //item not found; most likely item was deleted
@@ -171,17 +171,17 @@ export async function getCollage(items, setState, updateVar, setNeedUpdate){
     shoes.sort(compItemRank)
     accessories.sort(compItemRank)
 
-    console.log("item types:")
-    console.log(tops)
-    console.log(bottoms)
-    console.log(shoes)
-    console.log(accessories)
+    //console.log("item types:")
+    //console.log(tops)
+    //console.log(bottoms)
+    //console.log(shoes)
+    //console.log(accessories)
     bottomLayerComponent = convertItemsToLayeredComponent(Array.from(tops), 300, 300, tops.length)
-    console.log("item types:")
-    console.log(tops)
-    console.log(bottoms)
-    console.log(shoes)
-    console.log(accessories)
+    //console.log("item types:")
+    //console.log(tops)
+    //console.log(bottoms)
+    //console.log(shoes)
+    //console.log(accessories)
     setNeedUpdate(false)
     //change source={image} to source={{ uri: image_b64}}
     //don't setState as return: updates constantly
