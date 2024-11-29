@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from bson.objectid import ObjectId
+import datetime
 
 from db_helpers import (
     db_add_clothing_item_image,
@@ -14,7 +15,8 @@ from db_helpers import (
     db_get_outfit,
     db_add_outfit,
     db_delete_outfit,
-    db_add_clothing_item_tag
+    db_add_clothing_item_tag,
+    db_get_calendar_by_user
 )
 
 app = Flask(__name__)
@@ -258,6 +260,65 @@ def scrap(): #so that this database doesn't get impossibly messy while I'm testi
 
         # Return success message
         return jsonify({'message': 'Destroyed database data'}), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+# GET route to retrieve or create a Calendar by userID
+@app.route('/api/v1/calendar/<string:user_id>', methods=['GET'])
+def get_calendar(user_id):
+    try:
+        calendar = db_get_calendar_by_user(user_id)
+        if calendar:
+            return jsonify(calendar), 200
+        else:
+            return jsonify({'error': 'Outfit not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# GET route to retrieve a Day by its objectID
+@app.route('/api/v1/get-day/<string:day_id>', methods=['GET'])
+def get_day(day_id):
+    try:
+        day_collection = closet_lab_database["days"]
+        day = day_collection.find_one({'_id': ObjectId(day_id)})
+        if day:
+            return jsonify(day), 200
+        else:
+            return jsonify({'error': 'Day not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/v1/relevant-days/', methods=['POST'])
+def relevant_days(): #to fight against calendars with hundreds or thousands of Days
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        day_collection = closet_lab_database["days"]
+
+        defaultStart = '11/29/24 12:00:00'
+        defaultEnd = '12/29/24 11:59:59'
+        user = data.get('user_id', dummy_user_id)
+        if not data:
+            return jsonify({'error': 'No user provided'}), 400
+        calendar = db_get_calendar_by_user(user)
+        if not calendar:
+            return jsonify({'error': 'No calendar provided'}), 400
+        
+        start = datetime.strptime(data.get('startDate', defaultStart), '%m/%d/%y %H:%M:%S')
+        end = datetime.strptime(data.get('endDate', defaultEnd), '%m/%d/%y %H:%M:%S')
+        if end>=start:
+            return jsonify({'error': 'endDate >= startDate'}), 400
+        
+        returnInfo = []
+        for dayID in calendar['days']:
+            dayObj = day_collection.find_one({'_id': ObjectId(dayID)})
+            if dayObj and (dayObj.date>=start) and (dayObj.date<=end):
+                returnInfo.append(dayObj)
+
+        return jsonify({'message': 'Outfit added successfully', 'days': returnInfo}), 201
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500

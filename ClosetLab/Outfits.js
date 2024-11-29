@@ -473,7 +473,7 @@ export function SingleOutfitView(){
                         </Pressable>
                     </View>
                     <View style={styles.spacer_row_even}>
-                        <Pressable style={styles.button_outfit_2x2} >
+                        <Pressable style={styles.button_outfit_2x2} onPress={() => setDeleteModalVisible(true)}>
                             <Text style={styles.button_text}>Discard Outfit</Text>
                         </Pressable>
                         <Pressable style={styles.button_outfit_2x2} >

@@ -1,6 +1,9 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import datetime
+from fullOutfitAlgorithm import (
+    createCollage
+)
 
 # Initialize the database connection
 client = MongoClient("mongodb+srv://kmalsky:Cw1ccE8Bq5VV8Lwe@closetlab.q7yvq.mongodb.net/?retryWrites=true&w=majority&appName=ClosetLab")  
@@ -153,10 +156,13 @@ def db_get_outfit(object_id: str):
         print("Getting outfit from database")
         outfit_collection = closet_lab_database["outfits"]
         document = outfit_collection.find_one({"_id": ObjectId(object_id)})
+        clothing_item_collection = closet_lab_database["clothing_items"]
         if document:
             document['_id'] = str(document['_id'])
             document['user_id'] = str(document.get('user_id', ''))
             document['items'] = [str(item) for item in document.get('items', [])]
+            itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in document.get('items', [])]
+            document['collage'] = createCollage(itemInfoList)
         return document
     except Exception as e:
         print("Error getting outfit from database:", str(e))
@@ -221,7 +227,7 @@ def db_add_day(date: datetime, user_id: str = dummy_user_id):
         day = {
             'calendar_id': calendar['_id'],
             'outfits': [],
-            'date': date # not sure about this, check if typing was dpne right
+            'date': date # not sure about this, check if typing was done right
         }
         day_collection.insert_one(day)
     except Exception as e:
