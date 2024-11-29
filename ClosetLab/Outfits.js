@@ -67,7 +67,7 @@ window.global_selectedOutfit = {
 
 window.global_outfitListNeedsUpdate = true;
 
-export const addOutfit = (visibleVar, setVisibleVar, navigation,setSecondaryUpdate) => {
+export const addOutfit = (visibleVar, setVisibleVar, navigation,setSecondaryUpdate, clothingItemCache) => {
 
     const [text, setText] = useState("");
     function titleThis(text) {
@@ -221,7 +221,7 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation,setSecondaryUpda
                 // onSubmitEditing={Keyboard.dismiss}
                 />
                 <Text style={styles.modalText}>Choose items:</Text>
-                {getListOfClothingItems(getAllItemsForUser("67057228f80354e361ae2bf5"))}
+                {getListOfClothingItems(clothingItemCache)}
                 {errorProp}
                 <Pressable
                     style={styles.button}
@@ -330,18 +330,19 @@ export function OutfitListView() {
 
     const [secondaryUpdateRequired, setSecondaryUpdate] = useState(false);
     const [returnedData, setReturnedData] = useState( getAllOutfitsForUser("67057228f80354e361ae2bf5"))
-    const [clothingItemCache, setClothingItemCache] = useState( getAllItemsForUser("67057228f80354e361ae2bf5"))
+    const [clothingItemCache, setClothingItemCache] = useState( []) //getAllItemsForUser("67057228f80354e361ae2bf5")
 
     async function updatePage(){
         setReturnedData([])
         setSecondaryUpdate(false)
-        //console.log("finished items")
-        const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
-        if (!response2.ok) {
-            throw new Error('Network response was not ok');
+        if ((clothingItemCache.length!=undefined)&&(clothingItemCache.length==0)){
+            const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
+            if (!response2.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const itemCache = await response2.json();
+            setClothingItemCache(itemCache)
         }
-        const itemCache = await response2.json();
-        setClothingItemCache(itemCache)
         //console.log("finished items")
         const response = await fetch(base_url+'v1/outfits-get-all/' + "67057228f80354e361ae2bf5");
         if (!response.ok) {
@@ -414,7 +415,7 @@ export function OutfitListView() {
             </Pressable>
         </View>
         {getMaybeList(returnedData)}
-        {addOutfit(addItemModalVisible, setAddItemModalVisible, navigation,setSecondaryUpdate)}
+        {addOutfit(addItemModalVisible, setAddItemModalVisible, navigation,setSecondaryUpdate, clothingItemCache)}
         {deleteOutfit(deleteItemModalVisible, setDeleteItemModalVisible, navigation,setSecondaryUpdate)}
     </SafeAreaView>);
 }
@@ -423,11 +424,11 @@ export function OutfitListView() {
 export function SingleOutfitView(){
     const navigation = useNavigation();
     const onGoToHome = () => {
-        window.global_itemListNeedsUpdate = true
+        window.global_outfitListNeedsUpdate = true
         navigation.navigate('Home');
     };
     const onGoToList = () => {
-        window.global_itemListNeedsUpdate = true
+        window.global_outfitListNeedsUpdate = true
         navigation.navigate('Outfit List View');
     };
     const newOutfit = new Outfit(
@@ -438,8 +439,13 @@ export function SingleOutfitView(){
     newOutfit.clothingItems = window.global_selectedOutfit.clothingItems
 
     const [needUpdate, setNeedUpdate] = useState(true)
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false)
     const [collage, setCollage] = useState( <Text>Loading Collage...</Text>)
     getCollage(newOutfit.clothingItems, setCollage, needUpdate, setNeedUpdate)
+
+    
+
+
     //console.log(newOutfit)
     return (<SafeAreaView style={styles.container}>
         <View style={styles.container}>
@@ -480,6 +486,7 @@ export function SingleOutfitView(){
             </View>
 
         </View>
+        {deleteOutfit(deleteModalVisible, setDeleteModalVisible, navigation,setNeedUpdate)}
     </SafeAreaView>);
 }
 
