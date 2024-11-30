@@ -1,24 +1,28 @@
+import math
 from PIL import Image
 from rembg import remove
 import base64
 import matplotlib.pyplot as plt
 import os, io
+from io import BytesIO
 
-TOTAL_WIDTH = 100
 
-TOP_WIDTH = 55
-TOP_HEIGHT = 55
-TOP_START_X = 45
+TOTAL_WIDTH = 1000
+TOTAL_HEIGHT = 1000
 
-BOTTOM_WIDTH = 55
-BOTTOM_HEIGHT = 55
+TOP_WIDTH = 550
+TOP_HEIGHT = 550
+TOP_START_X = 450
 
-SHOE_WIDTH = 55
-SHOE_HEIGHT = 30
-SHOE_START_X = 70
+BOTTOM_WIDTH = 550
+BOTTOM_HEIGHT = 550
 
-ACC_WIDTH = 55
-ACC_HEIGHT = 40
+SHOE_WIDTH = 550
+SHOE_HEIGHT = 300
+SHOE_START_X = 700
+
+ACC_WIDTH = 550
+ACC_HEIGHT = 400
 
 ItemLayerType = {
     'TOP': "top",
@@ -110,7 +114,7 @@ def createCollage(imgList: list[object]):
                 print("invalid image link")
                 return "error"
             id_ofItem = identifyItem(imgInfo)
-            no_bg_img = "testing"#Image.open(io.BytesIO(remove(img_content))).convert('RGBA')
+            no_bg_img = Image.open(io.BytesIO(remove(img_content))).convert('RGBA')
             itemTracker[id_ofItem[0]].append((no_bg_img, id_ofItem[1]))
 
         itemTracker['TOP'].sort(key=sortBySecondElement)
@@ -125,7 +129,7 @@ def createCollage(imgList: list[object]):
         #    bottom_file_content = f.read()
 
         print("Images Loaded Successfully.")
-        return itemTracker
+        
         #TODO: 
         #   use itemTracker to add every item to proper place in collage
         #   pant  shirt
@@ -137,6 +141,35 @@ def createCollage(imgList: list[object]):
         #layers from top to bottom: pants, shoes, shirts, acc
         #layers within those groups dictated by order in which they appear in above lists (topItems, etc)
         #ties in rank are broken alphabetically
+
+        #currently itemTracker['BOTTOM'] = list[ tup(Image, rank:int) ]
+
+        merged_img = Image.new('RGBA', (TOTAL_WIDTH, TOTAL_HEIGHT), 'WHITE')
+        i=0
+        for shirtTup in itemTracker['TOP']:
+            numShirts = len(itemTracker['TOP'])
+            #TOP_WIDTH = 55
+            #TOP_HEIGHT = 55
+            #TOP_START_X = 45
+            #print("new item"  + str(i))
+            scaleFactor = (1/numShirts)
+            imgScaleFactor = scaleFactor*2
+            resized = shirtTup[0].resize((int(TOP_WIDTH*imgScaleFactor), int(TOP_HEIGHT*imgScaleFactor)), Image.Resampling.LANCZOS)
+            xDelta = (TOTAL_WIDTH - (TOP_WIDTH*imgScaleFactor) - TOP_START_X)*scaleFactor
+            yDelta = (TOP_HEIGHT - (TOP_HEIGHT*imgScaleFactor))*scaleFactor
+            merged_img.alpha_composite(resized, (int(TOP_START_X+xDelta*i), int(yDelta*i)))
+            #print("merged item " + str(i))
+            i+=1
+
+            
+        
+        buffered = BytesIO()
+        merged_img.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue())
+        print("sent img")
+        return 'data:image/png;base64,'+str(img_str)[2:-1]
+
+        return itemTracker
 
         try:
             #top_img_no_bg = Image.open(io.BytesIO(remove(top_file_content))).convert('RGBA')

@@ -552,7 +552,7 @@ export function ClothingItemListView() {
         setReturnedData([])
         setSecondaryUpdate(false)
         //console.log(returnedData)
-        console.log("tried update")
+        //console.log("tried update")
         const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
 
         if (!response.ok) {
@@ -575,7 +575,7 @@ export function ClothingItemListView() {
     //}
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
-            console.log("page loaded !!")
+            //console.log("page loaded !!")
             if (window.global_itemListNeedsUpdate){
                 updatePage()
             }

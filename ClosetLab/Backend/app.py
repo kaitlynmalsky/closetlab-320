@@ -214,6 +214,7 @@ def get_outfit(outfit_id):
             return jsonify({'error': 'Outfit not found'}), 404
 
     except Exception as e:
+        #print(str(e))
         return jsonify({'error': str(e)}), 500
     
 # GET route to retrieve all outfits belonging to user, by user ID

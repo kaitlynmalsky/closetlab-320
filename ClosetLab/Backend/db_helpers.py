@@ -163,6 +163,7 @@ def db_get_outfit(object_id: str):
             document['items'] = [str(item) for item in document.get('items', [])]
             itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in document.get('items', [])]
             document['collage'] = createCollage(itemInfoList)
+        #print("attempted doc:" + str(document))
         return document
     except Exception as e:
         print("Error getting outfit from database:", str(e))

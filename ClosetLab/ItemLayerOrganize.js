@@ -122,8 +122,49 @@ function compItemRank(a, b){
     if (a.rank>b.rank){return 1}
 }
 
+export function getCollage(setState, updateVar, setNeedUpdate, img){
+    if (!updateVar){
+        return
+    }
+    const errorImage = require("./assets/buttonIcons/icon_cam.png");
+    imgLink = window.global_selectedOutfit.collage
+    if (img){
+        imgLink=img
+    }
+    if (imgLink==="none"){
+        const returnVal = (<ImageBackground resizeMode="contain" style={
+            {
+                width: 300,
+                height: 300,
+                borderWidth: 1,
+                borderColor: 'black',
+                justifyContent: 'space-between',
+            }
+        }
+        source={errorImage}>
+        </ImageBackground>)
+        
+        if (setNeedUpdate){setNeedUpdate(false)}
+        if (setState){setState(returnVal)}
+        return returnVal
+    }
+    const returnVal = <ImageBackground resizeMode="contain" style={
+        {
+            width: 300,
+            height: 300,
+            borderWidth: 1,
+            borderColor: 'black',
+            justifyContent: 'space-between',
+        }
+    }
+    source={{ uri: imgLink }}>
+    </ImageBackground>
+    if (setState){setState(returnVal)}
+    if (setNeedUpdate){setNeedUpdate(false)}
+    return returnVal
+}
 
-export async function getCollage(items, setState, updateVar, setNeedUpdate){
+export async function getCollage_Old(items, setState, updateVar, setNeedUpdate){
     if (!updateVar){
         return
     }

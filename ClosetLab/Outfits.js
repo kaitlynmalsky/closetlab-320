@@ -63,6 +63,7 @@ window.global_selectedOutfit = {
     db_id: "none",
     title: "Loading Outfit Name...",
     clothingItems: [],
+    collage: "none"
 };
 
 window.global_outfitListNeedsUpdate = true;
@@ -311,6 +312,7 @@ export function OutfitListView() {
         }
         window.global_selectedOutfit.title = item.name;
         window.global_selectedOutfit.clothingItems = item.items;
+        window.global_selectedOutfit.collage = item.collage;
     }
 
     function onGoToSingleOutfitView_createFunc(outfit) {
@@ -359,7 +361,6 @@ export function OutfitListView() {
         updatePage()
     }
 
-
     const renderOutfitItem = ({ item }) => (
         <View style={styles.listItem} key={item._id}>
 
@@ -368,6 +369,7 @@ export function OutfitListView() {
                     <View key={item._id}>
                         <Text>Name: {item.name}</Text>
                         <Text>objectID: {item._id}</Text>
+                        {getCollage(false, true, false, item.collage)}
                         <Text>Items: {reduceListToHumanReadable_Super(item.items, clothingItemCache)}</Text>
                         
                     </View>
@@ -440,8 +442,9 @@ export function SingleOutfitView(){
 
     const [needUpdate, setNeedUpdate] = useState(true)
     const [deleteModalVisible, setDeleteModalVisible] = useState(false)
-    const [collage, setCollage] = useState( <Text>Loading Collage...</Text>)
-    getCollage(newOutfit.clothingItems, setCollage, needUpdate, setNeedUpdate)
+    const [collage, setCollage] = useState(<Text>Loading Collage...</Text>)
+    //setCollage(window.global_selectedOutfit.collage)
+    getCollage(setCollage, needUpdate, setNeedUpdate)
 
     
 
