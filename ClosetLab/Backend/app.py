@@ -153,6 +153,7 @@ def set_donation_reminders(item_id):
 # GET route to retrieve all clothing items belonging to user, by user ID
 @app.route('/api/v1/clothing-items-get-all/<string:user_id>', methods=['GET'])
 def get_all_clothing_items(user_id):
+    print("received")
     try:
         # Convert user_id to ObjectId if necessary
         user_id_obj = ObjectId(user_id)
@@ -233,6 +234,24 @@ def get_all_outfits(user_id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# POST route to set item ids for an outfit
+@app.route('/api/v1/set-outfit-items', methods=['POST'])
+def set_outfit_items():
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        item_id = data.get("_id")
+        newItemIDs = data.get("items")
+        outfit_collection = closet_lab_database["outfits"]
+        outfit_collection.update_one(
+            {'_id': ObjectId(item_id)},
+            {'$set': {'items': newItemIDs}},
+        )
+        return jsonify({'message': 'set outfit items successfully', '_id': item_id}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}, 500)
 
 # DELETE route to delete an outfit by ID
 @app.route('/api/v1/outfits/<string:outfit_id>', methods=['DELETE'])

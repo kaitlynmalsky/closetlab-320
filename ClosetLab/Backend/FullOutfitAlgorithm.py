@@ -2,7 +2,6 @@ import math
 from PIL import Image
 from rembg import remove
 import base64
-import matplotlib.pyplot as plt
 import os, io
 from io import BytesIO
 
@@ -13,16 +12,22 @@ TOTAL_HEIGHT = 1000
 TOP_WIDTH = 550
 TOP_HEIGHT = 550
 TOP_START_X = 450
+TOP_START_Y = 0
 
 BOTTOM_WIDTH = 550
 BOTTOM_HEIGHT = 550
+BOTTOM_START_X = 0
+BOTTOM_START_Y = 0
 
 SHOE_WIDTH = 550
 SHOE_HEIGHT = 300
-SHOE_START_X = 700
+SHOE_START_X = 500
+SHOE_START_Y= 500
 
 ACC_WIDTH = 550
-ACC_HEIGHT = 400
+ACC_HEIGHT = 300
+ACC_START_X = 0
+ACC_START_Y = 600
 
 ItemLayerType = {
     'TOP': "top",
@@ -86,14 +91,29 @@ def identifyItem(itemInfo):
                 return ['SHOE', j]
     return ['ACC', 0]
 
-
-top_image_path = "/Users/weifu/Desktop/Top1.png"
-bottom_image_path = "/Users/weifu/Desktop/Bot1.png"
-
-global top_img, bottom_img, top_file_content, bottom_file_content
-top_img, bottom_img, top_file_content, bottom_file_content = None, None, None, None
 def sortBySecondElement(e):
     return e[1]
+
+def mergeImgTable(tbl, mergeImg, START_X, START_Y, WIDTH, HEIGHT):
+    i=0
+    for shirtTup in tbl:
+        numShirts = len(tbl)
+        #TOP_WIDTH = 55
+        #TOP_HEIGHT = 55
+        #TOP_START_X = 45
+        #print("new item"  + str(i))
+        scaleFactor = (1/numShirts)
+        imgScaleFactor = scaleFactor
+        if scaleFactor!=1:
+            imgScaleFactor=2*scaleFactor
+        resized = shirtTup[0].resize((int(WIDTH*imgScaleFactor), int(HEIGHT*imgScaleFactor)), Image.Resampling.LANCZOS)
+        #xDelta = (TOTAL_WIDTH - (WIDTH*imgScaleFactor) - START_X)*scaleFactor
+        xDelta=150
+        #yDelta = (TOTAL_HEIGHT - (HEIGHT*imgScaleFactor) - START_Y)*scaleFactor
+        yDelta=150
+        mergeImg.alpha_composite(resized, (int(START_X+xDelta*i), int(START_Y+yDelta*i)))
+
+        i+=1
 
 def createCollage(imgList: list[object]):
     try:
@@ -145,21 +165,10 @@ def createCollage(imgList: list[object]):
         #currently itemTracker['BOTTOM'] = list[ tup(Image, rank:int) ]
 
         merged_img = Image.new('RGBA', (TOTAL_WIDTH, TOTAL_HEIGHT), 'WHITE')
-        i=0
-        for shirtTup in itemTracker['TOP']:
-            numShirts = len(itemTracker['TOP'])
-            #TOP_WIDTH = 55
-            #TOP_HEIGHT = 55
-            #TOP_START_X = 45
-            #print("new item"  + str(i))
-            scaleFactor = (1/numShirts)
-            imgScaleFactor = scaleFactor*2
-            resized = shirtTup[0].resize((int(TOP_WIDTH*imgScaleFactor), int(TOP_HEIGHT*imgScaleFactor)), Image.Resampling.LANCZOS)
-            xDelta = (TOTAL_WIDTH - (TOP_WIDTH*imgScaleFactor) - TOP_START_X)*scaleFactor
-            yDelta = (TOP_HEIGHT - (TOP_HEIGHT*imgScaleFactor))*scaleFactor
-            merged_img.alpha_composite(resized, (int(TOP_START_X+xDelta*i), int(yDelta*i)))
-            #print("merged item " + str(i))
-            i+=1
+        mergeImgTable(itemTracker['TOP'], merged_img, TOP_START_X, TOP_START_Y, TOP_WIDTH, TOP_HEIGHT)
+        mergeImgTable(itemTracker['BOTTOM'], merged_img, BOTTOM_START_X, BOTTOM_START_Y, BOTTOM_WIDTH, BOTTOM_HEIGHT)
+        mergeImgTable(itemTracker['SHOE'], merged_img, SHOE_START_X, SHOE_START_Y, SHOE_WIDTH, SHOE_HEIGHT)
+        mergeImgTable(itemTracker['ACC'], merged_img, ACC_START_X, ACC_START_Y, ACC_WIDTH, ACC_HEIGHT)
 
             
         

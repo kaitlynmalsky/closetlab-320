@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import datetime
-from fullOutfitAlgorithm import (
+from FullOutfitAlgorithm import (
     createCollage
 )
 

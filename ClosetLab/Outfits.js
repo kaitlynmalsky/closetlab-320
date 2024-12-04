@@ -3,9 +3,6 @@ import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, Scro
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
 import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteItem, getAllItemsForUser } from './APIContainer.js';
-import color_tag_styles from './ColorTags.js';
-import addTag from './AddTags.js';
-import removeTag from './RemoveTags.js';
 import { TagType, ClothingItem, Outfit} from './ClothingAndOutfits.js';
 import { CheckBox } from 'react-native-elements';
 
@@ -446,9 +443,6 @@ export function SingleOutfitView(){
     //setCollage(window.global_selectedOutfit.collage)
     getCollage(setCollage, needUpdate, setNeedUpdate)
 
-    
-
-
     //console.log(newOutfit)
     return (<SafeAreaView style={styles.container}>
         <View style={styles.container}>
@@ -479,8 +473,8 @@ export function SingleOutfitView(){
                         <Pressable style={styles.button_outfit_2x2} onPress={() => setDeleteModalVisible(true)}>
                             <Text style={styles.button_text}>Discard Outfit</Text>
                         </Pressable>
-                        <Pressable style={styles.button_outfit_2x2} >
-                            <Text style={styles.button_text}>Other Button</Text>
+                        <Pressable style={styles.button_outfit_2x2} onPress={onGoToList}>
+                            <Text style={styles.button_text}>Back to Outfits</Text>
                         </Pressable>
                     </View>
                 </View>
