@@ -2,6 +2,14 @@ import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteIt
 import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, ScrollView, FlatList, Modal, TextInput, ImageBackground, Image } from 'react-native';
 //items are listed from most outer-wear-ish to most inner-wear-ish
 
+const collageStyle = {
+    width: 300,
+    height: 300,
+    borderWidth: 3,
+    borderColor: 'black',
+    justifyContent: 'center',
+}
+
 export const ItemLayerType = Object.freeze({
     TOP: "top",
     BOTTOM: "bottom",
@@ -132,33 +140,17 @@ export function getCollage(setState, updateVar, setNeedUpdate, img){
         imgLink=img
     }
     if (imgLink==="none"){
-        const returnVal = (<ImageBackground resizeMode="contain" style={
-            {
-                width: 300,
-                height: 300,
-                borderWidth: 1,
-                borderColor: 'black',
-                justifyContent: 'space-between',
-            }
-        }
+        const returnVal = (<Image resizeMode="contain" style={collageStyle}
         source={errorImage}>
-        </ImageBackground>)
+        </Image>)
         
         if (setNeedUpdate){setNeedUpdate(false)}
         if (setState){setState(returnVal)}
         return returnVal
     }
-    const returnVal = <ImageBackground resizeMode="contain" style={
-        {
-            width: 300,
-            height: 300,
-            borderWidth: 1,
-            borderColor: 'black',
-            justifyContent: 'space-between',
-        }
-    }
+    const returnVal = <Image resizeMode="contain" style={collageStyle}
     source={{ uri: imgLink }}>
-    </ImageBackground>
+    </Image>
     if (setState){setState(returnVal)}
     if (setNeedUpdate){setNeedUpdate(false)}
     return returnVal
