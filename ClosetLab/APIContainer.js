@@ -1,12 +1,12 @@
 import React, { useState, useEffect, Component } from 'react';
- export const base_url = "http://localhost:8000/api/" // local host, for dev, make sure to comment out before pushing
+export const base_url = "http://localhost:8000/api/" // local host, for dev, make sure to comment out before pushing
 //export const base_url = "http://3.16.25.91/api/"
 //export const base_url = "https://closetlab.tech/api/"
 
 function fetchAPI(path, options = undefined) {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
-    if (options==undefined){
+    if (options == undefined) {
         options = {};
     }
     options['headers'] = {
@@ -104,9 +104,3 @@ export const deleteOutfit = (outfit_id) => {
     path = 'v1/outfits/' + outfit_id;
     return fetchAPI(path);
 }
-
-
-
-
-
-

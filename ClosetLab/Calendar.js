@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createElement } from 'react';
 import { SafeAreaView, Text, View, Pressable, TextInput, StyleSheet, Modal, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './Stylesheet';
 import { OutfitListView } from './Outfits';
-import { getAllOutfitsForUser } from './APIContainer';
+import { base_url, getAllOutfitsForUser } from './APIContainer';
 
 export function CalendarView() {
     const navigation = useNavigation();
@@ -26,16 +26,33 @@ export function CalendarView() {
     const [monthEvents, setMonthEvents] = useState({});
     const [monthOutfits, setMonthOutfits] = useState({});
 
-    const [allOutfits, setAllOutfits] = useState(getAllOutfitsForUser(dummyUser));
-    const getOutfits = (user) => {
+    const [outfitList, setOutfitList] = useState(<View><Text style={styles.modalText}>Outfits are loading...</Text></View>);
+    async function printOutfitSet() {
+        console.log(outfitSet);
+    }
+    function updateOutfitList() {
+        if (outfitSet.length === 0) {
+            console.log("Outfits still aren't loaded.")
+            return;
+        }
+        console.log(outfitSet);
+        console.log("outfitSet.length is " + outfitSet.length);
+        children = []
+        for (let i = 0; i < outfitSet.length; i++) {
+            children.push(<Text style={styles.modalText}>{outfitSet[i]["name"]}</Text>)
+        }
+        console.log("Outfits are updated!", outfitSet);
+        setOutfitList(<View>{children}</View>);
 
     }
+    const outfitSet = getAllOutfitsForUser(dummyUser); // load all outfits when opening the calendar
 
     const changeMonth = (delta) => {
         const newDate = new Date(currentDate);
         newDate.setMonth(currentDate.getMonth() + delta);
         setCurrentDate(newDate);
     };
+
 
     useEffect(() => {
         const year = currentDate.getFullYear();
@@ -66,6 +83,7 @@ export function CalendarView() {
     const handleOutfitButtonPress = (dayNumber) => {
         setSelectedDay(dayNumber);
         setModalVisible(true);
+        updateOutfitList();
     };
 
     const handleOutfitSelect = (selection) => {
@@ -173,14 +191,13 @@ export function CalendarView() {
                 <View style={modalStyles.centeredView}>
                     <View style={modalStyles.modalView}>
                         <Text style={styles.text}>Select Outfit</Text>
-                        <View>
-                            put the list here
-                        </View>
+                        <Pressable style={styles.button} onPress={() => updateOutfitList()}>
+                            <Text styles={styles.button_text}>Print Outfits</Text>
+                        </Pressable>
+                        {outfitList}
                         <Pressable style={styles.button} onPress={() => setModalVisible(false)}>
                             <Text style={styles.button_text}>Cancel</Text>
                         </Pressable>
-
-
                     </View>
                 </View>
             </Modal>
