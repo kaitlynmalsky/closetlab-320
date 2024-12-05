@@ -4,6 +4,7 @@ import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
 import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteItem, getAllItemsForUser } from './APIContainer.js';
 import { TagType, ClothingItem, Outfit} from './ClothingAndOutfits.js';
+import { editOutfit} from './EditOutfit.js';
 import { CheckBox } from 'react-native-elements';
 
 import {getCollage} from './ItemLayerOrganize.js'
@@ -142,7 +143,7 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation,setSecondaryUpda
             </ScrollView>
             )
         }
-        return (<Text>No Clothing Items Yet!</Text>) //default
+        return (<Text>Loading Items...</Text>) //default
     }
 
     const onAddItem = async () => {
@@ -302,7 +303,6 @@ export function OutfitListView() {
     //postOutfit({name:testItem.title, items:testItem.clothingItems, user_id:testItem.owner_db_id});
 
     function setGlobalViewOfItem(item) {
-        console.log(item);
         window.global_selectedOutfit.db_id = item._id;
         if (item.db_id) {
             window.global_selectedOutfit.db_id = item.db_id;
@@ -439,9 +439,30 @@ export function SingleOutfitView(){
 
     const [needUpdate, setNeedUpdate] = useState(true)
     const [deleteModalVisible, setDeleteModalVisible] = useState(false)
+    const [editModalVisible, setEditModalVisible] = useState(false)
     const [collage, setCollage] = useState(<Text>Loading Collage...</Text>)
+    const [clothingItemCache, setClothingItemCache] = useState( []) //getAllItemsForUser("67057228f80354e361ae2bf5")
     //setCollage(window.global_selectedOutfit.collage)
     getCollage(setCollage, needUpdate, setNeedUpdate)
+    async function updatePage(){
+        if ((clothingItemCache.length!=undefined)&&(clothingItemCache.length==0)){
+            const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
+            if (!response2.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const itemCache = await response2.json();
+            setClothingItemCache(itemCache)
+        }
+    }
+
+    React.useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', async () => {
+                updatePage()
+          // The screen is focused
+        });
+        // Return the function to unsubscribe from the event so it gets removed on unmount
+        return unsubscribe;
+    }, [navigation]);
 
     //console.log(newOutfit)
     return (<SafeAreaView style={styles.container}>
@@ -462,7 +483,7 @@ export function SingleOutfitView(){
                 </View>
                 <View style={styles.container}>
                     <View style={styles.spacer_row_even}>
-                        <Pressable style={styles.button_outfit_2x2} >
+                        <Pressable style={styles.button_outfit_2x2} onPress={() => setEditModalVisible(true)}>
                             <Text style={styles.button_text}>Edit Outfit</Text>
                         </Pressable>
                         <Pressable style={styles.button_outfit_2x2} >
@@ -484,6 +505,7 @@ export function SingleOutfitView(){
 
         </View>
         {deleteOutfit(deleteModalVisible, setDeleteModalVisible, navigation,setNeedUpdate)}
+        {editOutfit(editModalVisible, setEditModalVisible, navigation,false, clothingItemCache, newOutfit)}
     </SafeAreaView>);
 }
 

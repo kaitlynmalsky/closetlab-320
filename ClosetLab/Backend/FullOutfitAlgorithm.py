@@ -1,13 +1,13 @@
-import math
 from PIL import Image
 from rembg import remove
 import base64
-import os, io
+import io
 from io import BytesIO
 
 
 TOTAL_WIDTH = 1000
 TOTAL_HEIGHT = 1000
+OVERLAP_SPAN = 200
 
 TOP_WIDTH = 550
 TOP_HEIGHT = 550
@@ -21,7 +21,7 @@ BOTTOM_START_Y = 0
 
 SHOE_WIDTH = 550
 SHOE_HEIGHT = 300
-SHOE_START_X = 500
+SHOE_START_X = 400
 SHOE_START_Y= 500
 
 ACC_WIDTH = 550
@@ -107,10 +107,10 @@ def mergeImgTable(tbl, mergeImg, START_X, START_Y, WIDTH, HEIGHT):
         if scaleFactor!=1:
             imgScaleFactor=2*scaleFactor
         resized = shirtTup[0].resize((int(WIDTH*imgScaleFactor), int(HEIGHT*imgScaleFactor)), Image.Resampling.LANCZOS)
-        #xDelta = (TOTAL_WIDTH - (WIDTH*imgScaleFactor) - START_X)*scaleFactor
-        xDelta=150
-        #yDelta = (TOTAL_HEIGHT - (HEIGHT*imgScaleFactor) - START_Y)*scaleFactor
-        yDelta=150
+        xDelta = (OVERLAP_SPAN*scaleFactor)
+        #xDelta=150
+        yDelta = (OVERLAP_SPAN*scaleFactor)
+        #yDelta=150
         mergeImg.alpha_composite(resized, (int(START_X+xDelta*i), int(START_Y+yDelta*i)))
 
         i+=1
@@ -148,9 +148,8 @@ def createCollage(imgList: list[object]):
         #with open(bottom_image_path, "rb") as f:
         #    bottom_file_content = f.read()
 
-        print("Images Loaded Successfully.")
+        #print("Images Loaded Successfully.")
         
-        #TODO: 
         #   use itemTracker to add every item to proper place in collage
         #   pant  shirt
         #    pant   shirt
@@ -165,47 +164,50 @@ def createCollage(imgList: list[object]):
         #currently itemTracker['BOTTOM'] = list[ tup(Image, rank:int) ]
 
         merged_img = Image.new('RGBA', (TOTAL_WIDTH, TOTAL_HEIGHT), 'WHITE')
-        mergeImgTable(itemTracker['TOP'], merged_img, TOP_START_X, TOP_START_Y, TOP_WIDTH, TOP_HEIGHT)
-        mergeImgTable(itemTracker['BOTTOM'], merged_img, BOTTOM_START_X, BOTTOM_START_Y, BOTTOM_WIDTH, BOTTOM_HEIGHT)
-        mergeImgTable(itemTracker['SHOE'], merged_img, SHOE_START_X, SHOE_START_Y, SHOE_WIDTH, SHOE_HEIGHT)
-        mergeImgTable(itemTracker['ACC'], merged_img, ACC_START_X, ACC_START_Y, ACC_WIDTH, ACC_HEIGHT)
-
-            
+        hasTop = len(itemTracker['TOP'])>0
+        hasBot = len(itemTracker['BOTTOM'])>0
+        hasShoe = len(itemTracker['SHOE'])>0
+        hasAcc = len(itemTracker['ACC'])>0
+        #handle all
+        if hasTop and hasBot and hasShoe and hasAcc:
+            mergeImgTable(itemTracker['TOP'], merged_img, TOP_START_X, TOP_START_Y, TOP_WIDTH, TOP_HEIGHT)
+            mergeImgTable(itemTracker['BOTTOM'], merged_img, BOTTOM_START_X, BOTTOM_START_Y, BOTTOM_WIDTH, BOTTOM_HEIGHT)
+            mergeImgTable(itemTracker['SHOE'], merged_img, SHOE_START_X, SHOE_START_Y, SHOE_WIDTH, SHOE_HEIGHT)
+            mergeImgTable(itemTracker['ACC'], merged_img, ACC_START_X, ACC_START_Y, ACC_WIDTH, ACC_HEIGHT)
+        #handle top + 1/2 bottom
+        elif hasTop and hasBot and hasShoe:
+            mergeImgTable(itemTracker['TOP'], merged_img, TOP_START_X, TOP_START_Y, TOP_WIDTH, TOP_HEIGHT)
+            mergeImgTable(itemTracker['BOTTOM'], merged_img, BOTTOM_START_X, BOTTOM_START_Y, BOTTOM_WIDTH, BOTTOM_HEIGHT)
+            mergeImgTable(itemTracker['SHOE'], merged_img, 0, SHOE_START_Y, TOTAL_WIDTH, SHOE_HEIGHT)
+        elif hasTop and hasBot and hasAcc:
+            mergeImgTable(itemTracker['TOP'], merged_img, TOP_START_X, TOP_START_Y, TOP_WIDTH, TOP_HEIGHT)
+            mergeImgTable(itemTracker['BOTTOM'], merged_img, BOTTOM_START_X, BOTTOM_START_Y, BOTTOM_WIDTH, BOTTOM_HEIGHT)
+            mergeImgTable(itemTracker['ACC'], merged_img, 0, SHOE_START_Y, TOTAL_WIDTH, ACC_HEIGHT)
+        #handle bottom + 1/2 bottom
+        elif hasTop and hasShoe and hasAcc:
+            mergeImgTable(itemTracker['TOP'], merged_img, 0, TOP_START_Y, TOTAL_WIDTH, TOP_HEIGHT)
+            mergeImgTable(itemTracker['BOTTOM'], merged_img, BOTTOM_START_X, BOTTOM_START_Y, BOTTOM_WIDTH, BOTTOM_HEIGHT)
+            mergeImgTable(itemTracker['SHOE'], merged_img, SHOE_START_X, SHOE_START_Y, TOTAL_WIDTH, TOTAL_HEIGHT)
+        elif hasBot and hasShoe and hasAcc:
+            mergeImgTable(itemTracker['BOTTOM'], merged_img, 0, BOTTOM_START_Y, TOTAL_WIDTH, BOTTOM_HEIGHT)
+            mergeImgTable(itemTracker['SHOE'], merged_img, SHOE_START_X, SHOE_START_Y, SHOE_WIDTH, SHOE_HEIGHT)
+            mergeImgTable(itemTracker['ACC'], merged_img, ACC_START_X, ACC_START_Y, ACC_WIDTH, ACC_HEIGHT)
+        # handle only one category
+        elif hasTop and (not hasBot) and (not hasAcc) and (not hasShoe):
+            mergeImgTable(itemTracker['TOP'], merged_img, 0, 0, TOTAL_WIDTH, TOTAL_HEIGHT)
+        elif (not hasTop) and ( hasBot) and (not hasAcc) and (not hasShoe):
+            mergeImgTable(itemTracker['BOTTOM'], merged_img, 0, 0, TOTAL_WIDTH, TOTAL_HEIGHT)
+        elif (not hasTop) and (not hasBot) and (not hasAcc) and (hasShoe):
+            mergeImgTable(itemTracker['SHOE'], merged_img, 0, 0, TOTAL_WIDTH, TOTAL_HEIGHT)
+        elif (not hasTop) and (not hasBot) and (hasAcc) and (not hasShoe):
+            mergeImgTable(itemTracker['ACC'], merged_img, 0, 0, TOTAL_WIDTH, TOTAL_HEIGHT)
         
         buffered = BytesIO()
         merged_img.save(buffered, format="PNG")
         img_str = base64.b64encode(buffered.getvalue())
-        print("sent img")
+        #print("sent img")
         return 'data:image/png;base64,'+str(img_str)[2:-1]
 
-        return itemTracker
-
-        try:
-            #top_img_no_bg = Image.open(io.BytesIO(remove(top_file_content))).convert('RGBA')
-            #bottom_img_no_bg = Image.open(io.BytesIO(remove(bottom_file_content))).convert('RGBA')
-            #new_width = max(top_img_no_bg.width, bottom_img_no_bg.width)
-            #top_scale = new_width / top_img_no_bg.width
-            #bottom_scale = new_width / bottom_img_no_bg.width
-            #top_img_resized = top_img_no_bg.resize(
-            #    (new_width, int(top_img_no_bg.height * top_scale)), Image.Resampling.LANCZOS)
-            #bottom_img_resized = bottom_img_no_bg.resize(
-            #    (new_width, int(bottom_img_no_bg.height * bottom_scale)), Image.Resampling.LANCZOS)
-            #total_height = top_img_resized.height + bottom_img_resized.height
-            #merged_img = Image.new('RGBA', (new_width, total_height), 'WHITE')
-            #merged_img.paste(top_img_resized, (0, 0), top_img_resized)
-            #merged_img.paste(bottom_img_resized, (0, top_img_resized.height), bottom_img_resized)
-            #output_path = 'merged_outfit.jpg'
-            #merged_img.convert('RGB').save(output_path, 'JPEG')
-            #print("Merged Outfit Image:")
-            #plt.figure(figsize=(10, 15))
-            #plt.imshow(merged_img)
-            #plt.axis('off')
-            #plt.show()
-            #absolute_path = os.path.abspath(output_path)
-            #print(f"The output image has been saved at: {absolute_path}")
-            return "output"
-        except Exception as e:
-            print("An error occurred during processing:", str(e[0:10]))
     except FileNotFoundError as e:
         print(f"File not found: ") #{e}
     except Exception as e:

@@ -553,7 +553,13 @@ export function ClothingItemListView() {
         setSecondaryUpdate(false)
         //console.log(returnedData)
         //console.log("tried update")
-        const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
+        const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5",{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                "Access-Control-Allow-Origin": "*"
+            },
+        });
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
