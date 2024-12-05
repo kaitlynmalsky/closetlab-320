@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, Text, View, Pressable, TextInput, StyleSheet, Modal, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './Stylesheet';
+import { OutfitListView } from './Outfits';
+import { getAllOutfitsForUser } from './APIContainer';
 
 export function CalendarView() {
     const navigation = useNavigation();
@@ -11,7 +13,9 @@ export function CalendarView() {
     const [topModalVisible, setTopModalVisible] = useState(false);
     const [selectedTop, setSelectedTop] = useState(null);
     const [selectedBot, setSelectedBot] = useState(null);
-    
+
+    const dummyUser = "67057228f80354e361ae2bf5";
+
     const onGoToHome = () => {
         navigation.navigate('Home');
     };
@@ -21,6 +25,11 @@ export function CalendarView() {
     const [monthDays, setMonthDays] = useState([]);
     const [monthEvents, setMonthEvents] = useState({});
     const [monthOutfits, setMonthOutfits] = useState({});
+
+    const [allOutfits, setAllOutfits] = useState(getAllOutfitsForUser(dummyUser));
+    const getOutfits = (user) => {
+
+    }
 
     const changeMonth = (delta) => {
         const newDate = new Date(currentDate);
@@ -33,16 +42,16 @@ export function CalendarView() {
         const month = currentDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        
+
         let calendarDays = Array(firstDay).fill(null);
         for (let i = 1; i <= daysInMonth; i++) {
             calendarDays.push(i);
         }
-        
+
         while (calendarDays.length < 35) {
             calendarDays.push(null);
         }
-        
+
         setMonthDays(calendarDays);
     }, [currentDate]);
 
@@ -105,7 +114,7 @@ export function CalendarView() {
                         <Text style={styles.monthButtonText}>→</Text>
                     </Pressable>
                 </View>
-                
+
                 <View style={styles.calendarRow}>
                     {days.map((day, index) => (
                         <View key={index} style={styles.calendarHeaderCell}>
@@ -134,7 +143,7 @@ export function CalendarView() {
                                                 placeholder="Event"
                                                 placeholderTextColor="#999"
                                             />
-                                            <Pressable 
+                                            <Pressable
                                                 style={styles.outfitButton}
                                                 onPress={() => handleOutfitButtonPress(dayNumber)}
                                             >
@@ -163,28 +172,19 @@ export function CalendarView() {
             >
                 <View style={modalStyles.centeredView}>
                     <View style={modalStyles.modalView}>
-                        <Pressable
-                            style={modalStyles.modalButton}
-                            onPress={() => handleOutfitSelect('Top')}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Top</Text>
+                        <Text style={styles.text}>Select Outfit</Text>
+                        <View>
+                            put the list here
+                        </View>
+                        <Pressable style={styles.button} onPress={() => setModalVisible(false)}>
+                            <Text style={styles.button_text}>Cancel</Text>
                         </Pressable>
-                        <Pressable
-                            style={modalStyles.modalButton}
-                            onPress={() => handleOutfitSelect('Bot')}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Bot</Text>
-                        </Pressable>
-                        <Pressable
-                            style={[modalStyles.modalButton, modalStyles.cancelButton]}
-                            onPress={() => setModalVisible(false)}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Create</Text>
-                        </Pressable>
+
+
                     </View>
                 </View>
             </Modal>
-
+            {/* 
             <Modal
                 animationType="fade"
                 transparent={true}
@@ -297,7 +297,7 @@ export function CalendarView() {
                         </Pressable>
                     </View>
                 </View>
-            </Modal>
+            </Modal> */}
         </SafeAreaView>
     );
 }
@@ -380,7 +380,7 @@ const modalStyles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-}); 
+});
 
 
 //import { SafeAreaView, Text, View } from "react-native"
