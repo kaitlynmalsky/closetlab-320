@@ -283,7 +283,7 @@ export function ClothingItemView() {
                 <ScrollView>
                     {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible, setRemoveBrandModalVisible)}
                     {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible, setRemoveColorModalVisible)}
-                    {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible, setRemoveBrandModalVisible)}
+                    {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible, setRemoveTypeModalVisible)}
                     {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible, setRemoveOtherModalVisible)}
                     <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(visibleDonationsOn)}</Text></Text>
                 </ScrollView>
