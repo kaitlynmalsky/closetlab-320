@@ -2,8 +2,8 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, ScrollView, FlatList, Modal, TextInput, ImageBackground, Image } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
-import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteItem, getAllItemsForUser } from './APIContainer.js';
-import { TagType, ClothingItem, Outfit} from './ClothingAndOutfits.js';
+import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteItem } from './APIContainer.js';
+import { TagType, ClothingItem, Outfit, getLoading} from './ClothingAndOutfits.js';
 import { editOutfit} from './EditOutfit.js';
 import { CheckBox } from 'react-native-elements';
 
@@ -56,6 +56,7 @@ function convertOutfitToMessage(outfit){
     }
 }
 
+window.global_cachedOutfits = []
 
 window.global_selectedOutfit = {
     db_id: "none",
@@ -328,27 +329,40 @@ export function OutfitListView() {
     };
 
     const [secondaryUpdateRequired, setSecondaryUpdate] = useState(false);
-    const [returnedData, setReturnedData] = useState( getAllOutfitsForUser("67057228f80354e361ae2bf5"))
-    const [clothingItemCache, setClothingItemCache] = useState( []) //getAllItemsForUser("67057228f80354e361ae2bf5")
+    const [returnedData, setReturnedData] = useState( window.global_cachedOutfits)
+    const [clothingItemCache, setClothingItemCache] = useState( []) 
+    const [stillLoading, setLoading] = useState(false);
 
     async function updatePage(){
+        setLoading(true)
         setReturnedData([])
+        window.global_cachedOutfits = []
         setSecondaryUpdate(false)
+        //console.log("finished items")
+        const response = await fetch(base_url+'v1/outfits-get-all/' + "67057228f80354e361ae2bf5");
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const outfitIDs = await response.json();
+        for (index in outfitIDs){
+            const response_outfit = await fetch(base_url+'v1/outfits/' + outfitIDs[index]);
+            if (!response_outfit.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const outfit = await response_outfit.json();
+            window.global_cachedOutfits.push(outfit)
+            setReturnedData(window.global_cachedOutfits)
+        }
+        
+        setLoading(false)
         if ((clothingItemCache.length!=undefined)&&(clothingItemCache.length==0)){
-            const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
+            const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5"+"/FALSE");
             if (!response2.ok) {
                 throw new Error('Network response was not ok');
             }
             const itemCache = await response2.json();
             setClothingItemCache(itemCache)
         }
-        //console.log("finished items")
-        const response = await fetch(base_url+'v1/outfits-get-all/' + "67057228f80354e361ae2bf5");
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const responseData = await response.json();
-        setReturnedData(responseData)
         //console.log("finished outfits")
         
         window.global_outfitListNeedsUpdate = false
@@ -357,6 +371,8 @@ export function OutfitListView() {
     if (secondaryUpdateRequired){
         updatePage()
     }
+    //<Text>Items: {reduceListToHumanReadable_Super(item.items, clothingItemCache)}</Text>
+
 
     const renderOutfitItem = ({ item }) => (
         <View style={styles.listItem} key={item._id}>
@@ -367,8 +383,6 @@ export function OutfitListView() {
                         <Text>Name: {item.name}</Text>
                         <Text>objectID: {item._id}</Text>
                         {getCollage(false, true, false, item.collage)}
-                        <Text>Items: {reduceListToHumanReadable_Super(item.items, clothingItemCache)}</Text>
-                        
                     </View>
                     <Pressable style={styles.button_small} onPress={onOpenDeleteItemModal_createFunc(item)}>
                         {generateIcon('remove', styles.icon_general)}
@@ -379,7 +393,7 @@ export function OutfitListView() {
     );
 
     const getMaybeList = (returnedData) => {
-        var defaultList = (<Text>Loading Outfits...</Text>);
+        var defaultList = (<Text></Text>);
         if (returnedData.length > 0) {
             return (
                 <FlatList
@@ -414,6 +428,7 @@ export function OutfitListView() {
             </Pressable>
         </View>
         {getMaybeList(returnedData)}
+        {getLoading(stillLoading, "Loading Outfits...")}
         {addOutfit(addItemModalVisible, setAddItemModalVisible, navigation,setSecondaryUpdate, clothingItemCache)}
         {deleteOutfit(deleteItemModalVisible, setDeleteItemModalVisible, navigation,setSecondaryUpdate)}
     </SafeAreaView>);
@@ -427,7 +442,7 @@ export function SingleOutfitView(){
         navigation.navigate('Home');
     };
     const onGoToList = () => {
-        window.global_outfitListNeedsUpdate = true
+        //window.global_outfitListNeedsUpdate = true
         navigation.navigate('Outfit List View');
     };
     const newOutfit = new Outfit(
@@ -441,12 +456,12 @@ export function SingleOutfitView(){
     const [deleteModalVisible, setDeleteModalVisible] = useState(false)
     const [editModalVisible, setEditModalVisible] = useState(false)
     const [collage, setCollage] = useState(<Text>Loading Collage...</Text>)
-    const [clothingItemCache, setClothingItemCache] = useState( []) //getAllItemsForUser("67057228f80354e361ae2bf5")
+    const [clothingItemCache, setClothingItemCache] = useState( []) 
     //setCollage(window.global_selectedOutfit.collage)
     getCollage(setCollage, needUpdate, setNeedUpdate)
     async function updatePage(){
         if ((clothingItemCache.length!=undefined)&&(clothingItemCache.length==0)){
-            const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
+            const response2 = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5" +'/FALSE');
             if (!response2.ok) {
                 throw new Error('Network response was not ok');
             }

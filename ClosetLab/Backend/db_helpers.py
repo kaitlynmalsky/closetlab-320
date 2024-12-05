@@ -161,15 +161,23 @@ def db_get_outfit(object_id: str):
             document['_id'] = str(document['_id'])
             document['user_id'] = str(document.get('user_id', ''))
             document['items'] = [str(item) for item in document.get('items', [])]
-            itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in document.get('items', [])]
-            # document['collage'] = createCollage(itemInfoList)
+            document['collage'] = str(document.get('collage', ''))
+            if document['collage']=='':
+                itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in document.get('items', [])]
+                newCollage = createCollage(itemInfoList)
+                outfit_collection.update_one(
+                    {'_id': ObjectId(object_id)},
+                    {'$set': {'collage':newCollage}},
+                )
+                document['collage'] = newCollage
+
         #print("attempted doc:" + str(document))
         return document
     except Exception as e:
         print("Error getting outfit from database:", str(e))
         raise
 
-def db_add_outfit(user_id: str = dummy_user_id, name: str = "Unnamed Outfit", items: list = None):
+def db_add_outfit(user_id: str = dummy_user_id, name: str = "Unnamed Outfit", items: list = None, collage:list=[]):
     try:
         print("Adding outfit to database")
         outfit_collection = closet_lab_database["outfits"]
@@ -177,7 +185,8 @@ def db_add_outfit(user_id: str = dummy_user_id, name: str = "Unnamed Outfit", it
         outfit = {
             "user_id": ObjectId(user_id),
             "name": name,
-            "items": item_ids
+            "items": item_ids,
+            "collage": collage
         }
         result = outfit_collection.insert_one(outfit)
         print("Outfit added successfully with ID:", result.inserted_id)

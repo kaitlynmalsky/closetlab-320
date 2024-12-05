@@ -1,4 +1,4 @@
-import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteItem, getAllItemsForUser } from './APIContainer.js';
+import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteItem } from './APIContainer.js';
 import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, ScrollView, FlatList, Modal, TextInput, ImageBackground, Image } from 'react-native';
 //items are listed from most outer-wear-ish to most inner-wear-ish
 

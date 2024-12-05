@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, ScrollView, FlatList, Modal, TextInput, ImageBackground, Image } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
-import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteItem, getAllItemsForUser } from './APIContainer.js';
+import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteItem } from './APIContainer.js';
 import { TagType, ClothingItem, Outfit} from './ClothingAndOutfits.js';
 import { CheckBox } from 'react-native-elements';
 
