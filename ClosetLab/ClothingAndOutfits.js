@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, ImageBackground, Modal, TextInput } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
-import { logFetch, getItem, base_url, getAllItemsForUser, postItem, deleteItem } from './APIContainer.js';
+import { logFetch, getItem, base_url, postItem, deleteItem } from './APIContainer.js';
 import color_tag_styles from './ColorTags.js';
 import addTag from './AddTags.js';
 import removeTag from './RemoveTags.js';
@@ -15,6 +15,13 @@ export const TagType = Object.freeze({
     ITEM_TYPE: "type",
     OTHER: "other",
 });
+
+export function getLoading(loadingVar, msg){
+    if (loadingVar){
+        return (<Text>{msg}</Text>)
+    }
+    return (<Text></Text>)
+}
 
 //global variable: can be used on all pages. 
 //used to track the selected clothing item for the single item view.
@@ -32,11 +39,14 @@ window.global_selectedClothingItem = {
 
 };
 
+window.global_cachedItems = []
+
 window.global_itemListNeedsUpdate = true
 
 //takes a list of strings [b, a, c]. returns "a, b, c".
 // as of 10/31 3:46 pm, returns a text component instead
 export function reduceListToHumanReadable(thisList) {
+    if (thisList == undefined) { return <Text></Text> }
     if (thisList.length == 0) { return <Text></Text> }
     if (thisList.sort) { thisList = thisList.sort(); } //there's no list.sort on mobile?
     if (thisList.reduce) {
@@ -312,7 +322,7 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation,setSeconda
     }
 
     const [errorProp, setErrorProp] = useState(<Text></Text>);
-    const defaultWrongNameMessage = "Invalid bame!"
+    const defaultWrongNameMessage = "Invalid name!"
     const duplicateNameMessage = "That name already exists!"
 
     function generateErrorProp(thisText) {
@@ -541,19 +551,22 @@ export function ClothingItemListView() {
                 }}
             />)
         }
-        return (<Text>Loading Clothing Items...</Text>) //default
+        return (<Text></Text>) //default
     }
     
 
     //TODO: regenerate page on addItem and on deleteItem
     const [secondaryUpdateRequired, setSecondaryUpdate] = useState(false);
-    const [returnedData, setReturnedData] = useState(getAllItemsForUser("67057228f80354e361ae2bf5"));
+    const [returnedData, setReturnedData] = useState([]);//getAllItemsForUser("67057228f80354e361ae2bf5")
+    const [stillLoading, setLoading] = useState(false);
     async function updatePage(){
+        setLoading(true)
         setReturnedData([])
         setSecondaryUpdate(false)
         //console.log(returnedData)
+        window.global_cachedItems = []
         //console.log("tried update")
-        const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5",{
+        const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5"+"/TRUE",{
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -564,9 +577,25 @@ export function ClothingItemListView() {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        const responseData = await response.json();
-    
-        setReturnedData(responseData)
+        const itemIDs = await response.json();
+        console.log(itemIDs)
+        for (index in itemIDs){
+            const response_item = await fetch(base_url+'v1/clothing-items/' + itemIDs[index]);
+            if (!response_item.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const item = await response_item.json();
+            window.global_cachedItems.push(item)
+            //setReturnedData(window.global_cachedItems)
+            console.log(window.global_cachedItems)
+            console.log(returnedData)
+            if (index!=0){
+                setReturnedData(window.global_cachedItems)
+            }
+
+        }
+        setReturnedData(window.global_cachedItems)
+        setLoading(false)
         window.global_itemListNeedsUpdate = false
         if (secondaryUpdateRequired){setSecondaryUpdate(false)}
     }
@@ -605,6 +634,7 @@ export function ClothingItemListView() {
         {addClothingItem(addItemModalVisible, setAddItemModalVisible, navigation, setSecondaryUpdate)}
         {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible, navigation, setSecondaryUpdate)}
         {getMaybeList(returnedData)}
+        {getLoading(stillLoading, "Loading Clothing Items...")}
     </SafeAreaView>);
 }
 

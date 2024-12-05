@@ -2,6 +2,9 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from bson.objectid import ObjectId
 import datetime
+from FullOutfitAlgorithm import (
+    createCollage
+)
 
 from db_helpers import (
     db_add_clothing_item_image,
@@ -151,17 +154,20 @@ def set_donation_reminders(item_id):
         return jsonify({'error': str(e)}, 500)
     
 # GET route to retrieve all clothing items belonging to user, by user ID
-@app.route('/api/v1/clothing-items-get-all/<string:user_id>', methods=['GET'])
-def get_all_clothing_items(user_id):
-    print("received")
+# idsOnly = TRUE --> returns a list of ids instead of 
+@app.route('/api/v1/clothing-items-get-all/<string:user_id>/<string:idsOnly>', methods=['GET'])
+def get_all_clothing_items(user_id,idsOnly):
     try:
         # Convert user_id to ObjectId if necessary
         user_id_obj = ObjectId(user_id)
         item_collection = closet_lab_database["clothing_items"].find({"user_id": user_id_obj})
         returnItems = []
-
+        print(idsOnly)
         for item in item_collection:
-            returnItems.append(db_get_clothing_item(item["_id"]))
+            if idsOnly=='TRUE':
+                returnItems.append(str(item["_id"]))
+            else:
+                returnItems.append(db_get_clothing_item(item["_id"]))
 
         return jsonify(returnItems), 200
 
@@ -192,11 +198,15 @@ def add_outfit():
         name = data.get('name', 'Unnamed Outfit')
         user_id = data.get('user_id', dummy_user_id)
         items = data.get('items', [])
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in items]
+        newCollage = createCollage(itemInfoList)
 
         outfit_id = db_add_outfit(
             user_id=user_id,
             name=name,
-            items=items
+            items=items,
+            collage=newCollage
         )
 
         return jsonify({'message': 'Outfit added successfully', 'id': outfit_id}), 201
@@ -219,6 +229,7 @@ def get_outfit(outfit_id):
         return jsonify({'error': str(e)}), 500
     
 # GET route to retrieve all outfits belonging to user, by user ID
+#12/5/24: returns all ObjectIDs of outfits belonging to user instead
 @app.route('/api/v1/outfits-get-all/<string:user_id>', methods=['GET'])
 def get_all_outfits(user_id):
     try:
@@ -228,7 +239,8 @@ def get_all_outfits(user_id):
         returnItems = []
 
         for item in item_collection:
-            returnItems.append(db_get_outfit(item["_id"]))
+            #returnItems.append(db_get_outfit(item["_id"]))
+            returnItems.append(str(item["_id"]))
 
         return jsonify(returnItems), 200
 
@@ -243,11 +255,14 @@ def set_outfit_items():
         if not data:
             return jsonify({'error': 'No data provided'}), 400
         item_id = data.get("_id")
-        newItemIDs = data.get("items")
+        newItemIDs = data.get("items", [])
         outfit_collection = closet_lab_database["outfits"]
+        clothing_item_collection = closet_lab_database["clothing_items"]
+        itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in newItemIDs]
+        newCollage = createCollage(itemInfoList)
         outfit_collection.update_one(
             {'_id': ObjectId(item_id)},
-            {'$set': {'items': newItemIDs}},
+            {'$set': {'items': newItemIDs, 'collage':newCollage}},
         )
         return jsonify({'message': 'set outfit items successfully', '_id': item_id}), 201
     except Exception as e:
