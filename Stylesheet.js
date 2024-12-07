@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
     button_donation: {
         width: 60,
         height: 60,
-        //margin: 7,
         alignItems: 'center',
         justifyContent: 'bottom',
         borderWidth: 0,
