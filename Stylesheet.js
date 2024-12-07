@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
         borderWidth: 0,
         justifyContent: 'space-between',
     },
+
     spacer_row_mobile: {
         flexDirection: 'row',
         //alignItems: 'center',

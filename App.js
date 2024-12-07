@@ -11,13 +11,22 @@ import axios from 'axios';
 import { SafeAreaView } from 'react-native-web';
 import { postItem } from './APIContainer.js';
 import CalendarView from './Calendar.js';
+import LandingPage from './LandingPage.js';
+import NotificationPage from './NotificationPage.js';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Landing">
+        <Stack.Screen
+          name="Landing"
+          component={LandingPage}
+          options={{
+            headerShown: false,
+          }}
+        />
         <Stack.Screen
           name={'Home'}
           component={Home}
@@ -49,6 +58,13 @@ export default function App() {
         <Stack.Screen
           name={'Calendar'}
           component={CalendarView}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name={'Notification'}
+          component={NotificationPage}
           options={{
             headerShown: false,
           }}
