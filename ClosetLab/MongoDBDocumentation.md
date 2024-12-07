@@ -28,11 +28,11 @@ Collection list:
     * `_id: ObjectID`
     * `name: String`
     * `items: ObjectID[]`
+    * `image_link: String`
 * users
     * `_id: ObjectID`
-    * `username: String`
-    * `password: String`
-    * `calendar: ObjectID`
+    * `oauth_id: google_user_id`
+    * `email: String`
 
 ## Connection Details
 username: kmalsky
