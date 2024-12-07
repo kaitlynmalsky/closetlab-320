@@ -10,8 +10,8 @@ function fetchAPI(path, options = undefined) {
         options = {};
     }
     options['headers'] = {
-        'Content-Type': 'application/json',
-        "Access-Control-Allow-Origin": "*"
+        //'Content-Type': 'application/json',
+        //"Access-Control-Allow-Origin": "*"
     };
     const fetchData = async () => {
         //console.log("Trying to fetch API");
@@ -37,7 +37,7 @@ export const getItem = (item_id) => {
     return fetchAPI(path);
 }
 export function getAllItemsForUser(user_id) {
-    const path = 'v1/clothing-items-get-all/' + user_id;
+    const path = 'v1/clothing-items-get-all/' + user_id + '/FALSE';
     return fetchAPI(path);
 }
 export function getAllOutfitsForUser(user_id) {

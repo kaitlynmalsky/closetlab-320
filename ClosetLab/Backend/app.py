@@ -162,13 +162,15 @@ def get_all_clothing_items(user_id,idsOnly):
         user_id_obj = ObjectId(user_id)
         item_collection = closet_lab_database["clothing_items"].find({"user_id": user_id_obj})
         returnItems = []
-        print(idsOnly)
+        print(user_id_obj)
+        item_collection.batch_size(10000)
+        #print(item_collection)
         for item in item_collection:
+            #print(item)
             if idsOnly=='TRUE':
                 returnItems.append(str(item["_id"]))
             else:
                 returnItems.append(db_get_clothing_item(item["_id"]))
-
         return jsonify(returnItems), 200
 
     except Exception as e:

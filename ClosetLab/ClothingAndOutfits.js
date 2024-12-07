@@ -461,6 +461,8 @@ export const deleteClothingItem = (visibleVar, setVisibleVar, navigation, setSec
 }
 
 export function ClothingItemListView() {
+    const [stillLoading, setLoading] = useState(false);
+
     const navigation = useNavigation();
     const onGoToHome = () => {
         window.global_itemListNeedsUpdate = true
@@ -558,43 +560,40 @@ export function ClothingItemListView() {
     //TODO: regenerate page on addItem and on deleteItem
     const [secondaryUpdateRequired, setSecondaryUpdate] = useState(false);
     const [returnedData, setReturnedData] = useState([]);//getAllItemsForUser("67057228f80354e361ae2bf5")
-    const [stillLoading, setLoading] = useState(false);
     async function updatePage(){
         setLoading(true)
         setReturnedData([])
         setSecondaryUpdate(false)
-        //console.log(returnedData)
+        
         window.global_cachedItems = []
-        //console.log("tried update")
-        const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5"+"/TRUE",{
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                "Access-Control-Allow-Origin": "*"
-            },
-        });
+        
+        //const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5"+"/TRUE");
+        const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5"+"/FALSE");
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const itemIDs = await response.json();
-        console.log(itemIDs)
-        for (index in itemIDs){
-            const response_item = await fetch(base_url+'v1/clothing-items/' + itemIDs[index]);
-            if (!response_item.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const item = await response_item.json();
-            window.global_cachedItems.push(item)
-            //setReturnedData(window.global_cachedItems)
-            console.log(window.global_cachedItems)
-            console.log(returnedData)
-            if (index!=0){
-                setReturnedData(window.global_cachedItems)
-            }
 
-        }
-        setReturnedData(window.global_cachedItems)
+        setReturnedData(itemIDs)
+
+        //console.log(itemIDs)
+        //for (index in itemIDs){
+        //    const response_item = await fetch(base_url+'v1/clothing-items/' + itemIDs[index], {});
+        //    if (!response_item.ok) {
+        //        throw new Error('Network response was not ok');
+        //    }
+        //    const item = await response_item.json();
+        //    //if (window.global_itemRetrievalTracker==savedLoadingSet){
+        //        window.global_cachedItems.push(item)
+        //    //}
+        //    //setReturnedData(window.global_cachedItems)
+        //    if (index!=0){
+        //        setReturnedData(window.global_cachedItems)
+        //    }
+        //
+        //}
+        //setReturnedData(window.global_cachedItems)
         setLoading(false)
         window.global_itemListNeedsUpdate = false
         if (secondaryUpdateRequired){setSecondaryUpdate(false)}

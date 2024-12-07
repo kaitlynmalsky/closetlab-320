@@ -67,6 +67,16 @@ window.global_selectedOutfit = {
 
 window.global_outfitListNeedsUpdate = true;
 
+function removeDuplicateInCache(id){
+    if (window.global_cachedOutfits.length==0){return}
+    for (i=window.global_cachedOutfits.length-1; i>=0; i--){
+        console.log(window.global_cachedOutfits[i])
+        if ((window.global_cachedOutfits[i])&&(window.global_cachedOutfits[i]._id==id)){
+            window.global_cachedOutfits.pop(i)
+        }
+    }
+}
+
 export const addOutfit = (visibleVar, setVisibleVar, navigation,setSecondaryUpdate, clothingItemCache) => {
 
     const [text, setText] = useState("");
@@ -293,7 +303,12 @@ export const deleteOutfit = (visibleVar, setVisibleVar, navigation,setSecondaryU
 
 export function OutfitListView() {
     const navigation = useNavigation();
+
+    const [stillLoading, setLoading] = useState(false);
+
+
     const onGoToHome = () => {
+        if (stillLoading){return}
         window.global_outfitListNeedsUpdate = true
         navigation.navigate('Home');
     };
@@ -331,7 +346,6 @@ export function OutfitListView() {
     const [secondaryUpdateRequired, setSecondaryUpdate] = useState(false);
     const [returnedData, setReturnedData] = useState( window.global_cachedOutfits)
     const [clothingItemCache, setClothingItemCache] = useState( []) 
-    const [stillLoading, setLoading] = useState(false);
 
     async function updatePage(){
         setLoading(true)
@@ -350,6 +364,7 @@ export function OutfitListView() {
                 throw new Error('Network response was not ok');
             }
             const outfit = await response_outfit.json();
+            removeDuplicateInCache(outfit["_id"])
             window.global_cachedOutfits.push(outfit)
             setReturnedData(window.global_cachedOutfits)
         }
