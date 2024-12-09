@@ -3,6 +3,7 @@ import { SafeAreaView, Text, View, Pressable, TextInput, StyleSheet, Modal, Imag
 import { useNavigation } from '@react-navigation/native';
 import styles from './Stylesheet';
 import { OutfitListView } from './Outfits';
+import { addOutfitToCalendar } from './OutfitAddToCalendar';
 import { base_url, getAllOutfitsForUser } from './APIContainer';
 
 export function CalendarView() {
@@ -30,6 +31,8 @@ export function CalendarView() {
     async function printOutfitSet() {
         console.log(outfitSet);
     }
+    const outfitSet = getAllOutfitsForUser(dummyUser); // load all outfits when opening the calendar
+
     function updateOutfitList() {
         if (outfitSet.length === 0) {
             console.log("Outfits still aren't loaded.")
@@ -39,14 +42,14 @@ export function CalendarView() {
         console.log("outfitSet.length is " + outfitSet.length);
         children = []
         for (let i = 0; i < outfitSet.length; i++) {
-            children.push(<Text key={outfitSet[i]} style={styles.modalText}>{outfitSet[i]}</Text>)
+            children.push(<Text key={outfitSet[i]["_id"]} style={styles.modalText}>{outfitSet[i]["name"]}</Text>)
         }
         console.log("children is ", children);
         console.log("Outfits are updated!", outfitSet);
         setOutfitList(<View>{children}</View>);
 
     }
-    const outfitSet = getAllOutfitsForUser(dummyUser); // load all outfits when opening the calendar
+
 
     const changeMonth = (delta) => {
         const newDate = new Date(currentDate);
