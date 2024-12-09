@@ -39,8 +39,9 @@ export function CalendarView() {
         console.log("outfitSet.length is " + outfitSet.length);
         children = []
         for (let i = 0; i < outfitSet.length; i++) {
-            children.push(<Text style={styles.modalText}>{outfitSet[i]["name"]}</Text>)
+            children.push(<Text key={outfitSet[i]} style={styles.modalText}>{outfitSet[i]}</Text>)
         }
+        console.log("children is ", children);
         console.log("Outfits are updated!", outfitSet);
         setOutfitList(<View>{children}</View>);
 

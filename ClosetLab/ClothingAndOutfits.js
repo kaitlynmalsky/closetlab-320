@@ -16,8 +16,8 @@ export const TagType = Object.freeze({
     OTHER: "other",
 });
 
-export function getLoading(loadingVar, msg){
-    if (loadingVar){
+export function getLoading(loadingVar, msg) {
+    if (loadingVar) {
         return (<Text>{msg}</Text>)
     }
     return (<Text></Text>)
@@ -99,13 +99,13 @@ export class ClothingItem {
     }
     addPropertyToCategory(newStringProperty, category) {
         const cat_process = category.toLowerCase().trim()
-        return this[cat_process+"_tags"].push(newStringProperty)
+        return this[cat_process + "_tags"].push(newStringProperty)
     }
     removePropertyFromCategory(newStringProperty, category) {
         const cat_process = category.toLowerCase().trim()
-        const index = this[cat_process+"_tags"].indexOf(newStringProperty);
-        if (index > -1) { 
-            this[cat_process+"_tags"].splice(index, 1);
+        const index = this[cat_process + "_tags"].indexOf(newStringProperty);
+        if (index > -1) {
+            this[cat_process + "_tags"].splice(index, 1);
             return true;
         }
         return false;
@@ -131,7 +131,7 @@ export class Outfit {
     }
     removeItemFromOutfit(item) { //also removes all non-ClothingItem items
         const index = this.clothingItems.indexOf(item);
-        if (index > -1) { 
+        if (index > -1) {
             this.clothingItems.splice(index, 1);
             return true;
         }
@@ -197,12 +197,12 @@ export function ClothingItemView() {
     newClothing.setIndividualDonationReminder(window.global_selectedClothingItem.donationReminder)
     const [visibleDonationsOn, setVisibleDonationsOn] = useState(newClothing.useDonationReminder);
     const [visibleImageURI, setVisibleImageURI] = useState(window.global_selectedClothingItem.imageUri);
-    
+
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             //console.log("page loaded :)")
             setVisibleImageURI(window.global_selectedClothingItem.imageUri)
-          // The screen is focused
+            // The screen is focused
         });
         // Return the function to unsubscribe from the event so it gets removed on unmount
         return unsubscribe;
@@ -239,9 +239,9 @@ export function ClothingItemView() {
                 'Content-Type': 'application/json',
                 "Access-Control-Allow-Origin": "*"
             },
-            body: JSON.stringify({donation_reminders:window.global_selectedClothingItem.donationReminder})
+            body: JSON.stringify({ donation_reminders: window.global_selectedClothingItem.donationReminder })
         }
-        response = await fetch(base_url + 'v1/clothing-items/donation-reminders/'+window.global_selectedClothingItem._id+'/', options);
+        response = await fetch(base_url + 'v1/clothing-items/donation-reminders/' + window.global_selectedClothingItem._id + '/', options);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -298,7 +298,7 @@ export function ClothingItemView() {
                 </ScrollView>
             </View>
 
-            
+
             {removeTag(newClothing, "brand", removeBrandModalVisible, setRemoveBrandModalVisible)}
             {removeTag(newClothing, "color", removeColorModalVisible, setRemoveColorModalVisible)}
             {removeTag(newClothing, "type", removeTypeModalVisible, setRemoveTypeModalVisible)}
@@ -313,7 +313,7 @@ export function ClothingItemView() {
     </SafeAreaView>);
 }
 
-export const addClothingItem = (visibleVar, setVisibleVar, navigation,setSecondaryUpdate) => {
+export const addClothingItem = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
 
     const [text, setText] = useState("");
     function titleThis(text) {
@@ -395,7 +395,7 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation,setSeconda
                 <Pressable
                     style={styles.button}
                     onPress={onAddItem}>
-                    <Text style={styles.button_text}>Create new Item</Text>
+                    <Text style={styles.button_text}>Create new outfit</Text>
                 </Pressable>
                 <Pressable
                     style={styles.button}
@@ -472,7 +472,7 @@ export function ClothingItemListView() {
 
     const [addItemModalVisible, setAddItemModalVisible] = useState(false);
     const [deleteItemModalVisible, setDeleteItemModalVisible] = useState(false);
-    
+
     //setReturnedData(intermediateList)
     //console.log(intermediateList)
 
@@ -531,7 +531,7 @@ export function ClothingItemListView() {
                         alignItems: 'flex-end',
                     }
                 }
-                source={{ uri: item.image_link}} >
+                    source={{ uri: item.image_link }} >
                 </ImageBackground>
                 <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
                 <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
@@ -540,7 +540,7 @@ export function ClothingItemListView() {
     );
 
     const getMaybeList = (returnedData) => {
-        if (returnedData instanceof Promise){ 
+        if (returnedData instanceof Promise) {
             return (<Text>No Clothing Items Yet!</Text>)
         } //TODO: detect difference between not collected and not collected *yet*
 
@@ -555,20 +555,20 @@ export function ClothingItemListView() {
         }
         return (<Text></Text>) //default
     }
-    
+
 
     //TODO: regenerate page on addItem and on deleteItem
     const [secondaryUpdateRequired, setSecondaryUpdate] = useState(false);
     const [returnedData, setReturnedData] = useState([]);//getAllItemsForUser("67057228f80354e361ae2bf5")
-    async function updatePage(){
+    async function updatePage() {
         setLoading(true)
         setReturnedData([])
         setSecondaryUpdate(false)
-        
+
         window.global_cachedItems = []
-        
+
         //const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5"+"/TRUE");
-        const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5"+"/FALSE");
+        const response = await fetch(base_url + 'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5" + "/FALSE");
 
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -596,12 +596,12 @@ export function ClothingItemListView() {
         //setReturnedData(window.global_cachedItems)
         setLoading(false)
         window.global_itemListNeedsUpdate = false
-        if (secondaryUpdateRequired){setSecondaryUpdate(false)}
+        if (secondaryUpdateRequired) { setSecondaryUpdate(false) }
     }
-    if (secondaryUpdateRequired){
+    if (secondaryUpdateRequired) {
         updatePage()
     }
-    
+
     //intermediateList =  //TODO: use actual user ID
     //if ((intermediateList.length != returnedData.length)||window.global_itemListNeedsUpdate) {
     //    setReturnedData(intermediateList)
@@ -610,10 +610,10 @@ export function ClothingItemListView() {
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
             //console.log("page loaded !!")
-            if (window.global_itemListNeedsUpdate){
+            if (window.global_itemListNeedsUpdate) {
                 updatePage()
             }
-          // The screen is focused
+            // The screen is focused
         });
         // Return the function to unsubscribe from the event so it gets removed on unmount
         return unsubscribe;

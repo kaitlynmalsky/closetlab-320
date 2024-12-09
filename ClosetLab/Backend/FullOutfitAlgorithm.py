@@ -5,29 +5,29 @@ import io
 from io import BytesIO
 
 
-TOTAL_WIDTH = 1000
-TOTAL_HEIGHT = 1000
+TOTAL_WIDTH = 250
+TOTAL_HEIGHT = 250
 OVERLAP_SPAN = 200
 
-TOP_WIDTH = 550
-TOP_HEIGHT = 550
-TOP_START_X = 450
+TOP_WIDTH = int(TOTAL_WIDTH/1.81)
+TOP_HEIGHT = int(TOTAL_HEIGHT/1.81)
+TOP_START_X = int(TOTAL_HEIGHT/2.22)
 TOP_START_Y = 0
 
-BOTTOM_WIDTH = 550
-BOTTOM_HEIGHT = 550
+BOTTOM_WIDTH = int(TOTAL_WIDTH/1.81)
+BOTTOM_HEIGHT = int(TOTAL_HEIGHT/1.81)
 BOTTOM_START_X = 0
 BOTTOM_START_Y = 0
 
-SHOE_WIDTH = 550
-SHOE_HEIGHT = 300
-SHOE_START_X = 400
-SHOE_START_Y= 500
+SHOE_WIDTH = int(TOTAL_WIDTH/1.81)
+SHOE_HEIGHT = int(TOTAL_HEIGHT/3.33)
+SHOE_START_X = int(TOTAL_WIDTH/2.5)
+SHOE_START_Y= int(TOTAL_HEIGHT/2)
 
-ACC_WIDTH = 550
-ACC_HEIGHT = 300
+ACC_WIDTH = int(TOTAL_WIDTH/1.81)
+ACC_HEIGHT = int(TOTAL_HEIGHT/3.33)
 ACC_START_X = 0
-ACC_START_Y = 600
+ACC_START_Y = int(TOTAL_HEIGHT/3.33)
 
 ItemLayerType = {
     'TOP': "top",
@@ -203,7 +203,9 @@ def createCollage(imgList: list[object]):
             mergeImgTable(itemTracker['ACC'], merged_img, 0, 0, TOTAL_WIDTH, TOTAL_HEIGHT)
         
         buffered = BytesIO()
-        merged_img.save(buffered, format="PNG")
+        print(f"merged_img.size is {merged_img.size} before compression")
+        merged_img.save(buffered, format="PNG", quality=20, optimize=True)
+        print(f"merged_img.size is {merged_img.size} after compression")
         img_str = base64.b64encode(buffered.getvalue())
         #print("sent img")
         return 'data:image/png;base64,'+str(img_str)[2:-1]
