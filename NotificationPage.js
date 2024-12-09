@@ -6,7 +6,6 @@ export default function NotificationPage() {
     const navigation = useNavigation();
     const [selectedShirt, setSelectedShirt] = useState(null);
     const [visibleShirts, setVisibleShirts] = useState([1, 2]);
-    const [laundryClicked, setLaundryClicked] = useState(false);
 
     const onBackPress = () => {
         navigation.goBack();
@@ -14,16 +13,6 @@ export default function NotificationPage() {
 
     const onDonationPress = () => {
         if (selectedShirt) {
-            setVisibleShirts(visibleShirts.filter(shirt => shirt !== selectedShirt));
-            setSelectedShirt(null);
-        }
-    };
-
-    const onLaundryPress = () => {
-        if (!laundryClicked) {
-            setVisibleShirts([...visibleShirts, 3, 4]);
-            setLaundryClicked(true);
-        } else if (selectedShirt && selectedShirt > 2) {
             setVisibleShirts(visibleShirts.filter(shirt => shirt !== selectedShirt));
             setSelectedShirt(null);
         }
@@ -48,15 +37,9 @@ export default function NotificationPage() {
                         <Text style={styles.checkmarkText}>✓</Text>
                     </View>
                 )}
-                {shirtNumber <= 2 ? (
-                    <View style={[styles.laundryLabel, styles.donationLabel]}>
-                        <Text style={styles.laundryLabelText}>D</Text>
-                    </View>
-                ) : (
-                    <View style={[styles.laundryLabel]}>
-                        <Text style={styles.laundryLabelText}>L</Text>
-                    </View>
-                )}
+                <View style={[styles.laundryLabel, styles.donationLabel]}>
+                    <Text style={styles.laundryLabelText}>D</Text>
+                </View>
             </View>
         </Pressable>
     );
@@ -75,20 +58,6 @@ export default function NotificationPage() {
                 >
                     <Text style={styles.buttonText}>Donation</Text>
                 </Pressable>
-                <View style={styles.laundryButtonContainer}>
-                    <Pressable 
-                        style={[
-                            styles.button,
-                            styles.laundryButton,
-                            (!selectedShirt || selectedShirt <= 2) && !laundryClicked && styles.disabledButton
-                        ]} 
-                        onPress={onLaundryPress}
-                        disabled={(!selectedShirt || selectedShirt <= 2) && laundryClicked}
-                    >
-                        <Text style={styles.buttonText}>Laundry</Text>
-                    </Pressable>
-                    {!laundryClicked && <View style={styles.notificationDot} />}
-                </View>
                 <Pressable style={[styles.button, styles.backButton]} onPress={onBackPress}>
                     <Text style={styles.buttonText}>Back</Text>
                 </Pressable>
@@ -100,7 +69,7 @@ export default function NotificationPage() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#8B0000',
+        backgroundColor: '#89CFF0',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -158,12 +127,6 @@ const styles = StyleSheet.create({
     backButton: {
         backgroundColor: '#444',
     },
-    laundryButton: {
-        backgroundColor: '#1976D2',
-    },
-    disabledButton: {
-        opacity: 0.5,
-    },
     buttonText: {
         color: '#fff',
         fontSize: 18,
@@ -189,28 +152,5 @@ const styles = StyleSheet.create({
     },
     donationLabel: {
         backgroundColor: '#FF0000',
-    },
-    notificationDot: {
-        width: 10,
-        height: 10,
-        backgroundColor: '#FF0000',
-        borderRadius: 5,
-        position: 'absolute',
-        top: 10,
-        right: 10,
-    },
-    laundryButtonContainer: {
-        position: 'relative',
-    },
-    notificationDot: {
-        position: 'absolute',
-        top: -5,
-        left: -5,
-        width: 12,
-        height: 12,
-        backgroundColor: '#FF0000',
-        borderRadius: 6,
-        borderWidth: 2,
-        borderColor: '#fff',
-    },
+    }
 }); 
