@@ -36,7 +36,7 @@ export default function LandingPage() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#CC0000',
+        backgroundColor: '#89CFF0',
         alignItems: 'center',
         justifyContent: 'center',
     },
