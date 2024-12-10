@@ -244,12 +244,12 @@ def db_add_day(date: datetime, user_id: str = dummy_user_id):
         print("Error adding day to database:", str(e))
         raise
 
-def db_add_outfit_to_day(date: datetime, outfit_id: str,  user_id: str = dummy_user_id):
-    try:
-        print("Adding outfit " + outfit_id + " to day " + str(date))
-        day_collection = closet_lab_database["days"]
-        day = day_collection.find_one({'day': date}) # go back and fix this?
-        if day == None:
-            # Add the needed day if it doesn't exist already.
-            db_add_day(date, user_id)
+# def db_add_outfit_to_day(date: datetime, outfit_id: str,  user_id: str = dummy_user_id):
+#     try:
+#         print("Adding outfit " + outfit_id + " to day " + str(date))
+#         day_collection = closet_lab_database["days"]
+#         day = day_collection.find_one({'day': date}) # go back and fix this?
+#         if day == None:
+#             # Add the needed day if it doesn't exist already.
+#             db_add_day(date, user_id)
     

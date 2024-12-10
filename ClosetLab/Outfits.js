@@ -250,6 +250,26 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation, setSecondaryUpd
     </Modal>);
 }
 
+export const calendarAdd = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
+    let date = Date.now();
+    console.log(date);
+    return (<Modal
+        animationType="slide"
+        transparent={true}
+        visible={visibleVar}
+        onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setVisibleVar(false);
+        }}>
+        <View style={styles.container}>
+            <View style={styles.modalView}>
+                <Pressable onPress={() => setVisibleVar(false)} style={styles.button}><Text style={styles.button_text}>Cancel</Text></Pressable>
+                <Pressable style={styles.button}><Text style={styles.button_text}>Add to calendar</Text></Pressable>
+            </View>
+        </View>
+    </Modal>);
+}
+
 export const deleteOutfit = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
 
     toDeleteID = window.global_selectedOutfit.db_id
@@ -474,6 +494,8 @@ export function SingleOutfitView() {
     const [editModalVisible, setEditModalVisible] = useState(false)
     const [collage, setCollage] = useState(<Text>Loading Collage...</Text>)
     const [clothingItemCache, setClothingItemCache] = useState([])
+    const [calendarModalVisible, setCalendarModalVisible] = useState(false);
+
     //setCollage(window.global_selectedOutfit.collage)
     getCollage(setCollage, needUpdate, setNeedUpdate)
     async function updatePage() {
@@ -518,7 +540,7 @@ export function SingleOutfitView() {
                         <Pressable style={styles.button_outfit_2x2} onPress={() => setEditModalVisible(true)}>
                             <Text style={styles.button_text}>Edit Outfit</Text>
                         </Pressable>
-                        <Pressable style={styles.button_outfit_2x2} onPress={() =>}>
+                        <Pressable style={styles.button_outfit_2x2} onPress={() => setCalendarModalVisible(true)}>
                             <Text style={styles.button_text}>Save Outfit{"\n"}to Calendar</Text>
                         </Pressable>
                     </View>
@@ -538,6 +560,7 @@ export function SingleOutfitView() {
         </View>
         {deleteOutfit(deleteModalVisible, setDeleteModalVisible, navigation, setNeedUpdate)}
         {editOutfit(editModalVisible, setEditModalVisible, navigation, false, clothingItemCache, newOutfit)}
+        {calendarAdd(calendarModalVisible, setCalendarModalVisible, navigation)}
     </SafeAreaView>);
 }
 
