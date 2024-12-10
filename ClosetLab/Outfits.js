@@ -255,6 +255,7 @@ export const calendarAdd = (visibleVar, setVisibleVar, navigation, setSecondaryU
     dummy_user = "67057228f80354e361ae2bf5"
     const [selected, setSelected] = useState();
     async function addAPI() {
+        date_notime = new Date(new Date(selected).setHours(0, 0, 0))
         console.log("called addAPI() in calendarAdd with date = " + selected + " and outfitID = " + window.global_selectedOutfit.db_id);
         try {
             options = {

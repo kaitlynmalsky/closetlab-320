@@ -233,14 +233,14 @@ def db_add_day(date: datetime, outfit_id: str, user_id: str = dummy_user_id):
     try:
         print(f"Searching for existing days with datetime {date}")
         day_collection = closet_lab_database["days"]
-        old_count = day_collection.count_documents()
-        day_collection.delete_one({'date': date})
-        if day_collection.count_documents < old_count:
+        old_count = day_collection.count_documents({})
+        day_collection.delete_one({'date': str(date)})
+        if day_collection.count_documents({}) < old_count:
             print("existing day deleted")
         else:
             print("no days deleted")
     except Exception as e:
-        print("Error searching database")
+        print("Error searching database", e)
     try:
         print("Adding calendar day " + str(datetime) + " to user " + user_id)
         day_collection = closet_lab_database["days"]
