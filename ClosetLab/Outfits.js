@@ -253,6 +253,8 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation, setSecondaryUpd
 
 export const calendarAdd = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
     dummy_user = "67057228f80354e361ae2bf5"
+    let date = Date.now();
+    //console.log(date);
     const [selected, setSelected] = useState();
     async function addAPI() {
         date_notime = new Date(new Date(selected).setHours(0, 0, 0))

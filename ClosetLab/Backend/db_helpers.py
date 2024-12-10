@@ -179,7 +179,7 @@ def db_get_outfit(object_id: str):
         print("Error getting outfit from database:", str(e))
         raise
 
-def db_add_outfit(user_id: str = dummy_user_id, name: str = "Unnamed Outfit", items: list = None, collage:list=[]):
+def db_add_outfit(user_id: str = dummy_user_id, name: str = "Unnamed Outfit", items: list = None, collage:str=""):
     try:
         print("Adding outfit to database")
         outfit_collection = closet_lab_database["outfits"]
