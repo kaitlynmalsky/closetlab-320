@@ -5,6 +5,9 @@ import styles from './Stylesheet';
 import { OutfitListView } from './Outfits';
 import { addOutfitToCalendar } from './OutfitAddToCalendar';
 import { base_url, getAllOutfitsForUser, getOutfit } from './APIContainer';
+import { ImageBackground } from 'react-native-web';
+
+
 
 export function CalendarView() {
     const navigation = useNavigation();
@@ -14,6 +17,46 @@ export function CalendarView() {
     const [topModalVisible, setTopModalVisible] = useState(false);
     const [selectedTop, setSelectedTop] = useState(null);
     const [selectedBot, setSelectedBot] = useState(null);
+    const [calendarObject, setCalendarObject] = useState(null);
+    const [outfitsArray, setOutfitsArray] = useState(null);
+    const [daysArray, setDaysArray] = useState([]);
+
+    const dummy_user_id = "67057228f80354e361ae2bf5";
+
+    options = {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            "Access-Control-Allow-Origin": "*"
+        },
+    }
+    fetch(base_url + 'v1/calendar/' + dummy_user_id, options)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (jsonData) {
+            setCalendarObject(JSON.stringify(jsonData));
+            console.log('calendarObject is ' + calendarObject);
+            console.log('calendarObject[days] is ' + calendarObject['days'])
+            for (const day in calendarObject.days) {
+                fetch(base_url + 'v1/get-day/' + day, options)
+                    .then(function (response) {
+                        return response.json();
+                    }).then(function (dayJsonData) {
+                        setDaysArray(daysArray.push(dayJsonData['outfit']));
+                        console.log(daysArray);
+                    })
+            }
+        });
+
+    fetch(base_url + 'v1/outfits-get-all/' + dummy_user_id, options)
+        .then(function (jsonData) {
+            setOutfitsArray(JSON.stringify(jsonData))
+        });
+
+
+
 
     const dummyUser = "67057228f80354e361ae2bf5";
 
@@ -39,8 +82,6 @@ export function CalendarView() {
             console.log("Outfits still aren't loaded.")
             return;
         }
-        const outfit_objects = []
-
         console.log(outfitSet);
         console.log("outfitObjects is", outfitObjects);
         console.log("outfitSet.length is " + outfitSet.length);
@@ -164,6 +205,7 @@ export function CalendarView() {
                                             <Text style={styles.calendarDayNumber}>{dayNumber}</Text>
                                         </View>
                                     )}
+                                    <Image source="./assets/favicon.png"></Image>
                                 </View>
                             );
                         })}
@@ -194,120 +236,7 @@ export function CalendarView() {
                     </View>
                 </View>
             </Modal>
-            {/* 
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={botModalVisible}
-                onRequestClose={() => setBotModalVisible(false)}
-            >
-                <View style={modalStyles.centeredView}>
-                    <View style={modalStyles.modalView}>
-                        <View style={modalStyles.imageContainer}>
-                            <Pressable 
-                                style={[
-                                    modalStyles.imageButton,
-                                    selectedBot === 'bot1' && modalStyles.selectedImage
-                                ]}
-                                onPress={() => handleBotSelection('bot1')}
-                            >
-                                <Image 
-                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
-                                    style={modalStyles.image}
-                                />
-                                {selectedBot === 'bot1' && (
-                                    <View style={modalStyles.checkmark}>
-                                        <Text style={modalStyles.checkmarkText}>✓</Text>
-                                    </View>
-                                )}
-                            </Pressable>
-                            <Pressable 
-                                style={[
-                                    modalStyles.imageButton,
-                                    selectedBot === 'bot2' && modalStyles.selectedImage
-                                ]}
-                                onPress={() => handleBotSelection('bot2')}
-                            >
-                                <Image 
-                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
-                                    style={modalStyles.image}
-                                />
-                                {selectedBot === 'bot2' && (
-                                    <View style={modalStyles.checkmark}>
-                                        <Text style={modalStyles.checkmarkText}>✓</Text>
-                                    </View>
-                                )}
-                            </Pressable>
-                        </View>
-                        <Pressable
-                            style={[modalStyles.modalButton, modalStyles.cancelButton]}
-                            onPress={() => {
-                                setSelectedBot(null);
-                                setBotModalVisible(false);
-                            }}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Cancel</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </Modal>
 
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={topModalVisible}
-                onRequestClose={() => setTopModalVisible(false)}
-            >
-                <View style={modalStyles.centeredView}>
-                    <View style={modalStyles.modalView}>
-                        <View style={modalStyles.imageContainer}>
-                            <Pressable 
-                                style={[
-                                    modalStyles.imageButton,
-                                    selectedTop === 'top1' && modalStyles.selectedImage
-                                ]}
-                                onPress={() => handleTopSelection('top1')}
-                            >
-                                <Image 
-                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
-                                    style={modalStyles.image}
-                                />
-                                {selectedTop === 'top1' && (
-                                    <View style={modalStyles.checkmark}>
-                                        <Text style={modalStyles.checkmarkText}>✓</Text>
-                                    </View>
-                                )}
-                            </Pressable>
-                            <Pressable 
-                                style={[
-                                    modalStyles.imageButton,
-                                    selectedTop === 'top2' && modalStyles.selectedImage
-                                ]}
-                                onPress={() => handleTopSelection('top2')}
-                            >
-                                <Image 
-                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
-                                    style={modalStyles.image}
-                                />
-                                {selectedTop === 'top2' && (
-                                    <View style={modalStyles.checkmark}>
-                                        <Text style={modalStyles.checkmarkText}>✓</Text>
-                                    </View>
-                                )}
-                            </Pressable>
-                        </View>
-                        <Pressable
-                            style={[modalStyles.modalButton, modalStyles.cancelButton]}
-                            onPress={() => {
-                                setSelectedTop(null);
-                                setTopModalVisible(false);
-                            }}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Cancel</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </Modal> */}
         </SafeAreaView>
     );
 }

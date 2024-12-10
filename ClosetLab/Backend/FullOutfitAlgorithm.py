@@ -5,6 +5,7 @@ import io
 from io import BytesIO
 import requests
 
+print("in fulloutfitalgorithm")
 
 TOTAL_WIDTH = 250
 TOTAL_HEIGHT = 250

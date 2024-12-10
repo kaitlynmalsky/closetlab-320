@@ -19,7 +19,8 @@ from db_helpers import (
     db_add_outfit,
     db_delete_outfit,
     db_add_clothing_item_tag,
-    db_get_calendar_by_user
+    db_get_calendar_by_user,
+    db_add_day
 )
 
 app = Flask(__name__)
@@ -85,6 +86,24 @@ def add_clothing_item():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# POST route to add a day to the user's calendar
+@app.route('/api/v1/add-day/<string:user_id>', methods=['POST'])
+def add_day(user_id):
+    try:
+        print(f"got to the add-day route, data is {request.json}")
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        date = data.get('date')
+        outfit_id = data.get('outfit_id')
+        if not date or not outfit_id:
+            return jsonify({'error': 'date and outfit_id are required'}), 400
+        day_id = db_add_day(date, outfit_id, user_id)
+        return jsonify({'message': 'Day added successfully', 'id': day_id})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        
 
 # GET route to retrieve a clothing item by ID
 @app.route('/api/v1/clothing-items/<string:item_id>', methods=['GET'])
@@ -308,6 +327,7 @@ def get_calendar(user_id):
     try:
         calendar = db_get_calendar_by_user(user_id)
         if calendar:
+            print("returning calendar, got back to app.py")
             return jsonify(calendar), 200
         else:
             return jsonify({'error': 'Outfit not found'}), 404
@@ -327,82 +347,50 @@ def get_day(day_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-@app.route('/api/v1/relevant-days/', methods=['POST'])
-def relevant_days(): #to fight against calendars with hundreds or thousands of Days
+
+
+@app.route('/api/v1/calendar-detailed/<string:user_id>', methods=['GET'])
+def get_detailed_calendar(user_id):
     try:
-        data = request.json
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-
-        day_collection = closet_lab_database["days"]
-
-        defaultStart = '11/29/24 12:00:00'
-        defaultEnd = '12/29/24 11:59:59'
-        user = data.get('user_id', dummy_user_id)
-        if not data:
-            return jsonify({'error': 'No user provided'}), 400
-        calendar = db_get_calendar_by_user(user)
+        # Get the user's calendar
+        calendar = db_get_calendar_by_user(user_id)
         if not calendar:
-            return jsonify({'error': 'No calendar provided'}), 400
-        
-        start = datetime.strptime(data.get('startDate', defaultStart), '%m/%d/%y %H:%M:%S')
-        end = datetime.strptime(data.get('endDate', defaultEnd), '%m/%d/%y %H:%M:%S')
-        if end>=start:
-            return jsonify({'error': 'endDate >= startDate'}), 400
-        
-        returnInfo = []
-        for dayID in calendar['days']:
-            dayObj = day_collection.find_one({'_id': ObjectId(dayID)})
-            if dayObj and (dayObj.date>=start) and (dayObj.date<=end):
-                returnInfo.append(dayObj)
+            return jsonify({'error': 'Calendar not found'}), 404
 
-        return jsonify({'message': 'Outfit added successfully', 'days': returnInfo}), 201
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# POST route to retrieve a Day by its objectID
-#requires user_id, date, outfit_id
-@app.route('/api/v1/add-outfit-to-day', methods=['POST'])
-def add_outfit_to_day():
-    try:
-        data = request.json
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-        user_id = data.get('user_id', dummy_user_id)
-        properDate = data.get('date')
-        outfit_ids = data.get('outfit_ids')
-        calendar_collection = closet_lab_database["days"]
         day_collection = closet_lab_database["days"]
-        #add or create day
-        day = day_collection.find_one({'calendar_id': calendar['_id'], 'date' : properDate})
-        if day:
-            pass
-        else:
-            
-            calendar = db_get_calendar_by_user(user_id)
-            if not calendar:
-                return jsonify({'error': 'No calendar provided'}), 400
-            newDayObj = {
-            'calendar_id': calendar['_id'],
-            'outfits': [],
-            'date': properDate}
-            day_collection.insert_one(newDayObj)
-            new_id = day_collection.find_one({'calendar_id': calendar['_id'], 'date' : properDate})
-            calendar['days'].append(new_id)['_id']
-            calendar_collection.update_one(
-            {'_id': ObjectId(calendar['_id'])},
-            {'$set': {'days': calendar['days']}},
-            )
-            day=newDayObj
-        day['outfits'] = outfit_ids
-        day_collection.update_one(
-            {'_id': ObjectId(day['_id'])},
-            {'$set': {'outfits': day['outfits']}},
-        )
-            #return jsonify({'error': 'Day not found'}), 404
+        detailed_days = []
+
+        # Loop through the days in the calendar
+        for day_id in calendar.get('days', []):
+            day = day_collection.find_one({'_id': ObjectId(day_id)})
+            if day:
+                # Convert ObjectId fields to strings
+                day['_id'] = str(day['_id'])
+                day['calendar_id'] = str(day['calendar_id'])
+                day['date'] = day['date'].strftime('%Y-%m-%d')
+                
+                # Retrieve detailed outfits
+                outfits = []
+                for outfit_id in day.get('outfits', []):
+                    outfit = db_get_outfit(str(outfit_id))
+                    if outfit:
+                        outfit['_id'] = str(outfit['_id'])
+                        outfits.append(outfit)
+                day['outfits'] = outfits
+
+                detailed_days.append(day)
+
+        # Return the detailed calendar
+        return jsonify({
+            'calendar': {
+                '_id': str(calendar['_id']),
+                'days': detailed_days
+            }
+        }), 200
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)

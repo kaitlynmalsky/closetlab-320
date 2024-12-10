@@ -1,5 +1,7 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from operator import itemgetter
+from bson import json_util
 import datetime
 from FullOutfitAlgorithm import (
     createCollage
@@ -223,13 +225,31 @@ def db_get_calendar_by_user(user_id: str = dummy_user_id):
             calendar_collection.insert_one(calendar)
         else:
             print("Existing calendar for user " + user_id + " found")
+        if calendar:
+            # Convert ObjectId to string for JSON serialization
+            calendar['_id'] = str(calendar['_id'])
+            calendar['user_id'] = str(calendar.get('user_id', ''))
+            calendar['days'] = [str(day) for day in calendar['days']]
+        print(f"calendar is {calendar}")
+
         return calendar
     except Exception as e:
         print("Error getting calendar from database:", str(e))
         raise
-    
 
-def db_add_day(day: int, month: int, year:int, outfit_id: str, user_id: str = dummy_user_id):
+
+def db_add_day(date: datetime, outfit_id: str, user_id: str = dummy_user_id):
+    try:
+        print(f"Searching for existing days with datetime {date}")
+        day_collection = closet_lab_database["days"]
+        old_count = day_collection.count_documents({})
+        day_collection.delete_one({'date': str(date)})
+        if day_collection.count_documents({}) < old_count:
+            print("existing day deleted")
+        else:
+            print("no days deleted")
+    except Exception as e:
+        print("Error searching database", e)
     try:
         print("Adding calendar day " + str(datetime) + " to user " + user_id)
         day_collection = closet_lab_database["days"]
@@ -237,12 +257,16 @@ def db_add_day(day: int, month: int, year:int, outfit_id: str, user_id: str = du
         day = {
             'calendar_id': calendar['_id'],
             'outfit': ObjectId(outfit_id),
-            'day': day,
-            'month': month,
-            'year': year
+            'date': date
         }
-        day_collection.insert_one(day)
+        result = day_collection.insert_one(day)
+        print(f"debug: calendar[\'_id\'] is {calendar['_id']}")
+        filter = {'_id': calendar["_id"]}
+        list_all_days = list(map(itemgetter('_id'), day_collection.find({"calendar_id": calendar["_id"]})))
+        new_values = {"$set": {"days": list_all_days}}
+        closet_lab_database["calendars"].update_one(filter, new_values)
+        print("Day added successfully with id =", result.inserted_id)
+        return str(result.inserted_id)
     except Exception as e:
         print("Error adding day to database:", str(e))
         raise
-
