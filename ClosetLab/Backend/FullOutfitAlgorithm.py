@@ -3,6 +3,7 @@ from rembg import remove
 import base64
 import io
 from io import BytesIO
+import requests
 
 
 TOTAL_WIDTH = 250
@@ -72,6 +73,15 @@ shoeItems = [
 def itemNameContains(item, val):
     return (item['name']) and (val in str(item['name']).lower())
 
+def get_base64_from_url(url):
+    """Fetches an image from a URL and returns its base64 encoding."""
+
+    response = requests.get(url)
+    if response.status_code == 200:
+        return base64.b64encode(response.content).decode('utf-8')
+    else:
+        return None
+
 def identifyItem(itemInfo):
     t_Tags = itemInfo['type_tags'].copy()
     t_Tags.append("XXX")
@@ -129,7 +139,19 @@ def createCollage(imgList: list[object]):
             corrected = imgInfo['image_link']
             if (cutThis in imgInfo['image_link']):
                 corrected = imgInfo['image_link'][len(cutThis):] + "============="
-            img_content = base64.b64decode(corrected)
+            
+            print(corrected)
+            img_content = ""
+            no_bg_img = None
+            #urllib.request.urlretrieve( 
+            #        'https://media.geeksforgeeks.org/wp-content/uploads/20210318103632/gfg-300x300.png', 
+            #        "placeholder.png") 
+            #    img_content = Image.open("placeholder.png")
+            if ("https://" in imgInfo['image_link']):
+                img_content = base64.b64decode(get_base64_from_url(imgInfo['image_link']))
+                #Image.open(requests.get(imgInfo['image_link'], stream=True).raw)
+            else:
+                img_content = base64.b64decode(corrected)
             if not img_content:
                 print("invalid image link")
                 return "error"

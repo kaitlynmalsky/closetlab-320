@@ -253,7 +253,7 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation, setSecondaryUpd
 
 export const calendarAdd = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
     let date = Date.now();
-    console.log(date);
+    //console.log(date);
     const [selected, setSelected] = useState();
     return (<Modal
         animationType="slide"
