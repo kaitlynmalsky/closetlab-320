@@ -36,17 +36,10 @@ export function CalendarView() {
             return response.json();
         })
         .then(function (jsonData) {
-            setCalendarObject(JSON.stringify(jsonData));
-            console.log('calendarObject is ' + calendarObject);
-            console.log('calendarObject[days] is ' + calendarObject['days'])
-            for (const day in calendarObject.days) {
-                fetch(base_url + 'v1/get-day/' + day, options)
-                    .then(function (response) {
-                        return response.json();
-                    }).then(function (dayJsonData) {
-                        setDaysArray(daysArray.push(dayJsonData['outfit']));
-                        console.log(daysArray);
-                    })
+            if (calendarObject == null) {
+                setCalendarObject(jsonData);
+                console.log('calendarObject type is ' + typeof (calendarObject))
+                console.log('calendarObject is', calendarObject);
             }
         });
 
@@ -167,6 +160,15 @@ export function CalendarView() {
         return monthOutfits[monthKey] || '';
     };
 
+    //Demo
+    const getDayImage = (dayIndex, weekIndex) => {
+        day_int = weekIndex * 7 + (dayIndex + 1)
+        if (day_int == 24) {
+            return <Text>Cool outfit</Text>
+        }
+
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.calendarContainer}>
@@ -205,7 +207,7 @@ export function CalendarView() {
                                             <Text style={styles.calendarDayNumber}>{dayNumber}</Text>
                                         </View>
                                     )}
-                                    <Image source="./assets/favicon.png"></Image>
+                                    {getDayImage(dayIndex, weekIndex)}
                                 </View>
                             );
                         })}
