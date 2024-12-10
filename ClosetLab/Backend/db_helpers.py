@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from operator import itemgetter
 import datetime
 from FullOutfitAlgorithm import (
     createCollage
@@ -227,7 +228,7 @@ def db_get_calendar_by_user(user_id: str = dummy_user_id):
     except Exception as e:
         print("Error getting calendar from database:", str(e))
         raise
-    
+
 
 def db_add_day(date: datetime, outfit_id: str, user_id: str = dummy_user_id):
     try:
@@ -251,6 +252,11 @@ def db_add_day(date: datetime, outfit_id: str, user_id: str = dummy_user_id):
             'date': date
         }
         result = day_collection.insert_one(day)
+        print(f"debug: calendar[\'_id\'] is {calendar['_id']}")
+        filter = {'_id': calendar["_id"]}
+        list_all_days = list(map(itemgetter('_id'), day_collection.find({"calendar_id": calendar["_id"]})))
+        new_values = {"$set": {"days": list_all_days}}
+        closet_lab_database["calendars"].update_one(filter, new_values)
         print("Day added successfully with id =", result.inserted_id)
         return str(result.inserted_id)
     except Exception as e:
