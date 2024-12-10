@@ -31,7 +31,7 @@ CORS(app)  # Allow all origins for testing
 AWS_ACCESS_KEY =os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_KEY =os.environ.get("AWS_SECRET_ACCESS_KEY")
 S3_BUCKET = 'closetlab'
-S3_REGION = 'us-east-2'  # e.g., 'us-east-1'
+S3_REGION = os.environ.get("AWS_REGION")  # e.g., 'us-east-1'
 
 s3_client = boto3.client(
     's3',
