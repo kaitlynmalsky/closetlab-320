@@ -252,9 +252,30 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation, setSecondaryUpd
 }
 
 export const calendarAdd = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
-    let date = Date.now();
-    console.log(date);
+    dummy_user = "67057228f80354e361ae2bf5"
     const [selected, setSelected] = useState();
+    async function addAPI() {
+        console.log("called addAPI() in calendarAdd with date = " + selected + " and outfitID = " + window.global_selectedOutfit.db_id);
+        try {
+            options = {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    "Access-Control-Allow-Origin": "*"
+                },
+                body: JSON.stringify({ date: selected, outfit_id: window.global_selectedOutfit.db_id })
+            }
+
+            response = await fetch(base_url + 'v1/add-day/' + dummy_user, options);
+            if (!response.ok) {
+                throw new Error('Network response was not ok for day addition');
+            }
+        } catch (error) {
+            console.error("Error in addition:", error)
+        }
+        setVisibleVar(false);
+    }
     return (<Modal
         animationType="slide"
         transparent={true}
@@ -276,7 +297,7 @@ export const calendarAdd = (visibleVar, setVisibleVar, navigation, setSecondaryU
                 />
                 <View style={styles.spacer_row}>
                     <Pressable onPress={() => setVisibleVar(false)} style={styles.button}><Text style={styles.button_text}>Cancel</Text></Pressable>
-                    <Pressable style={styles.button}><Text style={styles.button_text}>Add to calendar</Text></Pressable>
+                    <Pressable style={styles.button} onPress={() => addAPI()}><Text style={styles.button_text}>Add to calendar</Text></Pressable>
                 </View>
             </View>
         </View>
@@ -501,6 +522,7 @@ export function SingleOutfitView() {
         "67057228f80354e361ae2bf5"
     );
     newOutfit.clothingItems = window.global_selectedOutfit.clothingItems
+    cur_outfit_id = window.global_selectedOutfit.db_id;
 
     const [needUpdate, setNeedUpdate] = useState(true)
     const [deleteModalVisible, setDeleteModalVisible] = useState(false)

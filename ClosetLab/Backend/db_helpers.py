@@ -250,7 +250,9 @@ def db_add_day(date: datetime, outfit_id: str, user_id: str = dummy_user_id):
             'outfit': ObjectId(outfit_id),
             'date': date
         }
-        day_collection.insert_one(day)
+        result = day_collection.insert_one(day)
+        print("Day added successfully with id =", result.inserted_id)
+        return str(result.inserted_id)
     except Exception as e:
         print("Error adding day to database:", str(e))
         raise
