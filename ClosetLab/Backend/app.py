@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 import datetime
 import boto3
 import base64
-
+import os
 from FullOutfitAlgorithm import (
     createCollage
 )
@@ -28,8 +28,8 @@ from db_helpers import (
 app = Flask(__name__)
 CORS(app)  # Allow all origins for testing
 # AWS S3 Configuration
-AWS_ACCESS_KEY = 'AKIAQUEKI7ZGQBDPF2PF'
-AWS_SECRET_KEY = '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'
+AWS_ACCESS_KEY =os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY =os.environ.get("AWS_SECRET_ACCESS_KEY")
 S3_BUCKET = 'closetlab'
 S3_REGION = 'us-east-2'  # e.g., 'us-east-1'
 
