@@ -404,5 +404,48 @@ def add_outfit_to_day():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/v1/calendar-detailed/<string:user_id>', methods=['GET'])
+def get_detailed_calendar(user_id):
+    try:
+        # Get the user's calendar
+        calendar = db_get_calendar_by_user(user_id)
+        if not calendar:
+            return jsonify({'error': 'Calendar not found'}), 404
+
+        day_collection = closet_lab_database["days"]
+        detailed_days = []
+
+        # Loop through the days in the calendar
+        for day_id in calendar.get('days', []):
+            day = day_collection.find_one({'_id': ObjectId(day_id)})
+            if day:
+                # Convert ObjectId fields to strings
+                day['_id'] = str(day['_id'])
+                day['calendar_id'] = str(day['calendar_id'])
+                day['date'] = day['date'].strftime('%Y-%m-%d')
+                
+                # Retrieve detailed outfits
+                outfits = []
+                for outfit_id in day.get('outfits', []):
+                    outfit = db_get_outfit(str(outfit_id))
+                    if outfit:
+                        outfit['_id'] = str(outfit['_id'])
+                        outfits.append(outfit)
+                day['outfits'] = outfits
+
+                detailed_days.append(day)
+
+        # Return the detailed calendar
+        return jsonify({
+            'calendar': {
+                '_id': str(calendar['_id']),
+                'days': detailed_days
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000)
