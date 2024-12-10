@@ -231,16 +231,26 @@ def db_get_calendar_by_user(user_id: str = dummy_user_id):
 
 def db_add_day(date: datetime, outfit_id: str, user_id: str = dummy_user_id):
     try:
+        print(f"Searching for existing days with datetime {date}")
+        day_collection = closet_lab_database["days"]
+        old_count = day_collection.count_documents()
+        day_collection.delete_one({'date': date})
+        if day_collection.count_documents < old_count:
+            print("existing day deleted")
+        else:
+            print("no days deleted")
+    except Exception as e:
+        print("Error searching database")
+    try:
         print("Adding calendar day " + str(datetime) + " to user " + user_id)
         day_collection = closet_lab_database["days"]
         calendar = db_get_calendar_by_user(user_id)
         day = {
             'calendar_id': calendar['_id'],
             'outfit': ObjectId(outfit_id),
-            'date': datetime
+            'date': date
         }
         day_collection.insert_one(day)
     except Exception as e:
         print("Error adding day to database:", str(e))
         raise
-
