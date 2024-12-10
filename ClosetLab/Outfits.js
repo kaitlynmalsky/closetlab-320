@@ -6,6 +6,7 @@ import { logFetch, getItem, base_url, getAllOutfitsForUser, postOutfit, deleteIt
 import { TagType, ClothingItem, Outfit, getLoading } from './ClothingAndOutfits.js';
 import { editOutfit } from './EditOutfit.js';
 import { CheckBox } from 'react-native-elements';
+import { DayPicker } from "react-day-picker";
 
 import { getCollage } from './ItemLayerOrganize.js'
 
@@ -253,6 +254,7 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation, setSecondaryUpd
 export const calendarAdd = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
     let date = Date.now();
     console.log(date);
+    const [selected, setSelected] = useState();
     return (<Modal
         animationType="slide"
         transparent={true}
@@ -261,10 +263,21 @@ export const calendarAdd = (visibleVar, setVisibleVar, navigation, setSecondaryU
             Alert.alert('Modal has been closed.');
             setVisibleVar(false);
         }}>
+
         <View style={styles.container}>
             <View style={styles.modalView}>
-                <Pressable onPress={() => setVisibleVar(false)} style={styles.button}><Text style={styles.button_text}>Cancel</Text></Pressable>
-                <Pressable style={styles.button}><Text style={styles.button_text}>Add to calendar</Text></Pressable>
+                <DayPicker
+                    mode="single"
+                    selected={selected}
+                    onSelect={setSelected}
+                    footer={
+                        selected ? `Selected: ${selected.toLocaleDateString()}` : "Pick a day."
+                    }
+                />
+                <View style={styles.spacer_row}>
+                    <Pressable onPress={() => setVisibleVar(false)} style={styles.button}><Text style={styles.button_text}>Cancel</Text></Pressable>
+                    <Pressable style={styles.button}><Text style={styles.button_text}>Add to calendar</Text></Pressable>
+                </View>
             </View>
         </View>
     </Modal>);
