@@ -5,6 +5,7 @@ import styles from './Stylesheet';
 import { OutfitListView } from './Outfits';
 import { addOutfitToCalendar } from './OutfitAddToCalendar';
 import { base_url, getAllOutfitsForUser, getOutfit } from './APIContainer';
+import { ImageBackground } from 'react-native-web';
 
 
 
@@ -18,6 +19,7 @@ export function CalendarView() {
     const [selectedBot, setSelectedBot] = useState(null);
     const [calendarObject, setCalendarObject] = useState(null);
     const [outfitsArray, setOutfitsArray] = useState(null);
+    const [daysArray, setDaysArray] = useState(null);
 
     const dummy_user_id = "67057228f80354e361ae2bf5";
 
@@ -30,8 +32,12 @@ export function CalendarView() {
         },
     }
     fetch(base_url + 'v1/calendar/' + dummy_user_id, options)
+        .then(function (response) {
+            return response.json();
+        })
         .then(function (jsonData) {
             setCalendarObject(JSON.stringify(jsonData));
+            console.log('calendarObject is ' + calendarObject);
         });
 
     fetch(base_url + 'v1/outfits-get-all/' + dummy_user_id, options)
@@ -64,8 +70,6 @@ export function CalendarView() {
             console.log("Outfits still aren't loaded.")
             return;
         }
-        const outfit_objects = []
-
         console.log(outfitSet);
         console.log("outfitObjects is", outfitObjects);
         console.log("outfitSet.length is " + outfitSet.length);
@@ -189,6 +193,7 @@ export function CalendarView() {
                                             <Text style={styles.calendarDayNumber}>{dayNumber}</Text>
                                         </View>
                                     )}
+                                    <Image source="./assets/favicon.png"></Image>
                                 </View>
                             );
                         })}

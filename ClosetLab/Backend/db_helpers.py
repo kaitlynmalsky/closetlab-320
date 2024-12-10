@@ -225,8 +225,14 @@ def db_get_calendar_by_user(user_id: str = dummy_user_id):
             calendar_collection.insert_one(calendar)
         else:
             print("Existing calendar for user " + user_id + " found")
+        if calendar:
+            # Convert ObjectId to string for JSON serialization
+            calendar['_id'] = str(calendar['_id'])
+            calendar['user_id'] = str(calendar.get('user_id', ''))
+            calendar['days'] = [str(day) for day in calendar['days']]
         print(f"calendar is {calendar}")
-        return json_util.dumps(calendar)
+
+        return calendar
     except Exception as e:
         print("Error getting calendar from database:", str(e))
         raise

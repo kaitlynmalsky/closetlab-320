@@ -4,6 +4,7 @@ import base64
 import io
 from io import BytesIO
 
+print("in fulloutfitalgorithm")
 
 TOTAL_WIDTH = 250
 TOTAL_HEIGHT = 250
