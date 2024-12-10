@@ -19,7 +19,7 @@ export function CalendarView() {
     const [selectedBot, setSelectedBot] = useState(null);
     const [calendarObject, setCalendarObject] = useState(null);
     const [outfitsArray, setOutfitsArray] = useState(null);
-    const [daysArray, setDaysArray] = useState(null);
+    const [daysArray, setDaysArray] = useState([]);
 
     const dummy_user_id = "67057228f80354e361ae2bf5";
 
@@ -38,12 +38,24 @@ export function CalendarView() {
         .then(function (jsonData) {
             setCalendarObject(JSON.stringify(jsonData));
             console.log('calendarObject is ' + calendarObject);
+            console.log('calendarObject[days] is ' + calendarObject['days'])
+            for (const day in calendarObject.days) {
+                fetch(base_url + 'v1/get-day/' + day, options)
+                    .then(function (response) {
+                        return response.json();
+                    }).then(function (dayJsonData) {
+                        setDaysArray(daysArray.push(dayJsonData['outfit']));
+                        console.log(daysArray);
+                    })
+            }
         });
 
     fetch(base_url + 'v1/outfits-get-all/' + dummy_user_id, options)
         .then(function (jsonData) {
             setOutfitsArray(JSON.stringify(jsonData))
         });
+
+
 
 
     const dummyUser = "67057228f80354e361ae2bf5";
