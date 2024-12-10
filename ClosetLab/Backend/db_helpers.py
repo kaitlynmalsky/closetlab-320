@@ -229,7 +229,7 @@ def db_get_calendar_by_user(user_id: str = dummy_user_id):
         raise
     
 
-def db_add_day(day: int, month: int, year:int, outfit_id: str, user_id: str = dummy_user_id):
+def db_add_day(date: datetime, outfit_id: str, user_id: str = dummy_user_id):
     try:
         print("Adding calendar day " + str(datetime) + " to user " + user_id)
         day_collection = closet_lab_database["days"]
@@ -237,9 +237,7 @@ def db_add_day(day: int, month: int, year:int, outfit_id: str, user_id: str = du
         day = {
             'calendar_id': calendar['_id'],
             'outfit': ObjectId(outfit_id),
-            'day': day,
-            'month': month,
-            'year': year
+            'date': datetime
         }
         day_collection.insert_one(day)
     except Exception as e:
