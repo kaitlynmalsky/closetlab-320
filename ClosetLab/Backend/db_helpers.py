@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from operator import itemgetter
+from bson import json_util
 import datetime
 from FullOutfitAlgorithm import (
     createCollage
@@ -224,7 +225,8 @@ def db_get_calendar_by_user(user_id: str = dummy_user_id):
             calendar_collection.insert_one(calendar)
         else:
             print("Existing calendar for user " + user_id + " found")
-        return calendar
+        print(f"calendar is {calendar}")
+        return json_util.dumps(calendar)
     except Exception as e:
         print("Error getting calendar from database:", str(e))
         raise

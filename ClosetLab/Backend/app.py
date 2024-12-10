@@ -327,6 +327,7 @@ def get_calendar(user_id):
     try:
         calendar = db_get_calendar_by_user(user_id)
         if calendar:
+            print("returning calendar, got back to app.py")
             return jsonify(calendar), 200
         else:
             return jsonify({'error': 'Outfit not found'}), 404

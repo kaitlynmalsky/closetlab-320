@@ -6,6 +6,8 @@ import { OutfitListView } from './Outfits';
 import { addOutfitToCalendar } from './OutfitAddToCalendar';
 import { base_url, getAllOutfitsForUser, getOutfit } from './APIContainer';
 
+
+
 export function CalendarView() {
     const navigation = useNavigation();
     const [modalVisible, setModalVisible] = useState(false);
@@ -14,6 +16,29 @@ export function CalendarView() {
     const [topModalVisible, setTopModalVisible] = useState(false);
     const [selectedTop, setSelectedTop] = useState(null);
     const [selectedBot, setSelectedBot] = useState(null);
+    const [calendarObject, setCalendarObject] = useState(null);
+    const [outfitsArray, setOutfitsArray] = useState(null);
+
+    const dummy_user_id = "67057228f80354e361ae2bf5";
+
+    options = {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            "Access-Control-Allow-Origin": "*"
+        },
+    }
+    fetch(base_url + 'v1/calendar/' + dummy_user_id, options)
+        .then(function (jsonData) {
+            setCalendarObject(JSON.stringify(jsonData));
+        });
+
+    fetch(base_url + 'v1/outfits-get-all/' + dummy_user_id, options)
+        .then(function (jsonData) {
+            setOutfitsArray(JSON.stringify(jsonData))
+        });
+
 
     const dummyUser = "67057228f80354e361ae2bf5";
 
