@@ -22,7 +22,8 @@ Collection list:
 * days
     * `_id: ObjectID`
     * `calendar_id: ObjectID`
-    * `outfits: ObjectID[]`
+    * `outfit_id: ObjectID[]`
+    * `outfit_name: String`
     * `date: Date`
 * outfits
     * `_id: ObjectID`

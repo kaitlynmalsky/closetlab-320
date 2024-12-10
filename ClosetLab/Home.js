@@ -54,15 +54,15 @@ export default Home = () => {
     //{imageElement}
     return (
         <SafeAreaView style={styles.container}>
-            
+
             <Pressable style={styles.button} onPress={onGoToOutfitList}>
-                <Text style={styles.button_text}>Outfit List Test</Text>
+                <Text style={styles.button_text}>Outfits</Text>
             </Pressable>
             <Pressable style={styles.button} onPress={onGoToClothingItemTest}>
-                <Text style={styles.button_text}>Go to clothing item test</Text>
+                <Text style={styles.button_text}>Clothing Items</Text>
             </Pressable>
             <Pressable style={styles.button} onPress={onGoToCalendar}>
-                <Text style={styles.button_text}>Go to calendar</Text>
+                <Text style={styles.button_text}>Calendar</Text>
             </Pressable>
 
         </SafeAreaView>

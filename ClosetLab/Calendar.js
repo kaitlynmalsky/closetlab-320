@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import styles from './Stylesheet';
 import { OutfitListView } from './Outfits';
 import { addOutfitToCalendar } from './OutfitAddToCalendar';
-import { base_url, getAllOutfitsForUser } from './APIContainer';
+import { base_url, getAllOutfitsForUser, getOutfit } from './APIContainer';
 
 export function CalendarView() {
     const navigation = useNavigation();
@@ -32,17 +32,21 @@ export function CalendarView() {
         console.log(outfitSet);
     }
     const outfitSet = getAllOutfitsForUser(dummyUser); // load all outfits when opening the calendar
+    const outfitObjects = []
 
     function updateOutfitList() {
         if (outfitSet.length === 0) {
             console.log("Outfits still aren't loaded.")
             return;
         }
+        const outfit_objects = []
+
         console.log(outfitSet);
+        console.log("outfitObjects is", outfitObjects);
         console.log("outfitSet.length is " + outfitSet.length);
         children = []
         for (let i = 0; i < outfitSet.length; i++) {
-            children.push(<Text key={outfitSet[i]["_id"]} style={styles.modalText}>{outfitSet[i]["name"]}</Text>)
+            children.push(<Text key={outfitSet[i]} style={styles.modalText}>{outfitSet[i]}</Text>)
         }
         console.log("children is ", children);
         console.log("Outfits are updated!", outfitSet);
@@ -158,21 +162,6 @@ export function CalendarView() {
                                     {dayNumber && (
                                         <View style={styles.calendarDayContent}>
                                             <Text style={styles.calendarDayNumber}>{dayNumber}</Text>
-                                            <TextInput
-                                                style={styles.calendarInput}
-                                                value={getEventValue(dayNumber)}
-                                                onChangeText={(text) => handleEventChange(dayNumber, text)}
-                                                placeholder="Event"
-                                                placeholderTextColor="#999"
-                                            />
-                                            <Pressable
-                                                style={styles.outfitButton}
-                                                onPress={() => handleOutfitButtonPress(dayNumber)}
-                                            >
-                                                <Text style={styles.outfitButtonText}>
-                                                    {getOutfitValue(dayNumber) || '                   Outfit'}
-                                                </Text>
-                                            </Pressable>
                                         </View>
                                     )}
                                 </View>
