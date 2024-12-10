@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createElement } from 'react';
 import { SafeAreaView, Text, View, Pressable, TextInput, StyleSheet, Modal, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './Stylesheet';
+import { OutfitListView } from './Outfits';
+import { addOutfitToCalendar } from './OutfitAddToCalendar';
+import { base_url, getAllOutfitsForUser, getOutfit } from './APIContainer';
 
-export default function CalendarView() {
+export function CalendarView() {
     const navigation = useNavigation();
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedDay, setSelectedDay] = useState(null);
@@ -11,7 +14,9 @@ export default function CalendarView() {
     const [topModalVisible, setTopModalVisible] = useState(false);
     const [selectedTop, setSelectedTop] = useState(null);
     const [selectedBot, setSelectedBot] = useState(null);
-    
+
+    const dummyUser = "67057228f80354e361ae2bf5";
+
     const onGoToHome = () => {
         navigation.navigate('Home');
     };
@@ -22,27 +27,56 @@ export default function CalendarView() {
     const [monthEvents, setMonthEvents] = useState({});
     const [monthOutfits, setMonthOutfits] = useState({});
 
+    const [outfitList, setOutfitList] = useState(<View><Text style={styles.modalText}>Outfits are loading...</Text></View>);
+    async function printOutfitSet() {
+        console.log(outfitSet);
+    }
+    const outfitSet = getAllOutfitsForUser(dummyUser); // load all outfits when opening the calendar
+    const outfitObjects = []
+
+    function updateOutfitList() {
+        if (outfitSet.length === 0) {
+            console.log("Outfits still aren't loaded.")
+            return;
+        }
+        const outfit_objects = []
+
+        console.log(outfitSet);
+        console.log("outfitObjects is", outfitObjects);
+        console.log("outfitSet.length is " + outfitSet.length);
+        children = []
+        for (let i = 0; i < outfitSet.length; i++) {
+            children.push(<Text key={outfitSet[i]} style={styles.modalText}>{outfitSet[i]}</Text>)
+        }
+        console.log("children is ", children);
+        console.log("Outfits are updated!", outfitSet);
+        setOutfitList(<View>{children}</View>);
+
+    }
+
+
     const changeMonth = (delta) => {
         const newDate = new Date(currentDate);
         newDate.setMonth(currentDate.getMonth() + delta);
         setCurrentDate(newDate);
     };
 
+
     useEffect(() => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-        
+
         let calendarDays = Array(firstDay).fill(null);
         for (let i = 1; i <= daysInMonth; i++) {
             calendarDays.push(i);
         }
-        
+
         while (calendarDays.length < 35) {
             calendarDays.push(null);
         }
-        
+
         setMonthDays(calendarDays);
     }, [currentDate]);
 
@@ -57,6 +91,7 @@ export default function CalendarView() {
     const handleOutfitButtonPress = (dayNumber) => {
         setSelectedDay(dayNumber);
         setModalVisible(true);
+        updateOutfitList();
     };
 
     const handleOutfitSelect = (selection) => {
@@ -105,7 +140,7 @@ export default function CalendarView() {
                         <Text style={styles.monthButtonText}>→</Text>
                     </Pressable>
                 </View>
-                
+
                 <View style={styles.calendarRow}>
                     {days.map((day, index) => (
                         <View key={index} style={styles.calendarHeaderCell}>
@@ -127,21 +162,6 @@ export default function CalendarView() {
                                     {dayNumber && (
                                         <View style={styles.calendarDayContent}>
                                             <Text style={styles.calendarDayNumber}>{dayNumber}</Text>
-                                            <TextInput
-                                                style={styles.calendarInput}
-                                                value={getEventValue(dayNumber)}
-                                                onChangeText={(text) => handleEventChange(dayNumber, text)}
-                                                placeholder="Event"
-                                                placeholderTextColor="#999"
-                                            />
-                                            <Pressable 
-                                                style={styles.outfitButton}
-                                                onPress={() => handleOutfitButtonPress(dayNumber)}
-                                            >
-                                                <Text style={styles.outfitButtonText}>
-                                                    {getOutfitValue(dayNumber) || '                   Outfit'}
-                                                </Text>
-                                            </Pressable>
                                         </View>
                                     )}
                                 </View>
@@ -163,141 +183,18 @@ export default function CalendarView() {
             >
                 <View style={modalStyles.centeredView}>
                     <View style={modalStyles.modalView}>
-                        <Pressable
-                            style={modalStyles.modalButton}
-                            onPress={() => handleOutfitSelect('Top')}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Top</Text>
+                        <Text style={styles.text}>Select Outfit</Text>
+                        <Pressable style={styles.button} onPress={() => updateOutfitList()}>
+                            <Text styles={styles.button_text}>Print Outfits</Text>
                         </Pressable>
-                        <Pressable
-                            style={modalStyles.modalButton}
-                            onPress={() => handleOutfitSelect('Bot')}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Bot</Text>
-                        </Pressable>
-                        <Pressable
-                            style={[modalStyles.modalButton, modalStyles.cancelButton]}
-                            onPress={() => setModalVisible(false)}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Create</Text>
+                        {outfitList}
+                        <Pressable style={styles.button} onPress={() => setModalVisible(false)}>
+                            <Text style={styles.button_text}>Cancel</Text>
                         </Pressable>
                     </View>
                 </View>
             </Modal>
 
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={botModalVisible}
-                onRequestClose={() => setBotModalVisible(false)}
-            >
-                <View style={modalStyles.centeredView}>
-                    <View style={modalStyles.modalView}>
-                        <View style={modalStyles.imageContainer}>
-                            <Pressable 
-                                style={[
-                                    modalStyles.imageButton,
-                                    selectedBot === 'bot1' && modalStyles.selectedImage
-                                ]}
-                                onPress={() => handleBotSelection('bot1')}
-                            >
-                                <Image 
-                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
-                                    style={modalStyles.image}
-                                />
-                                {selectedBot === 'bot1' && (
-                                    <View style={modalStyles.checkmark}>
-                                        <Text style={modalStyles.checkmarkText}>✓</Text>
-                                    </View>
-                                )}
-                            </Pressable>
-                            <Pressable 
-                                style={[
-                                    modalStyles.imageButton,
-                                    selectedBot === 'bot2' && modalStyles.selectedImage
-                                ]}
-                                onPress={() => handleBotSelection('bot2')}
-                            >
-                                <Image 
-                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
-                                    style={modalStyles.image}
-                                />
-                                {selectedBot === 'bot2' && (
-                                    <View style={modalStyles.checkmark}>
-                                        <Text style={modalStyles.checkmarkText}>✓</Text>
-                                    </View>
-                                )}
-                            </Pressable>
-                        </View>
-                        <Pressable
-                            style={[modalStyles.modalButton, modalStyles.cancelButton]}
-                            onPress={() => {
-                                setSelectedBot(null);
-                                setBotModalVisible(false);
-                            }}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Cancel</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </Modal>
-
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={topModalVisible}
-                onRequestClose={() => setTopModalVisible(false)}
-            >
-                <View style={modalStyles.centeredView}>
-                    <View style={modalStyles.modalView}>
-                        <View style={modalStyles.imageContainer}>
-                            <Pressable 
-                                style={[
-                                    modalStyles.imageButton,
-                                    selectedTop === 'top1' && modalStyles.selectedImage
-                                ]}
-                                onPress={() => handleTopSelection('top1')}
-                            >
-                                <Image 
-                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
-                                    style={modalStyles.image}
-                                />
-                                {selectedTop === 'top1' && (
-                                    <View style={modalStyles.checkmark}>
-                                        <Text style={modalStyles.checkmarkText}>✓</Text>
-                                    </View>
-                                )}
-                            </Pressable>
-                            <Pressable 
-                                style={[
-                                    modalStyles.imageButton,
-                                    selectedTop === 'top2' && modalStyles.selectedImage
-                                ]}
-                                onPress={() => handleTopSelection('top2')}
-                            >
-                                <Image 
-                                    source={require('./assets/images/placeholder_blue_shirt.jpg')}
-                                    style={modalStyles.image}
-                                />
-                                {selectedTop === 'top2' && (
-                                    <View style={modalStyles.checkmark}>
-                                        <Text style={modalStyles.checkmarkText}>✓</Text>
-                                    </View>
-                                )}
-                            </Pressable>
-                        </View>
-                        <Pressable
-                            style={[modalStyles.modalButton, modalStyles.cancelButton]}
-                            onPress={() => {
-                                setSelectedTop(null);
-                                setTopModalVisible(false);
-                            }}
-                        >
-                            <Text style={modalStyles.modalButtonText}>Cancel</Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </Modal>
         </SafeAreaView>
     );
 }
@@ -380,4 +277,28 @@ const modalStyles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-}); 
+});
+
+
+//import { SafeAreaView, Text, View } from "react-native"
+//import styles from "./Stylesheet"
+//
+//
+//const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+//
+//export function CalendarView() {
+//
+//    //suggested system for tracking user info: not implemented anywhere but here yet
+//    window.global_userInfo = {name: "DummyUser", _id:"67057228f80354e361ae2bf5"}
+//
+//    const today = new Date()
+//    const cur_month = month[today.getMonth()]
+//    return (
+//        <SafeAreaView style={styles.container}>
+//            <View>
+//                <Text style={styles.title}>Hello, {window.global_userInfo.name}!</Text>
+//                <Text style={styles.text}>{cur_month}</Text>
+//            </View>
+//        </SafeAreaView>
+//    )
+//}

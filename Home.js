@@ -4,7 +4,9 @@ import { useNavigation } from '@react-navigation/native';
 import { usePhotoGallery } from './Camera_Test.js';
 import styles from './Stylesheet';
 import { logFetch, getItem, postItem, deleteItem } from './APIContainer.js';
-//Test19
+
+
+//Base Home Tab. This also serves as a template for a basic tab. 
 export default Home = () => {
     const navigation = useNavigation();
     const photoTools = usePhotoGallery();
@@ -16,11 +18,15 @@ export default Home = () => {
         navigation.navigate('Clothing Item View');
     };
     const onGoToCalendar = () => {
-        navigation.navigate('Calendar');
+        navigation.navigate('Calendar')
+    }
+    const onGoToOutfitList = () => {
+        navigation.navigate('Outfit List View');
     };
     function getRecentTakenPhoto() {
         const maybeURI = photoTools.getRecentPhoto();
         if (maybeURI) {
+
             setImageElement(<Image style={
                 {
                     width: 300,
@@ -33,20 +39,32 @@ export default Home = () => {
                 source={{ uri: maybeURI }} />)
         }
         else {
+            //console.log("uri unavailable")
             setImageElement(<View>
                 <Text >No Recent Image!</Text>
             </View>)
+
         }
     }
-    
+    //<Pressable style={styles.button} onPress={onGoToCamera}>
+    //    <Text style={styles.button_text}>Go to video camera</Text>
+    //</Pressable>
+
+
+    //{imageElement}
     return (
         <SafeAreaView style={styles.container}>
+
+            <Pressable style={styles.button} onPress={onGoToOutfitList}>
+                <Text style={styles.button_text}>Outfits</Text>
+            </Pressable>
             <Pressable style={styles.button} onPress={onGoToClothingItemTest}>
-                <Text style={styles.button_text}>Go to clothing item test</Text>
+                <Text style={styles.button_text}>Clothing Items</Text>
             </Pressable>
             <Pressable style={styles.button} onPress={onGoToCalendar}>
-                <Text style={styles.button_text}>Go to Calendar</Text>
+                <Text style={styles.button_text}>Calendar</Text>
             </Pressable>
+
         </SafeAreaView>
     );
 };

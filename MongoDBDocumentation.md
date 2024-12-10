@@ -22,17 +22,20 @@ Collection list:
 * days
     * `_id: ObjectID`
     * `calendar_id: ObjectID`
-    * `outfits: ObjectID[]`
-    * `date: Date`
+    * `outfit_id: ObjectID`
+    * `outfit_name: String`
+    * `day: int`
+    * `month: int`
+    * `year: int`
 * outfits
     * `_id: ObjectID`
     * `name: String`
     * `items: ObjectID[]`
+    * `image_link: String`
 * users
     * `_id: ObjectID`
-    * `username: String`
-    * `password: String`
-    * `calendar: ObjectID`
+    * `oauth_id: google_user_id`
+    * `email: String`
 
 ## Connection Details
 username: kmalsky

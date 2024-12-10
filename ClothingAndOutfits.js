@@ -2,11 +2,11 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView, Keyboard, Button, StyleSheet, Text, Pressable, View, Image, ScrollView, FlatList, ImageBackground, Modal, TextInput } from 'react-native';
 import styles, { testImg_b64, generateIcon } from './Stylesheet';
 import React, { useState, useEffect } from 'react';
-import { logFetch, getItem, base_url, getAllItemsForUser, postItem, deleteItem } from './APIContainer.js';
+import { logFetch, getItem, base_url, postItem, deleteItem } from './APIContainer.js';
 import color_tag_styles from './ColorTags.js';
 import addTag from './AddTags.js';
 import removeTag from './RemoveTags.js';
-//Test19
+
 
 //Tag Types. Items have 4 types of tags, each with any number of user-defined string properties.
 export const TagType = Object.freeze({
@@ -15,6 +15,13 @@ export const TagType = Object.freeze({
     ITEM_TYPE: "type",
     OTHER: "other",
 });
+
+export function getLoading(loadingVar, msg) {
+    if (loadingVar) {
+        return (<Text>{msg}</Text>)
+    }
+    return (<Text></Text>)
+}
 
 //global variable: can be used on all pages. 
 //used to track the selected clothing item for the single item view.
@@ -32,12 +39,15 @@ window.global_selectedClothingItem = {
 
 };
 
+window.global_cachedItems = []
+
 window.global_itemListNeedsUpdate = true
 
 //takes a list of strings [b, a, c]. returns "a, b, c".
 // as of 10/31 3:46 pm, returns a text component instead
 export function reduceListToHumanReadable(thisList) {
-    if (thisList.length == 0) { return "" }
+    if (thisList == undefined) { return <Text></Text> }
+    if (thisList.length == 0) { return <Text></Text> }
     if (thisList.sort) { thisList = thisList.sort(); } //there's no list.sort on mobile?
     if (thisList.reduce) {
         return thisList.reduce(
@@ -89,13 +99,13 @@ export class ClothingItem {
     }
     addPropertyToCategory(newStringProperty, category) {
         const cat_process = category.toLowerCase().trim()
-        return this[cat_process+"_tags"].push(newStringProperty)
+        return this[cat_process + "_tags"].push(newStringProperty)
     }
     removePropertyFromCategory(newStringProperty, category) {
         const cat_process = category.toLowerCase().trim()
-        const index = this[cat_process+"_tags"].indexOf(newStringProperty);
-        if (index > -1) { 
-            this[cat_process+"_tags"].splice(index, 1);
+        const index = this[cat_process + "_tags"].indexOf(newStringProperty);
+        if (index > -1) {
+            this[cat_process + "_tags"].splice(index, 1);
             return true;
         }
         return false;
@@ -108,7 +118,7 @@ export class Outfit {
 
     title = "New Outfit"; //user-readable name of this outfit
 
-    clothingItems = [] //array of ClothingItems
+    clothingItems = [] //array of db_ids of ClothingItems
 
     constructor(title, dbId, userId) {
         this.title = title;
@@ -120,13 +130,12 @@ export class Outfit {
         this.clothingItems.push(item);
     }
     removeItemFromOutfit(item) { //also removes all non-ClothingItem items
-        this.clothingItems = this.clothingItems.filter(
-            function (itemEl) {
-                if (itemEl.title == null) { return false }
-                if (!itemEl.imageInfo == null) { return false }
-                return (itemEl.title !== item.title) || (itemEl.imageInfo !== item.imageInfo);
-            }
-        )
+        const index = this.clothingItems.indexOf(item);
+        if (index > -1) {
+            this.clothingItems.splice(index, 1);
+            return true;
+        }
+        return false;
     }
     setTitle(newTitle) {
         this.title = newTitle;
@@ -188,12 +197,12 @@ export function ClothingItemView() {
     newClothing.setIndividualDonationReminder(window.global_selectedClothingItem.donationReminder)
     const [visibleDonationsOn, setVisibleDonationsOn] = useState(newClothing.useDonationReminder);
     const [visibleImageURI, setVisibleImageURI] = useState(window.global_selectedClothingItem.imageUri);
-    
+
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
             //console.log("page loaded :)")
             setVisibleImageURI(window.global_selectedClothingItem.imageUri)
-          // The screen is focused
+            // The screen is focused
         });
         // Return the function to unsubscribe from the event so it gets removed on unmount
         return unsubscribe;
@@ -230,9 +239,9 @@ export function ClothingItemView() {
                 'Content-Type': 'application/json',
                 "Access-Control-Allow-Origin": "*"
             },
-            body: JSON.stringify({donation_reminders:window.global_selectedClothingItem.donationReminder})
+            body: JSON.stringify({ donation_reminders: window.global_selectedClothingItem.donationReminder })
         }
-        response = await fetch(base_url + 'v1/clothing-items/donation-reminders/'+window.global_selectedClothingItem._id+'/', options);
+        response = await fetch(base_url + 'v1/clothing-items/donation-reminders/' + window.global_selectedClothingItem._id + '/', options);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -283,13 +292,13 @@ export function ClothingItemView() {
                 <ScrollView>
                     {generateTagItem("Brands", reduceListToHumanReadable(newClothing.brand_tags), setBrandModalVisible, setRemoveBrandModalVisible)}
                     {generateTagItem("Colors", reduceListToHumanReadable(newClothing.color_tags), setColorModalVisible, setRemoveColorModalVisible)}
-                    {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible, setRemoveTypeModalVisible)}
+                    {generateTagItem("Types", reduceListToHumanReadable(newClothing.type_tags), setTypeModalVisible, setRemoveBrandModalVisible)}
                     {generateTagItem("Other", reduceListToHumanReadable(newClothing.other_tags), setOtherModalVisible, setRemoveOtherModalVisible)}
                     <Text style={styles.text}>Donation Reminders: <Text style={[styles.tag, styles.tag_default]}>{(String)(visibleDonationsOn)}</Text></Text>
                 </ScrollView>
             </View>
 
-            
+
             {removeTag(newClothing, "brand", removeBrandModalVisible, setRemoveBrandModalVisible)}
             {removeTag(newClothing, "color", removeColorModalVisible, setRemoveColorModalVisible)}
             {removeTag(newClothing, "type", removeTypeModalVisible, setRemoveTypeModalVisible)}
@@ -304,137 +313,7 @@ export function ClothingItemView() {
     </SafeAreaView>);
 }
 
-
-export function OutfitListView() {
-    const navigation = useNavigation();
-    const onGoToHome = () => {
-        navigation.navigate('Home');
-    };
-
-
-    // function onGoToSingleItemView_createFunc(item) {
-
-    //     return () => {
-    //         window.global_selectedClothingItem._id = item._id;
-    //         window.global_selectedClothingItem.name = item.name;
-    //         window.global_selectedClothingItem.imageUri = item.image_link;
-    //         window.global_selectedClothingItem.colors = item.color_tags;
-    //         window.global_selectedClothingItem.brands = item.brand_tags;
-    //         window.global_selectedClothingItem.types = item.type_tags;
-    //         window.global_selectedClothingItem.others = item.other_tags;
-    //         window.global_selectedClothingItem.donationReminder = item.donation_reminders;
-    //         navigation.navigate('Single Clothing Item View');
-    //     }
-    // };
-
-    function onGoToSingleOutfitView_createFunc(outfit) {
-        return () => {
-            window.global_selectedOutfit = {
-                db_id: outfit.db_id,
-                title: outfit.title,
-                clothingItems: outfit.clothingItems,
-            };
-            navigation.navigate('Single Outfit View');
-        }
-    }
-
-    const returnedData = getAllItemsForUser("67057228f80354e361ae2bf5")
-
-    const renderOutfitItem = ({ item }) => (
-        <View style={styles.listItem} key={item.db_id}>
-            <Pressable onPress={onGoToSingleOutfitView_createFunc(item)}>
-                <Text>Outfit Title: {item.title}</Text>
-                <Text>objectID: {item.db_id}</Text>
-
-                {/* For each clothing item in the outfit, display it in a similar "blue box" format */}
-                <FlatList
-                    data={item.clothingItems}
-                    renderItem={({ item: clothingItem }) => (
-                        <View style={styles.clothingItemBox}>
-                            <Text>Name: {clothingItem.name}</Text>
-                            <Text>objectID: {clothingItem.db_id}</Text>
-                            <Image
-                                resizeMode="contain"
-                                style={{
-                                    width: 300,
-                                    height: 300,
-                                    borderWidth: 1,
-                                    borderColor: 'black'
-                                }}
-                                source={{ uri: clothingItem.image_link }}
-                            />
-                            <Text>Colors: {reduceListToHumanReadable(clothingItem.color_tags)}</Text>
-                            <Text>Brands: {reduceListToHumanReadable(clothingItem.brand_tags)}</Text>
-                        </View>
-                    )}
-                    keyExtractor={(clothingItem) => clothingItem.db_id}
-                />
-            </Pressable>
-        </View>
-    );
-
-
-    //React complains if every item in a list doesn't have a unique 'key' prop
-    // const renderListItem = ({ item }) => (
-    //     <View style={styles.listItem} key={item._id}>
-    //         <Pressable onPress={onGoToSingleItemView_createFunc(item)}>
-    //             <Text>Name: {item.name}</Text>
-    //             <Text>objectID: {item._id}</Text>
-    //             <Image resizeMode="contain" style={
-    //                 {
-    //                     width: 300,
-    //                     height: 300,
-    //                     borderWidth: 1,
-    //                     borderColor: 'black'
-    //                 }
-    //             }
-    //                 source={{ uri: item.image }} />
-    //             <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
-    //             <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
-    //         </Pressable>
-    //     </View>
-    // );
-
-    // const getMaybeList = (returnedData) => {
-    //     var defaultList = (<Text>No Clothing Items Yet!</Text>)
-    //     if (returnedData.length > 0) {
-    //         return (<FlatList
-    //             data={returnedData}
-    //             renderItem={renderListItem}
-    //             keyExtractor={(item) => {
-    //                 return item._id;
-    //             }}
-    //         />)
-    //     }
-    //     return defaultList
-    // }
-
-    const getMaybeList = (returnedData) => {
-        var defaultList = (<Text>No Outfits Yet!</Text>);
-        if (returnedData.length > 0) {
-            return (
-                <FlatList
-                    data={returnedData}
-                    renderItem={renderOutfitItem}
-                    keyExtractor={(item) => item.db_id}
-                />
-            );
-        }
-        return defaultList;
-    };
-
-
-    return (<SafeAreaView style={styles.container}>
-        <Pressable style={styles.button} onPress={onGoToHome}>
-            {generateIcon('home', styles.button_iconCorner)}
-        </Pressable>
-        {getMaybeList(returnedData)}
-    </SafeAreaView>);
-}
-
-
-
-export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
+export const addClothingItem = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
 
     const [text, setText] = useState("");
     function titleThis(text) {
@@ -443,7 +322,7 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
     }
 
     const [errorProp, setErrorProp] = useState(<Text></Text>);
-    const defaultWrongNameMessage = "Invalid Name!"
+    const defaultWrongNameMessage = "Invalid name!"
     const duplicateNameMessage = "That name already exists!"
 
     function generateErrorProp(thisText) {
@@ -476,6 +355,8 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
             newItem.db_id = responseData.id;
             console.log(newItem.db_id)
             console.log('Data retrieved successfully:', responseData);
+            setSecondaryUpdate(true)
+            window.global_itemListNeedsUpdate = true
             navigation.navigate('Home');
             navigation.navigate('Clothing Item View');
         } catch (error) {
@@ -514,7 +395,7 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
                 <Pressable
                     style={styles.button}
                     onPress={onAddItem}>
-                    <Text style={styles.button_text}>Create new Item</Text>
+                    <Text style={styles.button_text}>Create new outfit</Text>
                 </Pressable>
                 <Pressable
                     style={styles.button}
@@ -526,7 +407,7 @@ export const addClothingItem = (visibleVar, setVisibleVar, navigation) => {
     </Modal>);
 }
 
-export const deleteClothingItem = (visibleVar, setVisibleVar, navigation) => {
+export const deleteClothingItem = (visibleVar, setVisibleVar, navigation, setSecondaryUpdate) => {
 
     toDeleteID = window.global_selectedClothingItem._id
     toDeleteName = window.global_selectedClothingItem.name
@@ -543,6 +424,8 @@ export const deleteClothingItem = (visibleVar, setVisibleVar, navigation) => {
             }
             //const responseData = await response.json();
             console.log(toDeleteID + ' deleted successfully');
+            window.global_itemListNeedsUpdate = true
+            setSecondaryUpdate(true)
             navigation.navigate('Home');
             navigation.navigate('Clothing Item View');
         } catch (error) {
@@ -578,6 +461,8 @@ export const deleteClothingItem = (visibleVar, setVisibleVar, navigation) => {
 }
 
 export function ClothingItemListView() {
+    const [stillLoading, setLoading] = useState(false);
+
     const navigation = useNavigation();
     const onGoToHome = () => {
         window.global_itemListNeedsUpdate = true
@@ -587,7 +472,7 @@ export function ClothingItemListView() {
 
     const [addItemModalVisible, setAddItemModalVisible] = useState(false);
     const [deleteItemModalVisible, setDeleteItemModalVisible] = useState(false);
-    
+
     //setReturnedData(intermediateList)
     //console.log(intermediateList)
 
@@ -646,7 +531,7 @@ export function ClothingItemListView() {
                         alignItems: 'flex-end',
                     }
                 }
-                source={{ uri: item.image_link}} >
+                    source={{ uri: item.image_link }} >
                 </ImageBackground>
                 <Text>Colors: {reduceListToHumanReadable(item.color_tags)}</Text>
                 <Text>Brands: {reduceListToHumanReadable(item.brand_tags)}</Text>
@@ -655,7 +540,7 @@ export function ClothingItemListView() {
     );
 
     const getMaybeList = (returnedData) => {
-        if (returnedData instanceof Promise){ 
+        if (returnedData instanceof Promise) {
             return (<Text>No Clothing Items Yet!</Text>)
         } //TODO: detect difference between not collected and not collected *yet*
 
@@ -668,12 +553,55 @@ export function ClothingItemListView() {
                 }}
             />)
         }
-        return (<Text>Loading Clothing Items...</Text>) //default
+        return (<Text></Text>) //default
     }
 
+
     //TODO: regenerate page on addItem and on deleteItem
-    
-    const [returnedData, setReturnedData] = useState(getAllItemsForUser("67057228f80354e361ae2bf5"));
+    const [secondaryUpdateRequired, setSecondaryUpdate] = useState(false);
+    const [returnedData, setReturnedData] = useState([]);//getAllItemsForUser("67057228f80354e361ae2bf5")
+    async function updatePage() {
+        setLoading(true)
+        setReturnedData([])
+        setSecondaryUpdate(false)
+
+        window.global_cachedItems = []
+
+        //const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5"+"/TRUE");
+        const response = await fetch(base_url + 'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5" + "/FALSE");
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const itemIDs = await response.json();
+
+        setReturnedData(itemIDs)
+
+        //console.log(itemIDs)
+        //for (index in itemIDs){
+        //    const response_item = await fetch(base_url+'v1/clothing-items/' + itemIDs[index], {});
+        //    if (!response_item.ok) {
+        //        throw new Error('Network response was not ok');
+        //    }
+        //    const item = await response_item.json();
+        //    //if (window.global_itemRetrievalTracker==savedLoadingSet){
+        //        window.global_cachedItems.push(item)
+        //    //}
+        //    //setReturnedData(window.global_cachedItems)
+        //    if (index!=0){
+        //        setReturnedData(window.global_cachedItems)
+        //    }
+        //
+        //}
+        //setReturnedData(window.global_cachedItems)
+        setLoading(false)
+        window.global_itemListNeedsUpdate = false
+        if (secondaryUpdateRequired) { setSecondaryUpdate(false) }
+    }
+    if (secondaryUpdateRequired) {
+        updatePage()
+    }
+
     //intermediateList =  //TODO: use actual user ID
     //if ((intermediateList.length != returnedData.length)||window.global_itemListNeedsUpdate) {
     //    setReturnedData(intermediateList)
@@ -682,21 +610,10 @@ export function ClothingItemListView() {
     React.useEffect(() => {
         const unsubscribe = navigation.addListener('focus', async () => {
             //console.log("page loaded !!")
-            if (window.global_itemListNeedsUpdate){
-                setReturnedData([])
-                //console.log(returnedData)
-                //console.log("tried update")
-                const response = await fetch(base_url+'v1/clothing-items-get-all/' + "67057228f80354e361ae2bf5");
-        
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const responseData = await response.json();
-            
-                setReturnedData(responseData)
-                window.global_itemListNeedsUpdate = false
+            if (window.global_itemListNeedsUpdate) {
+                updatePage()
             }
-          // The screen is focused
+            // The screen is focused
         });
         // Return the function to unsubscribe from the event so it gets removed on unmount
         return unsubscribe;
@@ -713,9 +630,10 @@ export function ClothingItemListView() {
             </Pressable>
         </View>
 
-        {addClothingItem(addItemModalVisible, setAddItemModalVisible, navigation)}
-        {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible, navigation)}
+        {addClothingItem(addItemModalVisible, setAddItemModalVisible, navigation, setSecondaryUpdate)}
+        {deleteClothingItem(deleteItemModalVisible, setDeleteItemModalVisible, navigation, setSecondaryUpdate)}
         {getMaybeList(returnedData)}
+        {getLoading(stillLoading, "Loading Clothing Items...")}
     </SafeAreaView>);
 }
 
