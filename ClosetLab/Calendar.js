@@ -141,8 +141,16 @@ export function CalendarView() {
     let displayYear = currentDate.getFullYear();
     console.log(displayMonth, displayYear);
     //Demo
-    const getDayImage = (day) => {
-        return <Text>{day}</Text>;
+    const getDayImage = (displayDay) => {
+        console.log(daysArray)
+        for (let i = 0; i < daysArray.length; i++) {
+            const dateObj = new Date(daysArray[i]['date']);
+            const outfitId = daysArray[i]['outfit'];
+            console.log('day, month, year:', dateObj.getDate(), dateObj.getMonth(), dateObj.getFullYear())
+            if (dateObj.getDate() == displayDay && dateObj.getMonth() == displayMonth && dateObj.getFullYear() == displayYear) {
+                return (<Text>{outfitId}</Text>)
+            }
+        }
     }
 
     // Wait for the outfits and calendar to load before displaying calendar
