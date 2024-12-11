@@ -50,7 +50,7 @@ export function CalendarView() {
     }
 
     if (calendarObject != null && calendarObject['days'] != null && calendarObject['days'].length > 0 && daysArray == null) {
-        console.log("updating daysArray now");
+        // console.log("updating daysArray now");
         const tempDaysArray = [];
         for (let i = 0; i < calendarObject['days'].length; i++) {
             day_id = calendarObject['days'][i];
@@ -69,9 +69,9 @@ export function CalendarView() {
     // console.log('calendarObject is', calendarObject);
     // console.log('outfitsArray is ', outfitsArray);
 
-    if (calendarObject != null) {
-        console.log('calendarObject is', calendarObject);
-    }
+    // if (calendarObject != null) {
+    //     console.log('calendarObject is', calendarObject);
+    // }
 
 
 
@@ -142,11 +142,10 @@ export function CalendarView() {
     console.log(displayMonth, displayYear);
     //Demo
     const getDayImage = (displayDay) => {
-        console.log(daysArray)
+        // console.log(daysArray)
         for (let i = 0; i < daysArray.length; i++) {
             const dateObj = new Date(daysArray[i]['date']);
             const outfitId = daysArray[i]['outfit'];
-            console.log('day, month, year:', dateObj.getDate(), dateObj.getMonth(), dateObj.getFullYear())
             if (dateObj.getDate() == displayDay && dateObj.getMonth() == displayMonth && dateObj.getFullYear() == displayYear) {
                 return (<Text>{outfitId}</Text>)
             }
