@@ -19,7 +19,7 @@ export function CalendarView() {
     const [selectedBot, setSelectedBot] = useState(null);
     const [calendarObject, setCalendarObject] = useState(null);
     const [outfitsArray, setOutfitsArray] = useState(null);
-    const [daysArray, setDaysArray] = useState([]);
+    const [daysArray, setDaysArray] = useState(null);
 
     const dummyUser = "67057228f80354e361ae2bf5";
 
@@ -48,12 +48,29 @@ export function CalendarView() {
                 setOutfitsArray(jsonData);
             })
     }
-    console.log('calendarObject is', calendarObject);
-    console.log('outfitsArray is ', outfitsArray);
+
+    if (calendarObject != null && calendarObject['days'] != null && calendarObject['days'].length > 0 && daysArray == null) {
+        console.log("updating daysArray now");
+        const tempDaysArray = [];
+        for (let i = 0; i < calendarObject['days'].length; i++) {
+            day_id = calendarObject['days'][i];
+            fetch(base_url + 'v1/get-day/' + day_id)
+                .then(function (response) {
+                    return response.json();
+                }).then(function (jsonData) {
+                    tempDaysArray.push(jsonData);
+                })
+        }
+        setDaysArray(tempDaysArray);
+
+    }
+    // console.log("daysArray is", daysArray);
+
+    // console.log('calendarObject is', calendarObject);
+    // console.log('outfitsArray is ', outfitsArray);
 
     if (calendarObject != null) {
         console.log('calendarObject is', calendarObject);
-        // fetch(base_url + 'v1/days')
     }
 
 
@@ -119,60 +136,22 @@ export function CalendarView() {
         setMonthDays(calendarDays);
     }, [currentDate]);
 
-    const handleEventChange = (day, text) => {
-        const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`;
-        setMonthEvents(prev => ({
-            ...prev,
-            [monthKey]: text
-        }));
-    };
 
-    const handleOutfitButtonPress = (dayNumber) => {
-        setSelectedDay(dayNumber);
-        setModalVisible(true);
-        updateOutfitList();
-    };
-
-    const handleOutfitSelect = (selection) => {
-        if (selection === 'Top') {
-            setModalVisible(false);
-            setTopModalVisible(true);
-        } else if (selection === 'Bot') {
-            setModalVisible(false);
-            setBotModalVisible(true);
-        } else {
-            setModalVisible(false);
-        }
-    };
-
-    const handleBotSelection = (botChoice) => {
-        setSelectedBot(botChoice);
-        // Don't close modal immediately so user can see selection
-    };
-
-    const handleTopSelection = (topChoice) => {
-        setSelectedTop(topChoice);
-        // Don't close modal immediately so user can see selection
-    };
-
-    const getEventValue = (day) => {
-        const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`;
-        return monthEvents[monthKey] || '';
-    };
-
-    const getOutfitValue = (day) => {
-        const monthKey = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${day}`;
-        return monthOutfits[monthKey] || '';
-    };
-
+    let displayMonth = currentDate.getMonth();
+    let displayYear = currentDate.getFullYear();
+    console.log(displayMonth, displayYear);
     //Demo
-    const getDayImage = (dayIndex, weekIndex) => {
-        day_int = weekIndex * 7 + (dayIndex + 1)
-        // if (day_int == 24) {
-        //     return <Text>Cool outfit</Text>
-        // }
-        return;
+    const getDayImage = (day) => {
+        return <Text>{day}</Text>;
+    }
 
+    // Wait for the outfits and calendar to load before displaying calendar
+    if (calendarObject == null || outfitsArray == null || daysArray == null) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Text style={styles.text}>Loading your calendar...</Text>
+            </SafeAreaView>
+        )
     }
 
     return (
@@ -213,7 +192,7 @@ export function CalendarView() {
                                             <Text style={styles.calendarDayNumber}>{dayNumber}</Text>
                                         </View>
                                     )}
-                                    {getDayImage(dayIndex, weekIndex)}
+                                    {getDayImage(dayNumber)}
                                 </View>
                             );
                         })}
@@ -328,27 +307,3 @@ const modalStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
 });
-
-
-//import { SafeAreaView, Text, View } from "react-native"
-//import styles from "./Stylesheet"
-//
-//
-//const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-//
-//export function CalendarView() {
-//
-//    //suggested system for tracking user info: not implemented anywhere but here yet
-//    window.global_userInfo = {name: "DummyUser", _id:"67057228f80354e361ae2bf5"}
-//
-//    const today = new Date()
-//    const cur_month = month[today.getMonth()]
-//    return (
-//        <SafeAreaView style={styles.container}>
-//            <View>
-//                <Text style={styles.title}>Hello, {window.global_userInfo.name}!</Text>
-//                <Text style={styles.text}>{cur_month}</Text>
-//            </View>
-//        </SafeAreaView>
-//    )
-//}
