@@ -21,7 +21,7 @@ export function CalendarView() {
     const [outfitsArray, setOutfitsArray] = useState(null);
     const [daysArray, setDaysArray] = useState([]);
 
-    const dummy_user_id = "67057228f80354e361ae2bf5";
+    const dummyUser = "67057228f80354e361ae2bf5";
 
     options = {
         method: 'GET',
@@ -32,24 +32,31 @@ export function CalendarView() {
         },
     }
     if (calendarObject == null) {
-        fetch(base_url + 'v1/calendar/' + dummy_user_id, options)
+        fetch(base_url + 'v1/calendar/' + dummyUser, options)
             .then(function (response) {
                 return response.json();
             })
             .then(function (jsonData) {
                 setCalendarObject(jsonData);
             });
-        fetch(base_url + 'v1/outfits-get-all/' + dummy_user_id, options)
-            .then(function (jsonData) {
-                setOutfitsArray(jsonData)
-            }).then(function () {
-                console.log('calendarObject is', calendarObject);
-            });
+    }
+    if (outfitsArray == null) {
+        fetch(base_url + 'v1/outfits-get-all/' + dummyUser)
+            .then(function (response) {
+                return response.json();
+            }).then(function (jsonData) {
+                setOutfitsArray(jsonData);
+            })
     }
     console.log('calendarObject is', calendarObject);
+    console.log('outfitsArray is ', outfitsArray);
+
+    if (calendarObject != null) {
+        console.log('calendarObject is', calendarObject);
+        // fetch(base_url + 'v1/days')
+    }
 
 
-    const dummyUser = "67057228f80354e361ae2bf5";
 
     const onGoToHome = () => {
         navigation.navigate('Home');
@@ -161,9 +168,10 @@ export function CalendarView() {
     //Demo
     const getDayImage = (dayIndex, weekIndex) => {
         day_int = weekIndex * 7 + (dayIndex + 1)
-        if (day_int == 24) {
-            return <Text>Cool outfit</Text>
-        }
+        // if (day_int == 24) {
+        //     return <Text>Cool outfit</Text>
+        // }
+        return;
 
     }
 
