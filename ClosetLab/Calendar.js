@@ -31,24 +31,22 @@ export function CalendarView() {
             "Access-Control-Allow-Origin": "*"
         },
     }
-    fetch(base_url + 'v1/calendar/' + dummy_user_id, options)
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (jsonData) {
-            if (calendarObject == null) {
+    if (calendarObject == null) {
+        fetch(base_url + 'v1/calendar/' + dummy_user_id, options)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (jsonData) {
                 setCalendarObject(jsonData);
-                console.log('calendarObject type is ' + typeof (calendarObject))
+            });
+        fetch(base_url + 'v1/outfits-get-all/' + dummy_user_id, options)
+            .then(function (jsonData) {
+                setOutfitsArray(jsonData)
+            }).then(function () {
                 console.log('calendarObject is', calendarObject);
-            }
-        });
-
-    fetch(base_url + 'v1/outfits-get-all/' + dummy_user_id, options)
-        .then(function (jsonData) {
-            setOutfitsArray(JSON.stringify(jsonData))
-        });
-
-
+            });
+    }
+    console.log('calendarObject is', calendarObject);
 
 
     const dummyUser = "67057228f80354e361ae2bf5";

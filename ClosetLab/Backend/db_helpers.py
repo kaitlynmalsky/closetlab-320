@@ -139,6 +139,20 @@ def db_get_clothing_item(object_id: str):
         print("Error getting clothing item from database:", str(e))
         raise
 
+def db_get_day(object_id: str):
+    try:
+        print("Getting day from database")
+        day_collection = closet_lab_database["days"]
+        document = day_collection.find_one({"_id": ObjectId(object_id)})
+        if document:
+            document['_id'] = str(document['_id'])
+            document['calendar_id'] = str(document['calendar_id'])
+            document['outfit'] = str(document['outfit'])
+            return document
+    except Exception as e:
+        print("Error getting day from database:", str(e))
+        raise
+
 def db_delete_clothing_item(object_id: str):
     try:
         print("Deleting clothing item from database")

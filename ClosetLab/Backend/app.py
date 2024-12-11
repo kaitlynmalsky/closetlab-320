@@ -20,7 +20,8 @@ from db_helpers import (
     db_delete_outfit,
     db_add_clothing_item_tag,
     db_get_calendar_by_user,
-    db_add_day
+    db_add_day,
+    db_get_day
 )
 
 app = Flask(__name__)
@@ -338,8 +339,7 @@ def get_calendar(user_id):
 @app.route('/api/v1/get-day/<string:day_id>', methods=['GET'])
 def get_day(day_id):
     try:
-        day_collection = closet_lab_database["days"]
-        day = day_collection.find_one({'_id': ObjectId(day_id)})
+        day = db_get_day(day_id)
         if day:
             return jsonify(day), 200
         else:
