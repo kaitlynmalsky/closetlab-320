@@ -2,6 +2,9 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from bson.objectid import ObjectId
 import datetime
+import boto3
+import base64
+import os
 from FullOutfitAlgorithm import (
     createCollage
 )
@@ -26,7 +29,34 @@ from db_helpers import (
 
 app = Flask(__name__)
 CORS(app)  # Allow all origins for testing
+# AWS S3 Configuration
+AWS_ACCESS_KEY =os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY =os.environ.get("AWS_SECRET_ACCESS_KEY")
+S3_BUCKET = 'closetlab'
+S3_REGION = os.environ.get("AWS_REGION")  # e.g., 'us-east-1'
 
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=AWS_ACCESS_KEY,
+    aws_secret_access_key=AWS_SECRET_KEY,
+    region_name=S3_REGION
+)
+
+# Function to upload file to S3
+def upload_to_s3(file, filename, folder='images/'):
+    key = f"{folder}{filename}"
+    s3_client.upload_fileobj(
+        file,
+        S3_BUCKET,
+        key,
+        ExtraArgs={'ACL': 'public-read', 'ContentType': file.content_type}
+    )
+    print("uploading to s3 bucket")
+    url = f"https://{S3_BUCKET}.s3.{S3_REGION}.amazonaws.com/{key}"
+    print(url)
+    if file:
+        return url
+    return " "
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -34,12 +64,48 @@ except Exception as e:
     print("MongoDB Connection Failed")
     print(e)
 
+
+
 print(client.list_database_names())
 closet_lab_database = client["closet_lab_db"]
 print("For reference, the names of the collections in the database are: " + str(closet_lab_database.list_collection_names()))
 
 app = Flask(__name__)
 CORS(app)  # Allow all origins for testing
+
+
+def upload_base64_to_s3(base64_image, file_name, bucket_name ="closetlab"):
+    """
+    Upload a Base64-encoded image to an S3 bucket as a PNG file.
+
+    Args:
+        base64_image (str): The Base64-encoded image string.
+        bucket_name (str): The name of the S3 bucket.
+        file_name (str): The desired file name in S3.
+
+    Returns:
+        str: The URL of the uploaded image.
+    """
+    # Decode the Base64 string into binary data
+    base64_data = base64.b64decode(base64_image.split(',')[1])
+    
+    # Upload the image to S3
+    try:
+        s3_client.put_object(
+            Bucket=bucket_name,
+            Key=file_name,
+            Body=base64_data,
+            ContentType='image/png',   # Adjust this if the image is not PNG
+        # Optional: Make the image publicly readable
+        )
+        # Construct the file URL (Adjust according to your S3 bucket configuration)
+        file_url = f"https://{bucket_name}.s3.amazonaws.com/{file_name}"
+        print("File uploaded successfully:", file_url)
+        return file_url
+    except Exception as e:
+        print("Error uploading file:", str(e))
+        raise
+
 
 @app.route('/api/test/', methods=['GET'])
 def api_test():
@@ -63,7 +129,8 @@ def add_clothing_item():
             return jsonify({'error': 'Image data is required'}), 400
 
         name = data.get('name', '')
-        image_link = data.get('image_link', '') 
+        image_link = upload_to_s3(image,name)
+        image = image_link
         user_id = data.get('user_id', dummy_user_id)
         brand_tags = data.get('brand_tags', [])
         color_tags = data.get('color_tags', [])
@@ -151,10 +218,12 @@ def remove_clothing_item_tags(item_id):
 @app.route('/api/v1/clothing-items/set-image-link/<string:item_id>/', methods=['POST'])
 def update_image_link_item(item_id):
     try:
+        print("a")
         data = request.json
         if not data:
             return jsonify({'error': 'No data provided'}), 400
-        image_link = data.get("image_link")
+        image_link = upload_base64_to_s3(data.get("image_link"),file_name=f'{item_id}.png')
+        print("The image link:")
         db_add_clothing_item_image(item_id, image_link)
         return jsonify({'message': 'Image set successfully', 'id': item_id}), 201
     except Exception as e:
@@ -393,4 +462,4 @@ def get_detailed_calendar(user_id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    app.run(host='0.0.0.0', port=8100)
