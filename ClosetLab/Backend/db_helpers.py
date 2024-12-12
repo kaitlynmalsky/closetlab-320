@@ -275,10 +275,7 @@ def db_add_day(date: datetime, outfit_id: str, user_id: str = dummy_user_id):
         }
         result = day_collection.insert_one(day)
         print(f"debug: calendar[\'_id\'] is {calendar['_id']}")
-        filter = {'_id': calendar["_id"]}
-        list_all_days = list(map(itemgetter('_id'), day_collection.find({"calendar_id": calendar["_id"]})))
-        new_values = {"$set": {"days": list_all_days}}
-        closet_lab_database["calendars"].update_one(filter, new_values)
+        closet_lab_database["calendars"].update_one({'_id': ObjectId(calendar['_id'])}, {'$push': {'days': day['_id']}})
         print("Day added successfully with id =", result.inserted_id)
         return str(result.inserted_id)
     except Exception as e:
