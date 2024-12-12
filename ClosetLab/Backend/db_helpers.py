@@ -6,12 +6,61 @@ import datetime
 from FullOutfitAlgorithm import (
     createCollage
 )
-
+import os
+import boto3
 # Initialize the database connection
 client = MongoClient("mongodb+srv://kmalsky:Cw1ccE8Bq5VV8Lwe@closetlab.q7yvq.mongodb.net/?retryWrites=true&w=majority&appName=ClosetLab")  
 closet_lab_database = client["closet_lab_db"]
 
 dummy_user_id = "67057228f80354e361ae2bf5"
+
+# AWS S3 Configuration
+AWS_ACCESS_KEY =os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_KEY =os.environ.get("AWS_SECRET_ACCESS_KEY")
+S3_BUCKET = 'closetlab'
+S3_REGION = os.environ.get("AWS_REGION")  # e.g., 'us-east-1'
+
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=AWS_ACCESS_KEY,
+    aws_secret_access_key=AWS_SECRET_KEY,
+    region_name=S3_REGION
+)
+
+
+def upload_base64_to_s3(base64_image, file_name, bucket_name ="closetlab"):
+    """
+    Upload a Base64-encoded image to an S3 bucket as a PNG file.
+
+    Args:
+        base64_image (str): The Base64-encoded image string.
+        bucket_name (str): The name of the S3 bucket.
+        file_name (str): The desired file name in S3.
+
+    Returns:
+        str: The URL of the uploaded image.
+    """
+    # Decode the Base64 string into binary data
+
+    base64_data = base64.b64decode(base64_image.split(',')[1])
+    # Upload the image to S3
+    try:
+
+        s3_client.put_object(
+            Bucket=bucket_name,
+            Key=file_name,
+            Body=base64_data,
+            ContentType='image/png',   # Adjust this if the image is not PNG
+        # Optional: Make the image publicly readable
+        )
+        # Construct the file URL (Adjust according to your S3 bucket configuration)
+        file_url = f"https://{bucket_name}.s3.amazonaws.com/{file_name}"
+        print("File uploaded successfully:", file_url)
+        return file_url
+    except Exception as e:
+        print("Error uploading file:", str(e))
+        raise
+
 
 def db_add_clothing_item(name: str = "", image_link: str = "", image: str = "", user_id: str = dummy_user_id,
                          brand_tags: list = None, color_tags: list = None,
@@ -173,6 +222,7 @@ def db_get_outfit(object_id: str):
         outfit_collection = closet_lab_database["outfits"]
         document = outfit_collection.find_one({"_id": ObjectId(object_id)})
         clothing_item_collection = closet_lab_database["clothing_items"]
+        print("a")
         if document:
             document['_id'] = str(document['_id'])
             document['user_id'] = str(document.get('user_id', ''))
@@ -181,6 +231,7 @@ def db_get_outfit(object_id: str):
             if document['collage']=='':
                 itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in document.get('items', [])]
                 newCollage = createCollage(itemInfoList)
+                print(type(newCollage))
                 outfit_collection.update_one(
                     {'_id': ObjectId(object_id)},
                     {'$set': {'collage':newCollage}},
