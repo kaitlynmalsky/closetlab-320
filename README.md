@@ -13,6 +13,7 @@ To run the source distribution, install the source code and then navigate to the
 
 ```
 cd ClosetLab
+npm install
 npx expo start
 ```
 
@@ -46,3 +47,12 @@ The outfit list allows you to organize your clothing items into outfits, ready t
 ### Calendar
 
 The calendar feature allows you to plan your outfit for a specified date in the future. To assign one of your outfits to a day, choose a day on the calendar, navigate through your outfit list, and select an assignment.
+
+
+#Running backend locally:
+
+cd ClosetLab/Backend/
+pip install flask flask-cors pymongo rembg boto3 pillow
+python app.py , or gunicorn --worker 3 --bind 0.0.0.0:5000 
+
+Keep in mind that since we use aws s3 buckets for image storage, you need to create your own s3 bucket to be used and an user on IAM page in aws.
