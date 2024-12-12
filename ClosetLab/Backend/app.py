@@ -263,14 +263,14 @@ def add_outfit():
         data = request.json
         if not data:
             return jsonify({'error': 'No data provided'}), 400
-        print("a")
         name = data.get('name', 'Unnamed Outfit')
         user_id = data.get('user_id', dummy_user_id)
         items = data.get('items', [])
         clothing_item_collection = closet_lab_database["clothing_items"]
         itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in items]
         newCollage = createCollage(itemInfoList)
-        collage_s3 = upload_base64_to_s3(newCollage,f"{user_id}_collage_{name}")
+        collage_s3 = upload_base64_to_s3(newCollage,f"{user_id}_collage_{name.replace(' ','_')}")
+        print(collage_s3)
         outfit_id = db_add_outfit(
             user_id=user_id,
             name=name,
