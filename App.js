@@ -13,7 +13,6 @@ import { SafeAreaView } from 'react-native-web';
 import { postItem } from './APIContainer.js';
 import { CalendarView } from './Calendar.js';
 import LandingPage from './LandingPage';
-import Notification from './Notification.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -83,13 +82,6 @@ export default function App() {
         <Stack.Screen
           name={'Calendar'}
           component={CalendarView}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name={'Notification'}
-          component={Notification}
           options={{
             headerShown: false,
           }}
