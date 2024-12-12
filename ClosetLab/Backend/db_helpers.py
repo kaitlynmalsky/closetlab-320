@@ -222,7 +222,6 @@ def db_get_outfit(object_id: str):
         outfit_collection = closet_lab_database["outfits"]
         document = outfit_collection.find_one({"_id": ObjectId(object_id)})
         clothing_item_collection = closet_lab_database["clothing_items"]
-        print("a")
         if document:
             document['_id'] = str(document['_id'])
             document['user_id'] = str(document.get('user_id', ''))

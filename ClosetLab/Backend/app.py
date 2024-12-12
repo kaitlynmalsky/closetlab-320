@@ -270,7 +270,7 @@ def add_outfit():
         itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in items]
         newCollage = createCollage(itemInfoList)
         collage_s3 = upload_base64_to_s3(newCollage,f"{user_id}_collage_{name.replace(' ','_')}")
-        print(collage_s3)
+        # print(collage_s3)
         outfit_id = db_add_outfit(
             user_id=user_id,
             name=name,
