@@ -12,6 +12,8 @@ import axios from 'axios';
 import { SafeAreaView } from 'react-native-web';
 import { postItem } from './APIContainer.js';
 import { CalendarView } from './Calendar.js';
+import LandingPage from './LandingPage';
+import Notification from './Notification.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,35 +23,6 @@ Stack.Navigator is a registry of all tabs that exist.
 
 Maybe we should generalize a function for creating tabs?
 */
-//const cp = require('child_process');
-
-// Run a Python script and return output
-//function runPythonScript(scriptPath, args) {
-//
-//  // Use child_process.spawn method from 
-//  // child_process module and assign it to variable
-//  const pyProg = cp.spawn('python', [scriptPath].concat(args));
-//
-//  // Collect data from script and print to console
-//  let data = '';
-//  pyProg.stdout.on('data', (stdout) => {
-//    data += stdout.toString();
-//  });
-//
-//  // Print errors to console, if any
-//  pyProg.stderr.on('data', (stderr) => {
-//    console.log(`stderr: ${stderr}`);
-//  });
-//
-//  // When script is finished, print collected data
-//  pyProg.on('close', (code) => {
-//    console.log(`child process exited with code ${code}`);
-//    console.log(data);
-//  });
-//}
-
-// Run the Python file
-
 
 export default function App() {
 
@@ -58,6 +31,13 @@ export default function App() {
 
       <Stack.Navigator>
 
+        <Stack.Screen
+          name={'Landing'}
+          component={LandingPage}
+          options={{
+            headerShown: false,
+          }}
+        />
         <Stack.Screen
           name={'Home'}
           component={Home}
@@ -103,6 +83,13 @@ export default function App() {
         <Stack.Screen
           name={'Calendar'}
           component={CalendarView}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name={'Notification'}
+          component={Notification}
           options={{
             headerShown: false,
           }}
