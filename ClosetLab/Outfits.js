@@ -239,7 +239,7 @@ export const addOutfit = (visibleVar, setVisibleVar, navigation, setSecondaryUpd
                 <Pressable
                     style={styles.button}
                     onPress={onAddItem}>
-                    <Text style={styles.button_text}>Create new Item</Text>
+                    <Text style={styles.button_text}>Create new outfit</Text>
                 </Pressable>
                 <Pressable
                     style={styles.button}
