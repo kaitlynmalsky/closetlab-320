@@ -111,7 +111,7 @@ export const addOutfitToCalendar = (visibleVar, setVisibleVar, navigation, outfi
                     date: date
                 })
             }
-            response = await fetch(base_url + 'v1/add-outfit-to-day', options);
+            response = await fetch(base_url + 'v1/add-day', options);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }

@@ -42,30 +42,6 @@ s3_client = boto3.client(
     region_name=S3_REGION
 )
 
-# Function to upload file to S3
-def upload_to_s3(file, filename, folder='images/'):
-    key = f"{folder}{filename}"
-    s3_client.upload_fileobj(
-        file,
-        S3_BUCKET,
-        key,
-        ExtraArgs={'ACL': 'public-read', 'ContentType': file.content_type}
-    )
-    print("uploading to s3 bucket")
-    url = f"https://{S3_BUCKET}.s3.{S3_REGION}.amazonaws.com/{key}"
-    print(url)
-    if file:
-        return url
-    return " "
-try:
-    client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
-except Exception as e:
-    print("MongoDB Connection Failed")
-    print(e)
-
-
-
 print(client.list_database_names())
 closet_lab_database = client["closet_lab_db"]
 print("For reference, the names of the collections in the database are: " + str(closet_lab_database.list_collection_names()))
@@ -87,10 +63,11 @@ def upload_base64_to_s3(base64_image, file_name, bucket_name ="closetlab"):
         str: The URL of the uploaded image.
     """
     # Decode the Base64 string into binary data
+
     base64_data = base64.b64decode(base64_image.split(',')[1])
-    
     # Upload the image to S3
     try:
+
         s3_client.put_object(
             Bucket=bucket_name,
             Key=file_name,
@@ -125,12 +102,13 @@ def add_clothing_item():
             return jsonify({'error': 'No data provided'}), 400
 
         image = data.get('image_link')
+        # print(image)
         if not image:
             return jsonify({'error': 'Image data is required'}), 400
 
         name = data.get('name', '')
-        image_link = upload_to_s3(image,name)
-        image = image_link
+        image_link = "https://closetlab.s3.us-east-2.amazonaws.com/icon_cam.png"
+        image = "https://closetlab.s3.us-east-2.amazonaws.com/icon_cam.png"
         user_id = data.get('user_id', dummy_user_id)
         brand_tags = data.get('brand_tags', [])
         color_tags = data.get('color_tags', [])
@@ -153,6 +131,7 @@ def add_clothing_item():
         return jsonify({'message': 'Clothing item added successfully', 'id': item_id}), 201
 
     except Exception as e:
+        print(e)
         return jsonify({'error': str(e)}), 500
 
 # POST route to add a day to the user's calendar
@@ -218,7 +197,6 @@ def remove_clothing_item_tags(item_id):
 @app.route('/api/v1/clothing-items/set-image-link/<string:item_id>/', methods=['POST'])
 def update_image_link_item(item_id):
     try:
-        print("a")
         data = request.json
         if not data:
             return jsonify({'error': 'No data provided'}), 400
@@ -285,19 +263,19 @@ def add_outfit():
         data = request.json
         if not data:
             return jsonify({'error': 'No data provided'}), 400
-
+        print("a")
         name = data.get('name', 'Unnamed Outfit')
         user_id = data.get('user_id', dummy_user_id)
         items = data.get('items', [])
         clothing_item_collection = closet_lab_database["clothing_items"]
         itemInfoList = [clothing_item_collection.find_one({"_id": ObjectId(item)}) for item in items]
         newCollage = createCollage(itemInfoList)
-
+        collage_s3 = upload_base64_to_s3(newCollage,f"{user_id}_collage_{name}")
         outfit_id = db_add_outfit(
             user_id=user_id,
             name=name,
             items=items,
-            collage=newCollage
+            collage=collage_s3
         )
 
         return jsonify({'message': 'Outfit added successfully', 'id': outfit_id}), 201
@@ -462,4 +440,4 @@ def get_detailed_calendar(user_id):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8100)
+    app.run(host='0.0.0.0', port=8100,debug=True)
